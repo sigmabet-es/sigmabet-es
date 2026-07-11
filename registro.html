@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registro público | SigmaBet</title>
+    <meta name="description" content="Historial público de picks de SigmaBet: cuota, stake, resultado, unidades, balance y ROI." />
+    <link rel="icon" href="assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260709-05" />
+    <script src="assets/js/main.js?v=20260709-05" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html"><img src="assets/img/logo.svg?v=20260709-05" alt="" /><span>SigmaBet</span></a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Menú principal" data-nav>
+        <a href="index.html">Inicio</a><a href="registro.html" aria-current="page">Registro</a><a href="senal-sigma.html" data-signal-sheet-url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=1487545286&amp;single=true&amp;output=csv" data-dedicated-sheet="true">Señal Sigma</a><a href="normas.html">Normas</a><a href="juego-responsable.html">Juego responsable</a>
+      </nav>
+      <a class="button button-small" href="https://x.com/Sigma_Bet_" target="_blank" rel="noreferrer">Seguir en X</a>
+    </header>
+    <main>
+      <section class="registry-shell registry-only" aria-labelledby="registro-title">
+        <div
+          class="registry-board"
+          data-registry
+          data-sheet-url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=544576635&amp;single=true&amp;output=csv"
+          data-refresh-ms="60000"
+        >
+          <div class="registry-head">
+            <div>
+              <p class="kicker">Registro SigmaBet</p>
+              <h1 id="registro-title">Registro público</h1>
+              <p>Historial conectado a Google Sheets. Sin picks borrados, sin maquillar resultados.</p>
+            </div>
+          </div>
+
+          <div class="registry-toolbar" aria-label="Filtros del registro">
+            <label>
+              <span>Tiempo</span>
+              <select aria-label="Filtrar por tiempo" data-filter="time">
+                <option value="Todos">Histórico</option>
+                <option value="7d">Última semana</option>
+                <option value="30d">Último mes</option>
+                <option value="90d">Últimos 3 meses</option>
+                <option value="365d">Último año</option>
+                <option value="custom">Personalizado</option>
+              </select>
+            </label>
+            <div class="registry-custom-range" data-custom-range hidden>
+              <label>
+                <span>Desde</span>
+                <input type="date" aria-label="Fecha desde" data-filter="from" />
+              </label>
+              <label>
+                <span>Hasta</span>
+                <input type="date" aria-label="Fecha hasta" data-filter="to" />
+              </label>
+            </div>
+          </div>
+
+          <section class="registry-overview" aria-label="Estadísticas del registro">
+            <div class="registry-stat-grid">
+              <article><span>Tips</span><strong data-summary="total">0</strong></article>
+              <article><span>Acierto</span><strong data-summary="hit">0.00%</strong></article>
+              <article><span>Yield</span><strong data-summary="yield">0.00%</strong></article>
+              <article><span>Cuota media</span><strong data-summary="avgOdd">0.00</strong></article>
+              <article><span>Beneficio</span><strong data-summary="balance">0.00 u</strong></article>
+              <article><span>Stake medio</span><strong data-summary="avgStake">0.00 u</strong></article>
+            </div>
+            <div class="registry-chart-card">
+              <div class="registry-chart-head">
+                <div>
+                  <h2>Evolución</h2>
+                  <p>Balance de unidades según los filtros activos.</p>
+                </div>
+                <span>Actualizado <b data-summary="updated">--</b></span>
+              </div>
+              <div class="chart-frame registry-chart" data-registry-chart aria-label="Gráfica de rendimiento del registro">
+                <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
+                  <path class="chart-grid-line" d="M24 56 H616"></path>
+                  <path class="chart-grid-line" d="M24 120 H616"></path>
+                  <path class="chart-grid-line" d="M24 184 H616"></path>
+                  <path class="chart-zero-line" d="M28 184 H612"></path>
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <p class="registry-status" data-registry-status>Conectando con Google Sheets...</p>
+
+          <div class="registry-history-head">
+            <div>
+              <h2>Histórico de apuestas</h2>
+              <p>Todos los picks registrados según los filtros activos.</p>
+            </div>
+            <span data-registry-count>0 picks</span>
+          </div>
+
+          <section class="registry-ledger" aria-label="Histórico de apuestas" data-registry-rows>
+            <div class="registry-ledger-empty">No se borran pérdidas. No se ocultan rachas malas. No se maquilla el histórico.</div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div><a class="brand footer-brand" href="index.html"><img src="assets/img/logo.svg?v=20260709-05" alt="" /><span>SigmaBet</span></a><p>Más datos. Menos fe.</p><p>+18 | Juego responsable. No hay apuestas seguras. Las apuestas implican riesgo.</p></div>
+      <nav aria-label="Footer"><a href="https://x.com/Sigma_Bet_" target="_blank" rel="noreferrer">X: @Sigma_Bet_</a><a href="mailto:contacto@sigmabet.es">contacto@sigmabet.es</a><a href="legal.html">Legal</a><a href="privacidad.html">Privacidad</a><a href="juego-responsable.html">Juego responsable</a></nav>
+      <p class="copyright">SigmaBet © 2026</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+npm-debug.log*
+backups/
+tmp/
+src/
+public/
+/app.js
+/styles.css
+/astro.config.mjs
+/package.json
+/package-lock.json
+/tsconfig.json
+assets/hero-*.png
+assets/favicon.svg

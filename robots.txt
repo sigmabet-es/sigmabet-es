@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /material-grafico.html
+Allow: /
+
+Sitemap: https://sigmabet.es/sitemap.xml

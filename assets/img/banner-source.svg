@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Banner SigmaBet</title>
+  <desc id="desc">Banner SigmaBet con símbolo grande, wordmark y estética terminal.</desc>
+  <style>@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@800&amp;display=swap");</style>
+  <defs>
+    <linearGradient id="fade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#061209"/>
+      <stop offset="0.38" stop-color="#071109"/>
+      <stop offset="0.68" stop-color="#0A0A0A"/>
+      <stop offset="1" stop-color="#0A0A0A"/>
+    </linearGradient>
+    <pattern id="grid" width="76" height="76" patternUnits="userSpaceOnUse">
+      <path d="M76 0H0V76" fill="none" stroke="#00FF7F" stroke-width="1.2" opacity="0.11"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#fade)"/>
+  <rect width="1600" height="900" fill="url(#grid)"/>
+  <text x="235" y="268" fill="#00FF7F" opacity=".17" font-family="Manrope, Inter, system-ui, sans-serif" font-size="1060" font-weight="800" text-anchor="middle" dominant-baseline="central">σ</text>
+  <text x="650" y="462" fill="#F5F5F5" font-family="Manrope, Inter, system-ui, sans-serif" font-size="174" font-weight="800" letter-spacing="0">SigmaBet</text>
+  <text x="96" y="780" fill="#00FF7F" font-family="JetBrains Mono, IBM Plex Mono, ui-monospace, monospace" font-size="32" font-weight="850" letter-spacing="18">&gt; DATOS · ANÁLISIS · DISCIPLINA</text>
+</svg>

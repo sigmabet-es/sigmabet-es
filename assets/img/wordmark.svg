@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">Wordmark SigmaBet</title>
+  <desc id="desc">Wordmark limpio de SigmaBet con símbolo de marca y tipografía Manrope 800.</desc>
+  <style>@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@800&amp;display=swap");</style>
+  <rect width="1600" height="500" fill="#0A0A0A"/>
+  <text x="470" y="248" fill="#00FF7F" font-family="Manrope, Inter, system-ui, sans-serif" font-size="174" font-weight="800" text-anchor="middle" dominant-baseline="central">σ</text>
+  <text x="640" y="318" fill="#F5F5F5" font-family="Manrope, Inter, system-ui, sans-serif" font-size="136" font-weight="800" letter-spacing="0">SigmaBet</text>
+</svg>

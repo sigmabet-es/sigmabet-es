@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SigmaBet | Picks de fútbol con datos, análisis y disciplina</title>
+    <meta
+      name="description"
+      content="SigmaBet es una cuenta de picks de fútbol basada en datos, análisis, stake recomendado y registro público. Sin apuestas seguras. Sin humo. +18 Juego responsable."
+    />
+    <meta name="keywords" content="picks fútbol, tipster fútbol, análisis fútbol, stake apuestas, registro picks, Señal Sigma, SigmaBet, más datos menos fe" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:title" content="SigmaBet | Más datos. Menos fe." />
+    <meta property="og:description" content="Picks de fútbol con análisis, stake recomendado y registro público. Sin apuestas seguras. Sin humo." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/img/banner.webp" />
+    <link rel="canonical" href="https://sigmabet.es/" />
+    <link rel="icon" href="assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260709-05" />
+    <script src="assets/js/main.js?v=20260709-05" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="SigmaBet inicio">
+        <img src="assets/img/logo.svg?v=20260709-05" alt="" />
+        <span>SigmaBet</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" aria-label="Menú principal" data-nav>
+        <a href="index.html" aria-current="page">Inicio</a>
+        <a href="registro.html">Registro</a>
+        <a href="senal-sigma.html" data-signal-sheet-url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=1487545286&amp;single=true&amp;output=csv" data-dedicated-sheet="true">Señal Sigma</a>
+        <a href="normas.html">Normas</a>
+        <a href="juego-responsable.html">Juego responsable</a>
+      </nav>
+      <a class="button button-small" href="https://x.com/Sigma_Bet_" target="_blank" rel="noreferrer">Seguir en X</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="kicker">DATOS · ANÁLISIS · DISCIPLINA</p>
+          <h1>Más datos. Menos fe.</h1>
+          <p class="hero-lead">Picks de fútbol con análisis, stake recomendado y registro público.</p>
+          <p class="muted">Sin apuestas seguras. Sin humo. Sin prometer beneficios.</p>
+          <div class="button-row">
+            <a class="button" href="registro.html">Ver registro</a>
+            <a class="button button-ghost" href="https://x.com/Sigma_Bet_" target="_blank" rel="noreferrer">Seguir en X</a>
+          </div>
+        </div>
+        <aside class="hero-visual" aria-label="Resumen SigmaBet">
+          <img src="assets/img/banner-source.svg" alt="" />
+          <div class="terminal-panel">
+            <div class="terminal-bar"><span></span><span></span><span></span></div>
+            <p><strong>sigma_method</strong></p>
+            <p>lectura: fútbol</p>
+            <p>criterio: valor esperado</p>
+            <p>stake: controlado</p>
+            <p>registro: público</p>
+            <p class="terminal-ok">estado: sin humo</p>
+          </div>
+          <div class="metric-strip" aria-label="Pilares SigmaBet">
+            <span>Valor</span>
+            <span>Stake</span>
+            <span>ROI</span>
+          </div>
+        </aside>
+      </section>
+
+      <section
+        class="home-live"
+        data-home-feed
+        data-sheet-url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=544576635&amp;single=true&amp;output=csv"
+        data-refresh-ms="60000"
+      >
+        <div class="home-section-title">
+          <p class="kicker">Registro en vivo</p>
+          <h2>Apuestas pendientes y rendimiento.</h2>
+          <p>Datos sincronizados con el tracker público de SigmaBet.</p>
+        </div>
+
+        <div class="live-grid">
+          <article class="pending-panel">
+            <div class="panel-title">
+              <h3>Apuestas pendientes</h3>
+              <a href="registro.html">Ver registro</a>
+            </div>
+            <div class="pending-list" data-pending-picks>
+              <div class="pending-item">
+                <span>Actualizando</span>
+                <strong>Conectando con Google Sheets</strong>
+                <em>--</em>
+              </div>
+            </div>
+          </article>
+
+          <article class="performance-panel">
+            <div class="panel-title">
+              <div>
+                <h3>Rendimiento</h3>
+                <span data-home-status>Actualizando...</span>
+              </div>
+              <label class="range-select">
+                <span>Rango</span>
+                <select data-home-range>
+                  <option value="week">Última semana</option>
+                  <option value="month" selected>Último mes</option>
+                  <option value="quarter">Últimos 3 meses</option>
+                  <option value="year">Último año</option>
+                  <option value="custom">Personalizado</option>
+                  <option value="all">Histórico</option>
+                </select>
+              </label>
+            </div>
+            <div class="custom-range" data-home-custom-range hidden>
+              <label>
+                <span>Desde</span>
+                <input type="date" data-home-date="from" />
+              </label>
+              <label>
+                <span>Hasta</span>
+                <input type="date" data-home-date="to" />
+              </label>
+            </div>
+            <div class="performance-stats">
+              <div><span>Tips</span><strong data-home-stat="settled">0</strong></div>
+              <div><span>Acierto</span><strong data-home-stat="hit">0.00%</strong></div>
+              <div><span>Yield</span><strong data-home-stat="yield">0.00%</strong></div>
+              <div><span>Cuota media</span><strong data-home-stat="avgOdd">0.00</strong></div>
+              <div><span>Beneficio</span><strong data-home-stat="balance">0.00 u</strong></div>
+              <div><span>Stake medio</span><strong data-home-stat="avgStake">0.00 u</strong></div>
+            </div>
+            <div class="chart-frame" data-performance-chart aria-label="Gráfica de rendimiento">
+              <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
+                <path class="chart-grid-line" d="M24 56 H616"></path>
+                <path class="chart-grid-line" d="M24 120 H616"></path>
+                <path class="chart-grid-line" d="M24 184 H616"></path>
+                <path class="chart-area" d="M24 184 L616 184 L616 184 L24 184 Z"></path>
+                <path class="chart-line" d="M24 184 L616 184"></path>
+              </svg>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="signal-home"
+        data-signal-feed
+        data-sheet-url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=1487545286&amp;single=true&amp;output=csv"
+        data-dedicated-sheet="true"
+        data-refresh-ms="60000"
+      >
+        <div class="signal-home-copy">
+          <p class="kicker gold">Señal Sigma</p>
+          <h2>Mayor confianza. Misma transparencia.</h2>
+          <p data-signal-copy>Señal Sigma es una apuesta puntual a la que damos mayor confianza dentro del método. Solo aparece cuando hay una lectura diferencial y siempre queda registrada.</p>
+        </div>
+        <aside class="signal-home-status">
+          <span data-signal-badge>Escaneando</span>
+          <strong data-signal-match>Sin encuentro activo</strong>
+          <p data-signal-access-copy>Cuando haya una señal activa, podrás acceder durante un tiempo limitado. Después quedará registrada en el histórico.</p>
+          <div class="signal-home-meta">
+            <span><b data-signal-access-odd>--</b>Cuota</span>
+            <span><b data-signal-access-stake>--</b>Stake</span>
+            <span><b data-signal-countdown>--:--:--</b>Tiempo</span>
+          </div>
+          <div class="button-row">
+            <a class="button button-gold signal-access-button is-disabled" href="senal-sigma.html" aria-disabled="true" data-signal-access>Acceder</a>
+            <a class="button button-ghost" href="senal-sigma.html">Ver estado</a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="qa-home">
+        <div class="home-section-title">
+          <p class="kicker">Q&A</p>
+          <h2>Preguntas rápidas.</h2>
+        </div>
+        <div class="qa-list">
+          <details open>
+            <summary>¿Hay apuestas seguras?</summary>
+            <p>No. Cualquier apuesta puede perder. SigmaBet trabaja con lectura, datos y gestión de riesgo, no con promesas.</p>
+          </details>
+          <details>
+            <summary>¿Cuándo se publica un pick?</summary>
+            <p>Solo cuando el equipo ve una lectura con valor. Si no hay claridad, no se publica por obligación.</p>
+          </details>
+          <details>
+            <summary>¿Qué es la Señal Sigma?</summary>
+            <p>Es una lectura puntual de mayor confianza dentro del método. No está siempre disponible y no garantiza resultado.</p>
+          </details>
+          <details>
+            <summary>¿Dónde se ven los resultados?</summary>
+            <p>En el registro público, conectado al tracker de Google Sheets. Se muestran verdes, rojos, pendientes, unidades y evolución.</p>
+          </details>
+        </div>
+        <p class="responsible-note">+18 | Juego responsable. No hay apuestas seguras. Las apuestas implican riesgo.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <a class="brand footer-brand" href="index.html">
+          <img src="assets/img/logo.svg?v=20260709-05" alt="" />
+          <span>SigmaBet</span>
+        </a>
+        <p>Más datos. Menos fe.</p>
+        <p>+18 | Juego responsable. No hay apuestas seguras. Las apuestas implican riesgo.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="https://x.com/Sigma_Bet_" target="_blank" rel="noreferrer">X: @Sigma_Bet_</a>
+        <a href="mailto:contacto@sigmabet.es">contacto@sigmabet.es</a>
+        <a href="legal.html">Legal</a>
+        <a href="privacidad.html">Privacidad</a>
+        <a href="juego-responsable.html">Juego responsable</a>
+      </nav>
+      <p class="copyright">SigmaBet © 2026</p>
+    </footer>
+  </body>
+</html>
