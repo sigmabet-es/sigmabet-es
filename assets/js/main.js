@@ -1,5 +1,20 @@
 const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
+const TELEGRAM_URL = "https://t.me/SigmaBetES";
+
+document.querySelectorAll("[data-telegram-link]").forEach((link) => {
+  link.setAttribute("href", TELEGRAM_URL);
+});
+
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 10000) => {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeout);
+  }
+};
 
 if (toggle && nav) {
   toggle.addEventListener("click", () => {
@@ -8,6 +23,37 @@ if (toggle && nav) {
     nav.classList.toggle("is-open", !isOpen);
   });
 }
+
+const telegramMobileBar = (() => {
+  if (!window.matchMedia("(max-width: 760px)").matches) return null;
+  if (sessionStorage.getItem("sigmabetTelegramBarClosed") === "true") return null;
+
+  const bar = document.createElement("div");
+  bar.className = "telegram-mobile-bar";
+  bar.setAttribute("data-telegram-mobile-bar", "");
+  bar.innerHTML = `
+    <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Unirme al Telegram gratis</a>
+    <button type="button" aria-label="Cerrar Telegram">×</button>
+  `;
+  document.body.append(bar);
+
+  const show = () => {
+    if (!bar.classList.contains("is-visible")) bar.classList.add("is-visible");
+  };
+  const close = () => {
+    sessionStorage.setItem("sigmabetTelegramBarClosed", "true");
+    bar.remove();
+    window.removeEventListener("scroll", onScroll);
+  };
+  const onScroll = () => {
+    if (window.scrollY > 360) show();
+  };
+
+  bar.querySelector("button")?.addEventListener("click", close);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.setTimeout(show, 4500);
+  return bar;
+})();
 
 const signalFeed = document.querySelector("[data-signal-feed]");
 const signalNavLink = document.querySelector('.site-nav a[href="senal-sigma.html"]');
@@ -39,6 +85,7 @@ if (signalNavLink || signalFeed) {
     accessDate: signalFeed?.querySelector("[data-signal-access-date]"),
     accessOdd: signalFeed?.querySelector("[data-signal-access-odd]"),
     accessStake: signalFeed?.querySelector("[data-signal-access-stake]"),
+    accessPrice: signalFeed?.querySelector("[data-signal-access-price]"),
     countdown: signalFeed?.querySelector("[data-signal-countdown]"),
     countdownCard: signalFeed?.querySelector("[data-signal-countdown-card]"),
     countdownCopy: signalFeed?.querySelector("[data-signal-countdown-copy]"),
@@ -129,6 +176,7 @@ if (signalNavLink || signalFeed) {
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades", "uds", "beneficio", "lucro"],
     tipo: ["tipo", "tipo de apuesta", "tipo de pick"],
+    price: ["precio", "importe", "coste", "precio acceso", "precio señal", "precio senal"],
     accessUrl: ["enlace acceso", "link acceso", "url acceso", "enlace de acceso", "pasarela", "pago", "link pago", "enlace pago"],
     accessUntil: [
       "disponible hasta",
@@ -190,6 +238,7 @@ if (signalNavLink || signalFeed) {
           stake: signalCell(row, headers, "stake"),
           profit: signalCell(row, headers, "profit"),
           tipo: inferredType,
+          price: signalCell(row, headers, "price"),
           accessUrl: signalCell(row, headers, "accessUrl"),
           accessUntil: signalCell(row, headers, "accessUntil"),
           isExplicitSignal: explicitSignal,
@@ -298,7 +347,7 @@ if (signalNavLink || signalFeed) {
       signalTargets.countdown.textContent = "--:--:--";
       if (signalTargets.radarCountdown) signalTargets.radarCountdown.textContent = "--:--:--";
       if (signalTargets.countdownLabel) signalTargets.countdownLabel.textContent = "Tiempo de acceso";
-      if (signalTargets.countdownCopy) signalTargets.countdownCopy.textContent = "La ventana de acceso se mostrará cuando haya una señal activa.";
+      if (signalTargets.countdownCopy) signalTargets.countdownCopy.textContent = "La ventana de compra se mostrará cuando haya una señal activa.";
       return false;
     }
 
@@ -306,11 +355,11 @@ if (signalNavLink || signalFeed) {
     const expired = remaining <= 0;
     signalTargets.countdown.textContent = signalCountdownText(remaining);
     if (signalTargets.radarCountdown) signalTargets.radarCountdown.textContent = signalCountdownText(remaining);
-    if (signalTargets.countdownLabel) signalTargets.countdownLabel.textContent = expired ? "Acceso cerrado" : "Tiempo de acceso";
+    if (signalTargets.countdownLabel) signalTargets.countdownLabel.textContent = expired ? "Compra cerrada" : "Disponible durante";
     if (signalTargets.countdownCopy) {
       signalTargets.countdownCopy.textContent = expired
-        ? "La ventana de acceso ha finalizado."
-        : "Acceso disponible durante el tiempo indicado.";
+        ? "La ventana de compra ha finalizado."
+        : "Compra disponible durante el tiempo indicado.";
     }
     signalTargets.countdownCard?.classList.toggle("is-expired", expired);
     return expired;
@@ -329,7 +378,7 @@ if (signalNavLink || signalFeed) {
     signalNavLink?.classList.toggle("signal-nav-active", hasActiveSignal);
 
     signalTargets.badges.forEach((target) => {
-      target.textContent = hasActiveSignal ? "Señal localizada" : "Escaneando";
+      target.textContent = hasActiveSignal ? "Estado: Señal Sigma activa" : "Estado: Sin Señal Sigma activa";
     });
     signalTargets.titles.forEach((target) => {
       target.textContent = hasActiveSignal ? "Señal detectada" : "Sin señal detectada";
@@ -339,8 +388,8 @@ if (signalNavLink || signalFeed) {
     }
     signalTargets.copies.forEach((target) => {
       target.textContent = hasActiveSignal
-        ? "Señal Sigma es una apuesta a la que damos mayor confianza dentro de nuestro método. Está activa por tiempo limitado y quedará registrada al cierre."
-        : "Señal Sigma solo aparece cuando encontramos una lectura por encima del filtro habitual. Si no hay valor suficiente, no se publica.";
+        ? "Señal Sigma es una apuesta puntual que supera nuestro filtro habitual de análisis y confianza. No es apuesta segura y quedará registrada al cierre."
+        : "Una Señal Sigma solo aparece cuando el análisis supera nuestro filtro habitual. Si no hay valor suficiente, no se abre ninguna señal.";
     });
     if (signalTargets.count) {
       const closedRows = signalRows.filter(signalIsClosed);
@@ -374,20 +423,29 @@ if (signalNavLink || signalFeed) {
         : "Pendiente";
     }
     if (signalTargets.accessTitle) {
-      signalTargets.accessTitle.textContent = accessAvailable ? "Acceso abierto" : hasActiveSignal ? "Acceso en breve" : "Acceso no abierto";
+      signalTargets.accessTitle.textContent = accessAvailable ? "Compra abierta" : hasActiveSignal ? "Compra no disponible" : "Sin Señal Sigma activa";
     }
     if (signalTargets.accessCopy) {
       signalTargets.accessCopy.textContent = hasActiveSignal
-        ? "Acceso puntual a una lectura de mayor confianza, siempre con riesgo real y gestión de stake."
-        : "Cuando no haya una Señal Sigma activa, no habrá acceso disponible. Si no hay valor suficiente, no se publica.";
+        ? "Compra puntual de una lectura de mayor confianza. Tras el pago, se entrega acceso al canal privado de esta señal concreta."
+        : "No abrimos una señal si no encontramos valor suficiente.";
     }
     if (signalTargets.accessDate) signalTargets.accessDate.textContent = hasActiveSignal ? signalText(activeSignal.fecha) : "--";
     if (signalTargets.accessOdd) signalTargets.accessOdd.textContent = hasActiveSignal ? signalText(activeSignal.cuota) : "--";
     if (signalTargets.accessStake) signalTargets.accessStake.textContent = hasActiveSignal ? signalText(activeSignal.stake) : "--";
+    if (signalTargets.accessPrice) signalTargets.accessPrice.textContent = hasActiveSignal ? signalText(activeSignal.price, "No publicado") : "--";
     signalTargets.accessLinks.forEach((target) => {
-      target.classList.toggle("is-disabled", !accessAvailable);
-      target.setAttribute("aria-disabled", String(!accessAvailable));
-      target.setAttribute("href", accessAvailable ? accessUrl : "#");
+      const href = accessAvailable ? accessUrl : TELEGRAM_URL;
+      target.classList.toggle("is-disabled", hasActiveSignal && !accessAvailable);
+      target.setAttribute("aria-disabled", String(hasActiveSignal && !accessAvailable));
+      target.setAttribute("href", href);
+      target.setAttribute("target", "_blank");
+      target.setAttribute("rel", "noreferrer");
+      target.textContent = accessAvailable
+        ? "Comprar acceso"
+        : hasActiveSignal
+          ? "Compra no disponible"
+          : "Recibir avisos en Telegram";
     });
   };
 
@@ -447,7 +505,7 @@ if (signalNavLink || signalFeed) {
 
     try {
       const separator = signalSheetUrl.includes("?") ? "&" : "?";
-      const response = await fetch(`${signalSheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+      const response = await fetchWithTimeout(`${signalSheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
       const signalRows = signalRowsFromCsv(await response.text());
       renderSignalState(signalRows);
@@ -1014,7 +1072,7 @@ if (registry) {
     try {
       updateStatus("Actualizando registro desde Google Sheets...");
       const separator = sheetUrl.includes("?") ? "&" : "?";
-      const response = await fetch(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+      const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
       const csvText = await response.text();
       registryRows = parseRegistryRows(csvText);
@@ -1381,7 +1439,7 @@ if (homeFeed) {
     try {
       if (statusTarget) statusTarget.textContent = "Actualizando";
       const separator = sheetUrl.includes("?") ? "&" : "?";
-      const response = await fetch(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+      const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
       homeRows = parseHomeRows(await response.text());
       renderHomeFeed();
@@ -1803,7 +1861,7 @@ if (shareRangeTool) {
   const loadShareRows = async () => {
     if (!sheetUrl) return;
     const separator = sheetUrl.includes("?") ? "&" : "?";
-    const response = await fetch(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+    const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
     const csvRows = parseRangeCsv(await response.text());
     const headerIndex = csvRows.findIndex((row) =>

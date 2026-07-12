@@ -173,6 +173,39 @@ main {
   animation-delay: 0.9s;
 }
 
+.nav-telegram {
+  display: none;
+}
+
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.header-x-link {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(245, 245, 245, 0.08);
+  border-radius: var(--radius);
+  color: #8f8f8f;
+  font-size: 13px;
+  font-weight: 850;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.header-x-link:hover {
+  border-color: rgba(245, 245, 245, 0.18);
+  background: rgba(245, 245, 245, 0.045);
+  color: var(--text);
+}
+
 @keyframes signalNavPulse {
   0%,
   100% {
@@ -255,6 +288,56 @@ main {
 
 .button-ghost:hover {
   border-color: rgba(245, 245, 245, 0.18);
+}
+
+.telegram-mobile-bar {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(0, 255, 127, 0.24);
+  border-radius: 12px;
+  background: rgba(9, 9, 9, 0.92);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.38);
+  padding: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(24px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  backdrop-filter: blur(18px);
+}
+
+.telegram-mobile-bar.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.telegram-mobile-bar a,
+.telegram-mobile-bar button {
+  min-height: 42px;
+  border-radius: var(--radius);
+  font-weight: 850;
+}
+
+.telegram-mobile-bar a {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #43ffa1 0%, var(--green) 100%);
+  color: #06130c;
+}
+
+.telegram-mobile-bar button {
+  border: 1px solid rgba(245, 245, 245, 0.1);
+  background: rgba(245, 245, 245, 0.04);
+  color: var(--text);
 }
 
 .button-gold {
@@ -435,6 +518,82 @@ main {
 
 .metric-strip span:last-child {
   border-right: 0;
+}
+
+.telegram-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1fr);
+  gap: clamp(24px, 4vw, 54px);
+  align-items: stretch;
+  width: min(var(--max), calc(100% - 32px));
+  margin: -22px auto 82px;
+}
+
+.telegram-copy,
+.telegram-panel {
+  border: 1px solid rgba(0, 255, 127, 0.14);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.026), transparent),
+    rgba(13, 13, 13, 0.92);
+}
+
+.telegram-copy {
+  display: grid;
+  align-content: center;
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.telegram-copy h2 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(32px, 4vw, 58px);
+  line-height: 1;
+}
+
+.telegram-copy p:not(.kicker),
+.telegram-panel p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.telegram-panel {
+  display: grid;
+  gap: 22px;
+  padding: clamp(26px, 3.4vw, 44px);
+}
+
+.telegram-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.telegram-list li {
+  position: relative;
+  color: var(--text);
+  font-weight: 760;
+  padding-left: 24px;
+}
+
+.telegram-list li::before {
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  content: "✓";
+}
+
+.telegram-panel strong {
+  color: var(--green);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .section,
@@ -1245,7 +1404,10 @@ main[data-signal-feed] {
 .signal-access-card,
 .signal-buy-card,
 .signal-workflow,
-.signal-history {
+.signal-history,
+.signal-private-panel article,
+.signal-comparison,
+.signal-faq {
   border: 1px solid rgba(215, 179, 84, 0.16);
   border-radius: var(--radius);
   background:
@@ -1308,7 +1470,7 @@ main[data-signal-feed] {
 
 .signal-access-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-top: auto;
 }
@@ -1442,9 +1604,114 @@ main[data-signal-feed] {
     0 24px 80px rgba(215, 179, 84, 0.045);
 }
 
+.signal-private-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.signal-private-panel article {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.signal-private-panel h3 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.04;
+}
+
+.signal-private-panel p:not(.kicker) {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.44;
+}
+
+.signal-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.signal-comparison div {
+  display: grid;
+  gap: 10px;
+  border-right: 1px solid rgba(245, 245, 245, 0.075);
+  padding: clamp(22px, 2.6vw, 34px);
+}
+
+.signal-comparison div:last-child {
+  border-right: 0;
+}
+
+.signal-comparison span {
+  color: var(--gold);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signal-comparison strong {
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.signal-comparison p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.signal-faq {
+  display: grid;
+  gap: 0;
+  margin: 16px 0 20px;
+  overflow: hidden;
+}
+
+.signal-faq details {
+  border-bottom: 1px solid rgba(245, 245, 245, 0.075);
+  padding: 0;
+}
+
+.signal-faq details:last-child {
+  border-bottom: 0;
+}
+
+.signal-faq summary {
+  cursor: pointer;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 850;
+  list-style: none;
+  padding: 22px 26px;
+}
+
+.signal-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.signal-faq p {
+  max-width: 900px;
+  margin: 0;
+  color: var(--muted);
+  padding: 0 26px 24px;
+}
+
 .signal-workflow {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   margin: 16px 0 20px;
   overflow: hidden;
 }
@@ -4328,8 +4595,16 @@ td {
     grid-template-columns: auto auto 1fr;
   }
 
-  .site-header > .button {
+  .site-header > .header-actions {
     justify-self: end;
+  }
+
+  .header-x-link {
+    display: none;
+  }
+
+  .nav-telegram {
+    display: block;
   }
 
   .nav-toggle {
@@ -4359,6 +4634,7 @@ td {
   }
 
   .hero,
+  .telegram-section,
   .split,
   .split.reverse,
   .section-head,
@@ -4375,6 +4651,8 @@ td {
   .signal-strip,
   .signal-layout,
   .signal-explain-grid,
+  .signal-private-panel,
+  .signal-comparison,
   .signal-bottom,
   .intro-grid,
   .premium-detail,
@@ -4413,8 +4691,22 @@ td {
 
   .signal-live-head,
   .signal-access-grid,
+  .signal-access-meta,
   .signal-workflow {
     grid-template-columns: 1fr;
+  }
+
+  .telegram-list {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-comparison div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(245, 245, 245, 0.075);
+  }
+
+  .signal-comparison div:last-child {
+    border-bottom: 0;
   }
 
   .signal-context-countdown {
@@ -5216,6 +5508,7 @@ td {
   .site-header,
   .site-footer,
   .hero,
+  .telegram-section,
   .section,
   .home-section,
   .sigma-board,
@@ -5239,7 +5532,7 @@ td {
     font-size: 15px;
   }
 
-  .site-header > .button {
+  .site-header > .header-actions {
     display: none;
   }
 
