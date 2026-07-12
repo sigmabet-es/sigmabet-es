@@ -38,20 +38,28 @@ const telegramMobileBar = (() => {
   document.body.append(bar);
 
   const show = () => {
-    if (!bar.classList.contains("is-visible")) bar.classList.add("is-visible");
+    if (!bar.classList.contains("is-visible")) {
+      bar.classList.add("is-visible");
+      document.body.classList.add("has-telegram-mobile-bar");
+    }
   };
   const close = () => {
     sessionStorage.setItem("sigmabetTelegramBarClosed", "true");
+    document.body.classList.remove("has-telegram-mobile-bar");
     bar.remove();
     window.removeEventListener("scroll", onScroll);
   };
+  let canShow = false;
   const onScroll = () => {
-    if (window.scrollY > 360) show();
+    if (canShow && window.scrollY > 640) show();
   };
 
   bar.querySelector("button")?.addEventListener("click", close);
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.setTimeout(show, 4500);
+  window.setTimeout(() => {
+    canShow = true;
+    if (window.scrollY > 640) show();
+  }, 7000);
   return bar;
 })();
 

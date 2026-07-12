@@ -6281,3 +6281,1358 @@ body:not(.has-active-signal) .signal-access-grid {
     justify-content: space-between;
   }
 }
+
+/* Responsive polish */
+.button-gold:hover,
+.button-gold:focus-visible {
+  border-color: rgba(215, 179, 84, 0.78);
+  background: linear-gradient(180deg, #ebcc78 0%, var(--gold) 100%);
+  box-shadow: 0 12px 34px rgba(215, 179, 84, 0.16);
+}
+
+.radar-access-button:hover,
+.radar-access-button:focus-visible {
+  border-color: rgba(215, 179, 84, 0.78);
+  background: linear-gradient(180deg, #ebcc78 0%, var(--gold) 100%);
+}
+
+@media (max-width: 920px) {
+  body {
+    font-size: 15px;
+  }
+
+  .site-header {
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    width: min(100% - 24px, var(--wide));
+    padding: 9px;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brand img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .nav-toggle {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .site-header > .header-actions {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin-right: 50px;
+  }
+
+  .site-nav {
+    top: calc(100% + 8px);
+    border-color: rgba(245, 245, 245, 0.1);
+    border-radius: 12px;
+    background: rgba(9, 9, 9, 0.98);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+    padding: 8px;
+  }
+
+  .site-nav a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 13px;
+  }
+
+  .site-nav .nav-telegram {
+    border-color: rgba(0, 255, 127, 0.22);
+    background: rgba(0, 255, 127, 0.08);
+    color: var(--green);
+  }
+
+  .hero,
+  .signal-hero {
+    min-height: auto;
+    gap: 34px;
+    padding: 64px 0 58px;
+  }
+
+  .hero h1,
+  .signal-hero h1 {
+    font-size: clamp(48px, 12vw, 82px);
+  }
+
+  .hero-lead,
+  .signal-hero p:not(.kicker) {
+    max-width: 760px;
+    font-size: clamp(19px, 4vw, 24px);
+  }
+
+  .telegram-section {
+    margin: 0 auto 62px;
+  }
+
+  .home-live {
+    padding: 24px 0 64px;
+  }
+
+  .home-section-title {
+    justify-items: start;
+    max-width: none;
+    text-align: left;
+  }
+
+  .live-grid {
+    gap: 14px;
+  }
+
+  .pending-panel,
+  .performance-panel {
+    min-height: auto;
+  }
+
+  .signal-home {
+    gap: 22px;
+    padding: 26px;
+  }
+
+  .signal-radar-panel {
+    right: calc(50% - 146vw);
+    width: 190vw;
+    opacity: 0.38;
+  }
+
+  .has-active-signal .radar-callout {
+    transform: translate(calc(-100% - 2px), -50%);
+  }
+
+  .signal-live {
+    padding: 28px 0 72px;
+  }
+
+  .signal-private-panel,
+  .signal-comparison,
+  .signal-data-grid {
+    gap: 12px;
+  }
+
+  .registry-only {
+    width: min(100% - 24px, 1500px);
+    margin-left: auto;
+    transform: none;
+  }
+
+  .registry-ledger-item summary {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    display: flex;
+    align-items: center;
+  }
+
+  .site-header > .header-actions {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: grid;
+    margin-left: auto;
+  }
+
+  .button-row {
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .button-row .button,
+  .button-row .radar-access-button {
+    width: 100%;
+  }
+
+  .hero,
+  .telegram-section,
+  .home-live,
+  .signal-home,
+  .qa-home,
+  .signal-live,
+  .registry-only {
+    width: min(100% - 24px, var(--wide));
+  }
+
+  .hero {
+    padding-top: 52px;
+  }
+
+  .hero-content {
+    min-width: 0;
+  }
+
+  .hero h1 {
+    max-width: 9ch;
+    font-size: clamp(48px, 17vw, 76px);
+  }
+
+  .hero-lead {
+    margin-top: 22px;
+    font-size: 20px;
+  }
+
+  .hero .muted {
+    font-size: 15px;
+  }
+
+  .hero-visual {
+    border-radius: 12px;
+  }
+
+  .hero-visual img {
+    aspect-ratio: 3 / 1;
+    object-fit: contain;
+    object-position: center;
+    background: #050706;
+  }
+
+  .terminal-panel {
+    padding: 18px 18px 12px;
+    font-size: 13px;
+  }
+
+  .metric-strip span {
+    min-height: 48px;
+    font-size: 11px;
+  }
+
+  .telegram-copy,
+  .telegram-panel {
+    padding: 22px;
+  }
+
+  .telegram-copy h2,
+  .home-section-title h2,
+  .signal-home h2,
+  .qa-home h2 {
+    font-size: clamp(32px, 10vw, 44px);
+  }
+
+  .telegram-copy p:not(.kicker),
+  .telegram-panel p,
+  .signal-home p {
+    font-size: 16px;
+  }
+
+  .telegram-list {
+    gap: 10px;
+  }
+
+  .home-section-title {
+    margin-bottom: 22px;
+  }
+
+  .panel-title {
+    display: grid;
+    gap: 14px;
+  }
+
+  .range-select {
+    width: 100%;
+  }
+
+  .pending-item summary {
+    padding: 16px;
+  }
+
+  .pending-summary-top,
+  .pending-data {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .pending-data {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pending-data span {
+    display: grid;
+    gap: 3px;
+  }
+
+  .pending-data span:last-child {
+    text-align: right;
+  }
+
+  .performance-stats,
+  .registry-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .performance-stats div,
+  .registry-stat-grid article {
+    min-height: 78px;
+    padding: 10px;
+  }
+
+  .performance-stats strong,
+  .registry-stat-grid strong {
+    font-size: clamp(18px, 6vw, 24px);
+  }
+
+  .chart-frame {
+    min-height: 220px;
+    padding: 10px 42px 10px 8px;
+  }
+
+  .chart-frame svg {
+    min-height: 200px;
+  }
+
+  .signal-home aside {
+    width: 100%;
+  }
+
+  .signal-home-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .signal-home .button-row {
+    margin-top: 10px;
+  }
+
+  .qa-list summary {
+    padding: 20px;
+  }
+
+  .signal-hero {
+    min-height: auto;
+    padding: 52px 0 66px;
+  }
+
+  .signal-hero h1 {
+    max-width: 9ch;
+    font-size: clamp(44px, 15vw, 68px);
+  }
+
+  .signal-radar-panel {
+    top: 54%;
+    right: calc(50% - 172vw);
+    width: 230vw;
+    opacity: 0.26;
+  }
+
+  .radar-callout-card {
+    min-width: 238px;
+    max-width: 280px;
+    padding: 13px;
+  }
+
+  .has-active-signal .radar-callout {
+    opacity: 0.95;
+    transform: translate(calc(-100% + 42px), -50%);
+  }
+
+  .radar-callout-line {
+    width: 44px;
+  }
+
+  .radar-access-button {
+    width: max-content;
+  }
+
+  .signal-live-head {
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .signal-live-head h2 {
+    font-size: clamp(32px, 10vw, 46px);
+    overflow-wrap: anywhere;
+  }
+
+  .signal-live-head p:not(.kicker),
+  .signal-private-panel p:not(.kicker),
+  .signal-access-card p,
+  .signal-workflow p,
+  .signal-faq p {
+    font-size: 16px;
+  }
+
+  .signal-access-card,
+  .signal-private-panel article,
+  .signal-comparison div,
+  .signal-performance,
+  .signal-workflow article {
+    padding: 20px;
+  }
+
+  .signal-context-countdown {
+    margin: 0;
+    padding: 16px;
+  }
+
+  .signal-context-countdown strong {
+    justify-self: start;
+    font-size: clamp(34px, 12vw, 48px);
+  }
+
+  .signal-match {
+    font-size: clamp(34px, 12vw, 52px);
+  }
+
+  .signal-access-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .signal-access-meta span {
+    padding: 12px;
+  }
+
+  .signal-performance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .registry-board {
+    padding: 16px;
+  }
+
+  .registry-only .registry-board {
+    padding: 14px;
+  }
+
+  .registry-head h1 {
+    font-size: clamp(34px, 11vw, 48px);
+  }
+
+  .registry-toolbar {
+    margin-top: 22px;
+  }
+
+  .registry-history-head {
+    display: grid;
+    gap: 12px;
+  }
+
+  .registry-ledger {
+    gap: 10px;
+  }
+
+  .registry-ledger-item summary {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .registry-ledger-content {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .registry-ledger .registry-event {
+    font-size: 19px;
+  }
+
+  .registry-ledger-meta {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .registry-ledger-meta span {
+    min-height: 48px;
+    min-width: 0;
+    padding: 9px 10px;
+  }
+
+  .registry-ledger-result {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto auto 38px;
+    justify-content: space-between;
+  }
+
+  .registry-ledger-expanded {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-header {
+    width: calc(100% - 18px);
+    top: 8px;
+    min-height: 62px;
+  }
+
+  .brand span {
+    font-size: 16px;
+  }
+
+  .site-header > .header-actions {
+    display: none;
+  }
+
+  .hero,
+  .telegram-section,
+  .home-live,
+  .signal-home,
+  .qa-home,
+  .signal-live,
+  .registry-only,
+  .site-footer {
+    width: calc(100% - 18px);
+  }
+
+  .hero h1,
+  .signal-hero h1 {
+    font-size: clamp(43px, 16vw, 62px);
+  }
+
+  .button {
+    min-height: 46px;
+    padding-inline: 14px;
+  }
+
+  .telegram-copy,
+  .telegram-panel,
+  .pending-panel,
+  .performance-panel,
+  .signal-home,
+  .registry-board {
+    padding: 16px;
+  }
+
+  .performance-stats {
+    gap: 7px;
+  }
+
+  .registry-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .performance-stats div {
+    min-height: 72px;
+    padding: 9px;
+  }
+
+  .registry-stat-grid article {
+    min-height: 78px;
+    padding: 10px;
+  }
+
+  .performance-stats span {
+    font-size: 8px;
+  }
+
+  .registry-stat-grid span {
+    font-size: 9px;
+  }
+
+  .performance-stats strong {
+    font-size: 17px;
+  }
+
+  .registry-stat-grid strong {
+    font-size: 20px;
+  }
+
+  .signal-home-meta,
+  .pending-data {
+    grid-template-columns: 1fr;
+  }
+
+  .pending-data span:last-child {
+    text-align: left;
+  }
+
+  .registry-ledger-meta,
+  .signal-performance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registry-ledger-result {
+    grid-template-columns: 1fr auto 36px;
+    gap: 8px;
+  }
+
+  .registry-ledger-result .pill {
+    justify-self: start;
+  }
+
+  .registry-ledger-result .registry-profit {
+    justify-self: end;
+  }
+
+  .registry-ledger-result .share-button,
+  .registry-ledger-result .pending-toggle {
+    justify-self: end;
+  }
+
+  .signal-access-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .radar-callout-card {
+    min-width: 220px;
+    max-width: 238px;
+  }
+}
+
+/* Final responsive guardrails */
+.button-gold:hover,
+.button-gold:focus-visible,
+.radar-access-button:hover,
+.radar-access-button:focus-visible {
+  border-color: rgba(215, 179, 84, 0.72);
+  background: linear-gradient(180deg, #e8c978 0%, var(--gold) 100%);
+  box-shadow:
+    0 12px 34px rgba(215, 179, 84, 0.16),
+    0 0 0 1px rgba(215, 179, 84, 0.08) inset;
+  color: #171104;
+}
+
+@media (max-width: 760px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  body {
+    position: relative;
+  }
+
+  .site-header {
+    position: sticky;
+    display: flex;
+    width: calc(100vw - 18px);
+    max-width: calc(100vw - 18px);
+    padding-right: 66px;
+  }
+
+  .nav-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: grid;
+    transform: translateY(-50%);
+  }
+
+  .site-nav {
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+
+  main,
+  .hero,
+  .telegram-section,
+  .home-live,
+  .signal-home,
+  .qa-home,
+  .signal-live,
+  .registry-only,
+  .page-hero,
+  .section,
+  .cta-band,
+  .narrow {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .hero,
+  .signal-hero,
+  .telegram-section,
+  .home-live,
+  .signal-home,
+  .qa-home,
+  .signal-live,
+  .registry-only,
+  .page-hero,
+  .section,
+  .cta-band,
+  .narrow {
+    width: calc(100vw - 18px);
+  }
+
+  .hero,
+  .signal-hero,
+  .live-grid,
+  .signal-live-grid,
+  .signal-access-grid,
+  .signal-private-panel,
+  .signal-comparison,
+  .signal-workflow,
+  .registry-overview,
+  .telegram-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-content,
+  .hero-visual,
+  .terminal-panel,
+  .telegram-copy,
+  .telegram-panel,
+  .home-section-title,
+  .pending-panel,
+  .performance-panel,
+  .signal-home,
+  .signal-live-head,
+  .signal-access-card,
+  .signal-private-panel article,
+  .registry-board,
+  .registry-chart-card,
+  .registry-history,
+  .registry-ledger-item,
+  .registry-ledger-item summary {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-lead,
+  .hero .muted,
+  .page-hero p,
+  .telegram-copy p,
+  .telegram-panel p,
+  .home-section-title p,
+  .signal-hero p,
+  .signal-live-head p,
+  .signal-access-card p,
+  .registry-head p,
+  .registry-chart-head p,
+  .registry-history-head p,
+  .qa-list p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+  }
+
+  .hero h1,
+  .page-hero h1,
+  .home-section-title h2,
+  .signal-hero h1,
+  .signal-live-head h2,
+  .registry-head h1,
+  .qa-home h2 {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .hero h1 {
+    max-width: 8.5ch;
+  }
+
+  .signal-hero h1 {
+    max-width: 9ch;
+  }
+
+  .hero-lead {
+    font-size: clamp(18px, 5.2vw, 20px);
+    line-height: 1.28;
+  }
+
+  .hero .muted,
+  .signal-hero p:not(.kicker) {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .hero-visual {
+    width: 100%;
+  }
+
+  .terminal-panel {
+    max-height: 176px;
+    overflow: hidden;
+  }
+
+  .signal-live-head h2 {
+    font-size: clamp(30px, 9.4vw, 42px);
+    line-height: 1.03;
+  }
+
+  .signal-live-head p:not(.kicker) {
+    font-size: 15px;
+  }
+
+  .registry-overview {
+    gap: 12px;
+  }
+
+  .registry-chart-card {
+    padding: 16px;
+  }
+
+  .registry-chart-head {
+    gap: 8px;
+  }
+
+  .chart-frame {
+    min-height: 190px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-header {
+    width: calc(100vw - 18px);
+    max-width: calc(100vw - 18px);
+  }
+
+  .brand img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .hero,
+  .signal-hero {
+    padding-top: 42px;
+  }
+
+  .signal-hero {
+    padding-bottom: 54px;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 15.2vw, 58px);
+  }
+
+  .signal-hero h1 {
+    font-size: clamp(40px, 14vw, 56px);
+  }
+
+  .telegram-copy h2,
+  .home-section-title h2,
+  .signal-home h2,
+  .qa-home h2,
+  .registry-head h1 {
+    font-size: clamp(30px, 9.4vw, 40px);
+  }
+
+  .hero-visual img {
+    aspect-ratio: 2.15 / 1;
+  }
+
+  .performance-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .performance-stats div {
+    min-height: 68px;
+  }
+
+  .registry-ledger-item summary {
+    padding: 14px;
+  }
+
+  .registry-ledger-result {
+    align-items: center;
+  }
+}
+
+/* Home page design refinement */
+.telegram-section {
+  position: relative;
+}
+
+.telegram-section::before,
+.signal-home::before,
+.performance-panel::before,
+.pending-panel::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(245, 245, 245, 0.035), transparent 42%);
+  content: "";
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.pending-panel,
+.performance-panel,
+.signal-home,
+.telegram-copy,
+.telegram-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-live {
+  position: relative;
+}
+
+.home-live::before,
+.qa-home::before {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-bottom: 64px;
+  background: linear-gradient(90deg, transparent, rgba(245, 245, 245, 0.08), transparent);
+  content: "";
+}
+
+.pending-empty {
+  min-height: 132px;
+  align-content: center;
+  border-style: dashed;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 255, 127, 0.045), transparent 15rem),
+    rgba(8, 8, 8, 0.76);
+}
+
+.pending-empty span,
+.pending-empty em {
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+body:not(.has-active-signal) .signal-home-meta {
+  display: none;
+}
+
+body:not(.has-active-signal) .signal-home-status {
+  border-color: rgba(215, 179, 84, 0.2);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(215, 179, 84, 0.09), transparent 15rem),
+    rgba(245, 245, 245, 0.025);
+}
+
+body:not(.has-active-signal) .signal-home-status > span {
+  border-color: rgba(215, 179, 84, 0.3);
+  background: rgba(215, 179, 84, 0.055);
+}
+
+.has-telegram-mobile-bar {
+  padding-bottom: 76px;
+}
+
+@media (min-width: 921px) {
+  .hero {
+    min-height: min(820px, calc(100svh - 82px));
+  }
+
+  .telegram-section {
+    grid-template-columns: minmax(0, 0.72fr) minmax(420px, 1fr);
+  }
+
+  .telegram-copy,
+  .telegram-panel,
+  .pending-panel,
+  .performance-panel,
+  .signal-home {
+    border-radius: 14px;
+  }
+
+  .signal-home {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  body::before {
+    background-size: 48px 48px;
+    opacity: 0.46;
+  }
+
+  .site-header {
+    min-height: 56px;
+    border-radius: 14px;
+    padding: 9px 62px 9px 12px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brand span {
+    font-size: 18px;
+  }
+
+  .nav-toggle {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(245, 245, 245, 0.04);
+  }
+
+  .site-nav {
+    top: calc(100% + 10px);
+    gap: 5px;
+    border-radius: 14px;
+  }
+
+  .site-nav a {
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  .hero {
+    gap: 28px;
+    padding-top: 36px;
+    padding-bottom: 42px;
+  }
+
+  .hero h1 {
+    max-width: 7.4ch;
+    font-size: clamp(52px, 15.8vw, 72px);
+    line-height: 0.94;
+  }
+
+  .hero-lead {
+    max-width: 33ch;
+    margin-top: 24px;
+    font-size: clamp(21px, 5.6vw, 24px);
+    line-height: 1.22;
+  }
+
+  .hero .muted {
+    max-width: 28ch;
+    margin-top: 20px;
+    font-size: 17px;
+  }
+
+  .hero .button-row {
+    margin-top: 28px;
+  }
+
+  .hero .button {
+    min-height: 54px;
+    font-size: 18px;
+  }
+
+  .hero-visual {
+    border-radius: 14px;
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.32);
+  }
+
+  .hero-visual img {
+    aspect-ratio: 1.86 / 1;
+    object-fit: cover;
+    object-position: 44% center;
+  }
+
+  .hero-visual .terminal-panel,
+  .hero-visual .metric-strip {
+    display: none;
+  }
+
+  .telegram-section {
+    display: grid;
+    gap: 0;
+    border: 1px solid rgba(0, 255, 127, 0.16);
+    border-radius: 14px;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(0, 255, 127, 0.08), transparent 18rem),
+      linear-gradient(180deg, rgba(245, 245, 245, 0.026), transparent),
+      rgba(12, 12, 12, 0.94);
+    margin-bottom: 70px;
+    overflow: hidden;
+  }
+
+  .telegram-copy,
+  .telegram-panel {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .telegram-copy {
+    padding: 24px 24px 10px;
+  }
+
+  .telegram-panel {
+    gap: 18px;
+    padding: 12px 24px 24px;
+  }
+
+  .telegram-copy h2 {
+    max-width: 10ch;
+    font-size: clamp(38px, 11vw, 52px);
+    line-height: 0.98;
+  }
+
+  .telegram-copy p:not(.kicker) {
+    max-width: 32ch;
+    font-size: 17px;
+    line-height: 1.42;
+  }
+
+  .telegram-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    border-top: 1px solid rgba(245, 245, 245, 0.075);
+    padding-top: 18px;
+  }
+
+  .telegram-list li {
+    font-size: 17px;
+    line-height: 1.28;
+  }
+
+  .home-live {
+    padding-top: 8px;
+    padding-bottom: 58px;
+  }
+
+  .home-live::before,
+  .qa-home::before {
+    margin-bottom: 48px;
+  }
+
+  .home-section-title {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .home-section-title h2 {
+    max-width: 10ch;
+    font-size: clamp(40px, 11.8vw, 54px);
+    line-height: 1;
+  }
+
+  .home-section-title p:not(.kicker) {
+    max-width: 30ch;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  .pending-panel,
+  .performance-panel {
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .pending-panel {
+    min-height: auto;
+  }
+
+  .panel-title {
+    margin-bottom: 18px;
+  }
+
+  .panel-title h3 {
+    font-size: 28px;
+  }
+
+  .pending-empty {
+    min-height: 112px;
+    padding: 18px;
+  }
+
+  .pending-empty strong {
+    font-size: 21px;
+  }
+
+  .performance-panel {
+    gap: 16px;
+  }
+
+  .range-select select {
+    min-height: 58px;
+    border-radius: 12px;
+    font-size: 19px;
+  }
+
+  .performance-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .performance-stats div {
+    border-radius: 12px;
+    padding: 12px 10px;
+  }
+
+  .performance-stats span {
+    font-size: 9px;
+  }
+
+  .performance-stats strong {
+    font-size: clamp(19px, 6vw, 27px);
+  }
+
+  .chart-frame {
+    border-radius: 14px;
+    min-height: 226px;
+    margin-top: 14px;
+  }
+
+  .signal-home {
+    border-radius: 14px;
+    gap: 22px;
+    margin-top: 24px;
+    padding: 26px;
+  }
+
+  .signal-home h2 {
+    max-width: 10ch;
+    font-size: clamp(38px, 11vw, 52px);
+    line-height: 0.98;
+  }
+
+  .signal-home p {
+    max-width: 31ch;
+    margin-top: 18px;
+    font-size: 17px;
+    line-height: 1.42;
+  }
+
+  .signal-home aside {
+    gap: 18px;
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .signal-home-status strong {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .signal-home aside p {
+    max-width: none;
+    font-size: 16px;
+  }
+
+  .signal-home .button-row {
+    gap: 10px;
+  }
+
+  .signal-home .button {
+    min-height: 50px;
+  }
+
+  .qa-home {
+    padding-top: 64px;
+    padding-bottom: 78px;
+  }
+
+  .qa-home .home-section-title {
+    margin-bottom: 24px;
+  }
+
+  .qa-home h2 {
+    max-width: 11ch;
+    font-size: clamp(40px, 12vw, 56px);
+    line-height: 1;
+  }
+
+  .qa-list {
+    gap: 12px;
+  }
+
+  .qa-list details {
+    border-radius: 14px;
+  }
+
+  .qa-list summary {
+    grid-template-columns: minmax(0, 1fr) 42px;
+    gap: 14px;
+    min-height: 86px;
+    padding: 22px;
+    font-size: clamp(22px, 6.7vw, 30px);
+  }
+
+  .qa-list summary::after {
+    width: 42px;
+    height: 42px;
+  }
+
+  .qa-list details p {
+    margin-top: 0;
+    padding: 20px 22px 24px;
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  .qa-home .responsible-note {
+    margin-top: 34px;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  .telegram-mobile-bar {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    border-radius: 14px;
+    padding: 7px;
+  }
+
+  .telegram-mobile-bar a,
+  .telegram-mobile-bar button {
+    min-height: 46px;
+  }
+
+  .telegram-mobile-bar a {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero,
+  .telegram-section,
+  .home-live,
+  .signal-home,
+  .qa-home {
+    width: calc(100vw - 22px);
+  }
+
+  .hero {
+    padding-top: 34px;
+  }
+
+  .hero h1 {
+    font-size: clamp(50px, 16.4vw, 64px);
+  }
+
+  .hero-lead {
+    font-size: clamp(20px, 5.8vw, 23px);
+  }
+
+  .telegram-copy,
+  .telegram-panel,
+  .pending-panel,
+  .performance-panel,
+  .signal-home {
+    padding-inline: 20px;
+  }
+
+  .telegram-copy {
+    padding-top: 22px;
+    padding-bottom: 8px;
+  }
+
+  .telegram-panel {
+    padding-top: 10px;
+    padding-bottom: 22px;
+  }
+
+  .performance-stats {
+    gap: 7px;
+  }
+
+  .performance-stats div {
+    min-height: 76px;
+    padding: 10px 8px;
+  }
+
+  .performance-stats strong {
+    font-size: clamp(18px, 5.8vw, 24px);
+  }
+
+  .signal-home-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-home .button-row .button {
+    width: 100%;
+  }
+
+  .site-footer {
+    padding-top: 42px;
+  }
+}
