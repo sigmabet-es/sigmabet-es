@@ -7732,3 +7732,176 @@ body:not(.has-active-signal) .signal-home-status > span {
     animation: none;
   }
 }
+
+/* Mobile-only registry layout polish */
+@media (max-width: 760px) {
+  html,
+  body {
+    background-color: #070707;
+  }
+
+  .registry-only {
+    width: min(100%, calc(100vw - 18px));
+    margin: 18px auto 64px;
+    transform: none;
+  }
+
+  .registry-only .registry-board {
+    padding: 12px;
+  }
+
+  .registry-overview {
+    margin: 14px 0;
+  }
+
+  .registry-chart-card {
+    padding: 14px;
+  }
+
+  .registry-chart-head {
+    display: grid;
+    margin-bottom: 10px;
+  }
+
+  .registry-chart {
+    min-height: 0;
+  }
+
+  .registry-chart.chart-frame {
+    min-height: 198px;
+    padding: 8px 38px 8px 8px;
+  }
+
+  .registry-chart.chart-frame svg {
+    min-height: 176px;
+  }
+
+  .registry-ledger {
+    gap: 8px;
+  }
+
+  .registry-ledger-item summary {
+    padding: 12px;
+  }
+
+  .registry-ledger-content {
+    gap: 10px;
+  }
+
+  .registry-ledger .registry-event {
+    font-size: 17px;
+    line-height: 1.2;
+  }
+
+  .registry-ledger-meta {
+    gap: 8px;
+  }
+
+  .registry-ledger-meta span {
+    min-height: 40px;
+    padding: 7px 9px;
+    font-size: 9px;
+  }
+
+  .registry-ledger-meta b {
+    font-size: 13px;
+  }
+
+  .registry-ledger-result {
+    gap: 8px;
+  }
+
+  .registry-ledger-result .registry-profit {
+    font-size: 16px;
+  }
+
+  .registry-ledger-expanded {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .registry-only {
+    width: calc(100vw - 14px);
+    margin-top: 16px;
+  }
+
+  .registry-only .registry-board {
+    padding: 11px;
+  }
+
+  .registry-head h1,
+  .registry-only .registry-head h1 {
+    font-size: clamp(28px, 8.8vw, 36px);
+    line-height: 1.02;
+  }
+
+  .registry-only .registry-head p:not(.kicker),
+  .registry-history-head p,
+  .registry-chart-head p {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .registry-stat-grid article {
+    min-height: 68px;
+    padding: 9px;
+  }
+
+  .registry-stat-grid strong {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  .registry-chart-head h2,
+  .registry-history-head h2 {
+    font-size: 22px;
+    line-height: 1.08;
+  }
+
+  .registry-chart.chart-frame {
+    min-height: 172px;
+    padding: 6px 32px 6px 6px;
+  }
+
+  .registry-chart.chart-frame svg {
+    min-height: 154px;
+  }
+
+  .registry-ledger-item summary {
+    padding: 11px;
+  }
+
+  .registry-ledger .registry-event {
+    font-size: 16px;
+  }
+
+  .registry-date,
+  .registry-competition {
+    font-size: 10px;
+  }
+
+  .registry-ledger-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .registry-ledger-meta span {
+    min-height: 38px;
+    padding: 7px 8px;
+  }
+
+  .registry-ledger-result .pill {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .registry-ledger-result .registry-profit {
+    font-size: 15px;
+  }
+
+  .registry-ledger-result .share-button,
+  .registry-ledger-result .pending-toggle {
+    width: 32px;
+    height: 32px;
+  }
+}
