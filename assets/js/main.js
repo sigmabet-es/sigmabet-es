@@ -17,10 +17,20 @@ const fetchWithTimeout = async (url, options = {}, timeoutMs = 10000) => {
 };
 
 if (toggle && nav) {
+  const setNavOpen = (isOpen) => {
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+    nav.classList.toggle("is-open", isOpen);
+    document.body.classList.toggle("nav-is-open", isOpen);
+  };
+
   toggle.addEventListener("click", () => {
     const isOpen = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!isOpen));
-    nav.classList.toggle("is-open", !isOpen);
+    setNavOpen(!isOpen);
+  });
+
+  nav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setNavOpen(false));
   });
 }
 
@@ -838,10 +848,11 @@ if (registry) {
   const sharePickText = (row) => {
     const status = resultLabel(row.resultado);
     const profit = formatUnits(row.profit);
+    const isPendingRow = ["", "pendiente"].includes(normalize(row.resultado));
     const lines = [
       "SigmaBet | Pick registrado",
       `${displayText(row.partido, "Partido")} · ${displayText(row.competition, "Competición")}`,
-      `Pick: ${displayText(row.apuesta, "No disponible")}`,
+      `Pick: ${isPendingRow ? "Disponible en el Telegram gratuito" : displayText(row.apuesta, "No disponible")}`,
       `Cuota: ${displayText(row.cuota)} · Stake: ${displayText(row.stake)}`,
       `Resultado: ${status} · Unidades: ${profit}`,
       "+18 | Juego responsable. No hay apuestas seguras.",
@@ -1031,23 +1042,48 @@ if (registry) {
         const profit = numberFrom(row.profit);
         const profitClass = profit > 0 ? "profit-positive" : profit < 0 ? "profit-negative" : "";
         const statusLabel = resultLabel(row.resultado);
+        const isPendingRow = ["", "pendiente"].includes(normalize(row.resultado));
         const rowClass = `registry-row-${normalize(statusLabel).replace(/\s+/g, "-")}`;
-        const timeline = selectionParts(row.apuesta, row.resultadoSelecciones);
+        const timeline = isPendingRow ? [] : selectionParts(row.apuesta, row.resultadoSelecciones);
         const sharePayload = {
           type: "pick",
           date: row.fecha,
           competition: row.competition,
           match: row.partido,
-          pick: row.apuesta,
+          pick: isPendingRow ? "Disponible en el Telegram gratuito" : row.apuesta,
           odd: formatOdd(row.cuota),
           stake: row.stake,
           result: statusLabel,
           profit: formatUnits(row.profit),
-          selections: timeline.map((part) => ({
-            text: part.text,
-            status: resultLabel(part.status),
-          })),
+          selections: isPendingRow
+            ? []
+            : timeline.map((part) => ({
+                text: part.text,
+                status: resultLabel(part.status),
+              })),
         };
+
+        if (isPendingRow) {
+          return `
+            <article class="registry-ledger-item registry-row-pendiente registry-pending-card">
+              <div class="pending-telegram-banner">
+                <svg class="pending-telegram-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21.7 3.4 18.5 20c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L5.8 13.6.8 12c-1.1-.3-1.1-1.1.2-1.6L20.5 2.9c.9-.3 1.7.2 1.2.5Z"></path>
+                </svg>
+                <span>Apuesta en Telegram gratuito.</span>
+                <a class="pending-telegram-action" href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Acceder</a>
+              </div>
+              <div class="registry-pending-inner">
+                <div class="registry-ledger-main">
+                  <span class="registry-date">${escapeHtml(row.fecha)}</span>
+                  <strong class="registry-event">${escapeHtml(row.partido)}</strong>
+                  <span class="registry-competition">${escapeHtml(row.competition)}</span>
+                </div>
+                <span class="pending-status-pill">Pendiente</span>
+              </div>
+            </article>
+          `;
+        }
 
         return `
           <details class="registry-ledger-item ${rowClass}">
@@ -1074,20 +1110,32 @@ if (registry) {
               </div>
             </summary>
             <div class="registry-ledger-expanded">
-              <p class="registry-expanded-label">Pick registrado</p>
-              <div class="pick-timeline">
-                ${(timeline.length ? timeline : [{ text: row.apuesta || "Pick registrado", status: "" }])
-                  .map((part) => {
-                    const selectionLabel = resultLabel(part.status);
-                    const selectionClass = part.status ? normalize(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
-                    return `
-                      <div class="pick-step selection-${selectionClass}">
-                        <span>${escapeHtml(part.text)}</span>
-                      </div>
-                    `;
-                  })
-                  .join("")}
-              </div>
+              ${
+                isPendingRow
+                  ? `
+                    <p class="registry-expanded-label">Pick pendiente</p>
+                    <div class="pending-telegram-note">
+                      <span>Apuesta en Telegram gratuito.</span>
+                      <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Acceder</a>
+                    </div>
+                  `
+                  : `
+                    <p class="registry-expanded-label">Pick registrado</p>
+                    <div class="pick-timeline">
+                      ${(timeline.length ? timeline : [{ text: row.apuesta || "Pick registrado", status: "" }])
+                        .map((part) => {
+                          const selectionLabel = resultLabel(part.status);
+                          const selectionClass = part.status ? normalize(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
+                          return `
+                            <div class="pick-step selection-${selectionClass}">
+                              <span>${escapeHtml(part.text)}</span>
+                            </div>
+                          `;
+                        })
+                        .join("")}
+                    </div>
+                  `
+              }
             </div>
           </details>
         `;
@@ -1357,11 +1405,15 @@ if (homeFeed) {
 
   const filteredHomeRows = () => homeRows.filter((row) => isSettledHome(row) && dateInHomeRange(row));
 
-  const pickPartsHome = (value) =>
-    textHome(value, "")
-      .split(/\s+\+\s+/)
-      .map((part) => part.trim())
-      .filter(Boolean);
+  const pendingTelegramMarkup = (className = "pending-telegram-note") => `
+    <div class="${className}">
+      <svg class="pending-telegram-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21.7 3.4 18.5 20c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L5.8 13.6.8 12c-1.1-.3-1.1-1.1.2-1.6L20.5 2.9c.9-.3 1.7.2 1.2.5Z"></path>
+      </svg>
+      <span>Apuesta en Telegram gratuito.</span>
+      <a class="pending-telegram-action" href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Acceder</a>
+    </div>
+  `;
 
   const renderPendingHome = (rows) => {
     const pending = rows
@@ -1377,31 +1429,18 @@ if (homeFeed) {
 
     pendingTarget.innerHTML = pending
       .map((row) => {
-        const parts = pickPartsHome(row.apuesta);
-        const timeline = parts.length ? parts : [row.apuesta || "Pick pendiente"];
-
         return `
-          <details class="pending-item">
-            <summary>
-              <div class="pending-summary-top">
-                <span>${escapeHome(row.fecha)}</span>
-                <em>${escapeHome(row.competition || row.tipo || "Pendiente")}</em>
+          <article class="registry-ledger-item registry-row-pendiente registry-pending-card">
+            ${pendingTelegramMarkup("pending-telegram-banner")}
+            <div class="registry-pending-inner">
+              <div class="registry-ledger-main">
+                <span class="registry-date">${escapeHome(row.fecha)}</span>
+                <strong class="registry-event">${escapeHome(row.partido)}</strong>
+                <span class="registry-competition">${escapeHome(row.competition || row.tipo || "Pendiente")}</span>
               </div>
-              <div class="pending-summary-main">
-                <strong>${escapeHome(row.partido)}</strong>
-                <span class="pending-toggle"></span>
-              </div>
-              <div class="pending-data">
-                <span>Cuota <b>${escapeHome(row.cuota)}</b></span>
-                <span>Stake <b>${escapeHome(row.stake || "--")}</b></span>
-              </div>
-            </summary>
-            <div class="pending-expanded">
-              <div class="pick-timeline">
-                ${timeline.map((part) => `<div class="pick-step">${escapeHome(part)}</div>`).join("")}
-              </div>
+              <span class="pending-status-pill">Pendiente</span>
             </div>
-          </details>
+          </article>
         `;
       })
       .join("");
@@ -1776,7 +1815,7 @@ const shareCanvasHelpers = (() => {
     ctx.fillText("+18 · Juego responsable · No hay apuestas seguras", 116, 1000);
     ctx.fillStyle = green;
     ctx.font = `850 22px ${mono}`;
-    ctx.fillText("@Sigma_Bet_", 732, 1000);
+    ctx.fillText("@SigmaBetES", 732, 1000);
     return canvas;
   };
 
@@ -1837,7 +1876,7 @@ const shareCanvasHelpers = (() => {
     ctx.fillStyle = muted;
     ctx.font = `650 22px ${mono}`;
     ctx.fillText("#Balance", 116, 1006);
-    ctx.fillText("@Sigma_Bet_", 746, 1006);
+    ctx.fillText("@SigmaBetES", 746, 1006);
     return target;
   };
 
