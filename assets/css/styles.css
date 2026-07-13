@@ -7636,3 +7636,99 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding-top: 42px;
   }
 }
+
+/* Data loading and fallback states */
+.stat-skeleton {
+  display: inline-block;
+  width: min(8rem, 80%);
+  height: 1.1em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(245,245,245,0.08), rgba(245,245,245,0.2), rgba(245,245,245,0.08));
+  background-size: 220% 100%;
+  animation: sigmabet-skeleton 1.2s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+.performance-stats small,
+.registry-stat-grid small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted-2);
+  font-size: 12px;
+}
+
+.performance-stats strong:not(:has(.stat-skeleton)) + small,
+.registry-stat-grid strong:not(:has(.stat-skeleton)) + small {
+  display: none;
+}
+
+.data-warning {
+  margin: 12px 0 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 245, 245, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 196, 87, 0.08);
+  color: #f4d28b;
+  font-size: 14px;
+}
+
+.last-updated {
+  margin: -4px 0 14px;
+  color: var(--muted-2);
+  font-size: 13px;
+}
+
+.last-updated-mobile {
+  display: none;
+}
+
+.info-dot {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  place-items: center;
+  margin-left: 5px;
+  border: 1px solid rgba(245, 245, 245, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 800 11px/1 system-ui, sans-serif;
+  cursor: help;
+}
+
+.info-dot:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+@keyframes sigmabet-skeleton {
+  0% { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+@media (min-width: 761px) {
+  .home-live .performance-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-live .performance-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .last-updated-desktop {
+    display: none;
+  }
+
+  .last-updated-mobile {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-skeleton {
+    animation: none;
+  }
+}

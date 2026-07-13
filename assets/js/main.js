@@ -553,9 +553,12 @@ if (registry) {
     avgStake: registry.querySelector('[data-summary="avgStake"]'),
     updated: registry.querySelector('[data-summary="updated"]'),
   };
+  const registryWarningTarget = registry.querySelector("[data-registry-warning]");
   const sheetUrl = registry.dataset.sheetUrl?.trim();
   const refreshMs = Number(registry.dataset.refreshMs || 60000);
+  const registryCacheKey = `sigmabet:registry:${sheetUrl || "default"}`;
   let registryRows = [];
+  let registryUpdatedAt = "";
 
   const normalize = (value) =>
     String(value || "")
@@ -587,6 +590,7 @@ if (registry) {
     const parsed = Number.parseFloat(text);
     return Number.isFinite(parsed) ? parsed : 0;
   };
+  const hasNumber = (value) => Number.isFinite(numberFrom(value)) && String(value ?? "").trim() !== "";
 
   const formatUnits = (value) => {
     const number = numberFrom(value);
@@ -689,6 +693,25 @@ if (registry) {
     return index >= 0 ? row[index] : "";
   };
 
+  const isValidRegistryRow = (row, seen) => {
+    const result = normalize(row.resultado);
+    const validResults = ["ganado", "ganada", "verde", "win", "perdido", "perdida", "rojo", "loss", "nulo", "void", "push", "pendiente", ""];
+    const duplicateKey = [row.fecha, row.partido, row.apuesta, row.cuota, row.stake].map(normalize).join("|");
+    const valid =
+      parseDate(row.fecha) &&
+      displayText(row.partido, "") &&
+      displayText(row.apuesta, "") &&
+      hasNumber(row.cuota) &&
+      hasNumber(row.stake) &&
+      validResults.includes(result) &&
+      (result === "pendiente" || result === "" || hasNumber(row.profit)) &&
+      !seen.has(duplicateKey);
+
+    if (valid) seen.add(duplicateKey);
+    else console.warn("Fila de registro ignorada por validación", row);
+    return valid;
+  };
+
   const parseRegistryRows = (csvText) => {
     const csvRows = parseCsv(csvText);
     const headerIndex = csvRows.findIndex((row) =>
@@ -726,7 +749,11 @@ if (registry) {
           tipo: rawType || (normalize(apuesta).includes("dorado") || normalize(apuesta).includes("senal sigma") ? "Señal Sigma" : "Gratis"),
         };
       })
-      .filter((row) => row.fecha || row.competition || row.partido || row.apuesta || row.resultado);
+      .filter((row) => row.fecha || row.competition || row.partido || row.apuesta || row.resultado)
+      .filter((row, _, all) => {
+        if (!all._seen) Object.defineProperty(all, "_seen", { value: new Set() });
+        return isValidRegistryRow(row, all._seen);
+      });
   };
 
   const resultClass = (result) => {
@@ -887,25 +914,34 @@ if (registry) {
     const avgStake = settled.length ? stake / settled.length : 0;
     const balanceClass = balance > 0 ? "is-positive" : balance < 0 ? "is-negative" : "";
 
-    if (summaryTargets.total) summaryTargets.total.textContent = String(settled.length);
-    if (summaryTargets.hit) summaryTargets.hit.textContent = formatPercentValue(hitRate);
+    if (!settled.length) {
+      if (summaryTargets.total) summaryTargets.total.textContent = "Sin datos";
+      if (summaryTargets.hit) summaryTargets.hit.textContent = "Sin datos";
+      if (summaryTargets.balance) summaryTargets.balance.textContent = "Sin datos";
+      if (summaryTargets.yield) summaryTargets.yield.textContent = "Sin datos";
+      if (summaryTargets.avgOdd) summaryTargets.avgOdd.textContent = "Sin datos";
+      if (summaryTargets.avgStake) summaryTargets.avgStake.textContent = "Sin datos";
+    } else {
+      if (summaryTargets.total) summaryTargets.total.textContent = String(settled.length);
+      if (summaryTargets.hit) summaryTargets.hit.textContent = formatPercentValue(hitRate);
+      if (summaryTargets.balance) summaryTargets.balance.textContent = formatUnits(balance);
+      if (summaryTargets.yield) summaryTargets.yield.textContent = formatPercent(yieldValue);
+      if (summaryTargets.avgOdd) summaryTargets.avgOdd.textContent = avgOdd.toFixed(2);
+      if (summaryTargets.avgStake) summaryTargets.avgStake.textContent = `${avgStake.toFixed(2)} u`;
+    }
     if (summaryTargets.balance) {
-      summaryTargets.balance.textContent = formatUnits(balance);
       summaryTargets.balance.className = balanceClass;
     }
     if (summaryTargets.yield) {
-      summaryTargets.yield.textContent = formatPercent(yieldValue);
       summaryTargets.yield.className = yieldValue > 0 ? "is-positive" : yieldValue < 0 ? "is-negative" : "";
     }
-    if (summaryTargets.avgOdd) summaryTargets.avgOdd.textContent = avgOdd ? avgOdd.toFixed(2) : "0.00";
-    if (summaryTargets.avgStake) summaryTargets.avgStake.textContent = `${avgStake.toFixed(2)} u`;
     if (summaryTargets.updated) {
       summaryTargets.updated.textContent = new Intl.DateTimeFormat("es-ES", {
         day: "2-digit",
         month: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-      }).format(new Date());
+      }).format(registryUpdatedAt ? new Date(registryUpdatedAt) : new Date());
     }
   };
 
@@ -1079,16 +1115,28 @@ if (registry) {
 
     try {
       updateStatus("Actualizando registro desde Google Sheets...");
+      if (registryWarningTarget) registryWarningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
       const csvText = await response.text();
       registryRows = parseRegistryRows(csvText);
+      registryUpdatedAt = new Date().toISOString();
+      localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
       updateCustomRangeVisibility();
       renderRegistryView();
       updateStatus(`Registro conectado. ${registryRows.length} filas leídas desde Tracking.`);
     } catch (error) {
-      updateStatus(`No he podido leer el Google Sheet: ${error.message}`);
+      const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
+      if (cached?.rows?.length) {
+        registryRows = cached.rows;
+        registryUpdatedAt = cached.updatedAt;
+        renderRegistryView();
+        updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
+        if (registryWarningTarget) registryWarningTarget.hidden = false;
+      } else {
+        updateStatus(`No he podido leer el Google Sheet: ${error.message}`);
+      }
     }
   };
 
@@ -1114,6 +1162,8 @@ if (homeFeed) {
   const pendingTarget = homeFeed.querySelector("[data-pending-picks]");
   const chartTarget = homeFeed.querySelector("[data-performance-chart]");
   const statusTarget = homeFeed.querySelector("[data-home-status]");
+  const updatedTarget = homeFeed.querySelector("[data-home-updated]");
+  const warningTarget = homeFeed.querySelector("[data-home-warning]");
   const rangeTarget = homeFeed.querySelector("[data-home-range]");
   const customRangeTarget = homeFeed.querySelector("[data-home-custom-range]");
   const customDateTargets = {
@@ -1128,7 +1178,9 @@ if (homeFeed) {
     avgOdd: homeFeed.querySelector('[data-home-stat="avgOdd"]'),
     avgStake: homeFeed.querySelector('[data-home-stat="avgStake"]'),
   };
+  const homeCacheKey = `sigmabet:home:${sheetUrl || "default"}`;
   let homeRows = [];
+  let homeUpdatedAt = "";
 
   const normalizeHome = (value) =>
     String(value || "")
@@ -1159,6 +1211,7 @@ if (homeFeed) {
     const parsed = Number.parseFloat(text);
     return Number.isFinite(parsed) ? parsed : 0;
   };
+  const hasHomeNumber = (value) => Number.isFinite(numberHome(value)) && String(value ?? "").trim() !== "";
 
   const unitsHome = (value) => {
     const number = numberHome(value);
@@ -1238,6 +1291,7 @@ if (homeFeed) {
     if (headerIndex < 0) throw new Error("No se encontró la cabecera del Tracking.");
     const headers = rows[headerIndex];
 
+    const seen = new Set();
     return rows
       .slice(headerIndex + 1)
       .map((row) => ({
@@ -1252,7 +1306,24 @@ if (homeFeed) {
         profit: homeCell(row, headers, "profit"),
         tipo: homeCell(row, headers, "tipo"),
       }))
-      .filter((row) => row.fecha || row.partido || row.apuesta || row.resultado);
+      .filter((row) => row.fecha || row.partido || row.apuesta || row.resultado)
+      .filter((row) => {
+        const result = normalizeHome(row.resultado);
+        const validResults = ["ganado", "ganada", "verde", "win", "perdido", "perdida", "rojo", "loss", "nulo", "void", "push", "pendiente", ""];
+        const key = [row.fecha, row.partido, row.apuesta, row.cuota, row.stake].map(normalizeHome).join("|");
+        const valid =
+          parseHomeDate(row.fecha).getTime() !== 0 &&
+          textHome(row.partido, "") &&
+          textHome(row.apuesta, "") &&
+          hasHomeNumber(row.cuota) &&
+          hasHomeNumber(row.stake) &&
+          validResults.includes(result) &&
+          (result === "pendiente" || result === "" || hasHomeNumber(row.profit)) &&
+          !seen.has(key);
+        if (valid) seen.add(key);
+        else console.warn("Fila de portada ignorada por validación", row);
+        return valid;
+      });
   };
 
   const isSettledHome = (row) => !["", "pendiente"].includes(normalizeHome(row.resultado));
@@ -1401,18 +1472,31 @@ if (homeFeed) {
 
     const balanceClass = balance > 0 ? "is-positive" : balance < 0 ? "is-negative" : "";
 
-    if (statTargets.settled) statTargets.settled.textContent = String(settled.length);
-    if (statTargets.hit) statTargets.hit.textContent = percentHome(hitRate);
+    if (!settled.length) {
+      if (statTargets.settled) statTargets.settled.textContent = "Sin datos";
+      if (statTargets.hit) statTargets.hit.textContent = "Sin datos";
+      if (statTargets.balance) statTargets.balance.textContent = "Sin datos";
+      if (statTargets.yield) statTargets.yield.textContent = "Sin datos";
+    } else {
+      if (statTargets.settled) statTargets.settled.textContent = String(settled.length);
+      if (statTargets.hit) statTargets.hit.textContent = percentHome(hitRate);
+      if (statTargets.balance) statTargets.balance.textContent = unitsHome(balance);
+      if (statTargets.yield) statTargets.yield.textContent = percentHome(yieldValue * 100);
+    }
     if (statTargets.balance) {
-      statTargets.balance.textContent = unitsHome(balance);
       statTargets.balance.className = balanceClass;
     }
     if (statTargets.yield) {
-      statTargets.yield.textContent = percentHome(yieldValue * 100);
       statTargets.yield.className = yieldValue > 0 ? "is-positive" : yieldValue < 0 ? "is-negative" : "";
     }
     if (statTargets.avgOdd) statTargets.avgOdd.textContent = avgOdd ? avgOdd.toFixed(2) : "0.00";
     if (statTargets.avgStake) statTargets.avgStake.textContent = `${avgStake.toFixed(2)} u`;
+    if (updatedTarget) {
+      const updatedDate = homeUpdatedAt ? new Date(homeUpdatedAt) : new Date();
+      const desktop = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(updatedDate);
+      const mobile = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(updatedDate).replace(",", " ·");
+      updatedTarget.innerHTML = `<span class="last-updated-desktop">Última actualización: ${desktop}</span><span class="last-updated-mobile">Actualizado: ${mobile}</span>`;
+    }
     if (chartTarget) {
       chartTarget.innerHTML = `
         <div class="chart-unit-axis" aria-hidden="true">
@@ -1446,14 +1530,26 @@ if (homeFeed) {
     if (!sheetUrl) return;
     try {
       if (statusTarget) statusTarget.textContent = "Actualizando";
+      if (warningTarget) warningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
       homeRows = parseHomeRows(await response.text());
+      homeUpdatedAt = new Date().toISOString();
+      localStorage.setItem(homeCacheKey, JSON.stringify({ rows: homeRows, updatedAt: homeUpdatedAt }));
       renderHomeFeed();
       if (statusTarget) statusTarget.textContent = "En vivo";
     } catch (error) {
-      if (statusTarget) statusTarget.textContent = "Sin conexión";
+      const cached = JSON.parse(localStorage.getItem(homeCacheKey) || "null");
+      if (cached?.rows?.length) {
+        homeRows = cached.rows;
+        homeUpdatedAt = cached.updatedAt;
+        renderHomeFeed();
+        if (statusTarget) statusTarget.textContent = "Sin conexión";
+        if (warningTarget) warningTarget.hidden = false;
+      } else if (statusTarget) {
+        statusTarget.textContent = "Error de conexión";
+      }
     }
   };
 
