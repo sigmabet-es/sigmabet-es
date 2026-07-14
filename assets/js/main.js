@@ -1194,7 +1194,7 @@ if (registry) {
     if (source === "stale") {
       updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
     } else if (settledRows.length) {
-      updateStatus(`Datos actualizados: ${formatRegistryUpdatedAt()}.`);
+      updateStatus(`Se muestran datos. Última actualización: ${formatRegistryUpdatedAt()}.`);
     } else {
       updateStatus("Todavía no existen apuestas cerradas en este periodo.");
     }
@@ -1775,7 +1775,7 @@ if (homeFeed) {
     if (source === "stale") {
       if (statusTarget) statusTarget.textContent = "No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.";
     } else if (settledCount) {
-      if (statusTarget) statusTarget.textContent = `Datos actualizados: ${formatHomeUpdatedAt().mobile}.`;
+      if (statusTarget) statusTarget.textContent = "Se muestran datos.";
     } else if (statusTarget) {
       statusTarget.textContent = "Todavía no existen apuestas cerradas en este periodo.";
     }
