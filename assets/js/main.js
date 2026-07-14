@@ -524,7 +524,7 @@ if (signalNavLink || signalFeed) {
     try {
       const separator = signalSheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${signalSheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+      if (!response.ok) throw new Error(`La fuente de datos respondió ${response.status}`);
       const signalRows = signalRowsFromCsv(await response.text());
       renderSignalState(signalRows);
       renderSignalRows(signalRows);
@@ -1230,7 +1230,7 @@ if (registry) {
 
     const separator = sheetUrl.includes("?") ? "&" : "?";
     const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+    if (!response.ok) throw new Error(`La fuente de datos respondió ${response.status}`);
     return {
       rows: parseRegistryRows(await response.text()),
       updatedAt: new Date().toISOString(),
@@ -1839,7 +1839,7 @@ if (homeFeed) {
 
     const separator = sheetUrl.includes("?") ? "&" : "?";
     const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+    if (!response.ok) throw new Error(`La fuente de datos respondió ${response.status}`);
     return {
       rows: parseHomeRows(await response.text()),
       updatedAt: new Date().toISOString(),
@@ -2298,7 +2298,7 @@ if (shareRangeTool) {
     if (!sheetUrl) return;
     const separator = sheetUrl.includes("?") ? "&" : "?";
     const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+    if (!response.ok) throw new Error(`La fuente de datos respondió ${response.status}`);
     const csvRows = parseRangeCsv(await response.text());
     const headerIndex = csvRows.findIndex((row) =>
       row.some((cell) => normalizeRange(cell) === "fecha") &&
