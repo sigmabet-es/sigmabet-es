@@ -565,9 +565,10 @@ if (registry) {
     updated: registry.querySelector('[data-summary="updated"]'),
   };
   const registryWarningTarget = registry.querySelector("[data-registry-warning]");
+  const apiUrl = registry.dataset.apiUrl?.trim();
   const sheetUrl = registry.dataset.sheetUrl?.trim();
   const refreshMs = Number(registry.dataset.refreshMs || 60000);
-  const registryCacheKey = `sigmabet:registry:${sheetUrl || "default"}`;
+  const registryCacheKey = `sigmabet:registry:${apiUrl || sheetUrl || "default"}`;
   let registryRows = [];
   let registryUpdatedAt = "";
   let registryHasRenderedData = false;
@@ -1204,8 +1205,41 @@ if (registry) {
     if (statusTarget) statusTarget.textContent = message;
   };
 
+  const loadRegistryDataset = async () => {
+    if (apiUrl) {
+      try {
+        const separator = apiUrl.includes("?") ? "&" : "?";
+        const response = await fetchWithTimeout(`${apiUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+        const contentType = response.headers.get("content-type") || "";
+        if (!response.ok || !contentType.includes("application/json")) {
+          throw new Error(`La API respondió ${response.status}`);
+        }
+        const payload = await response.json();
+        if (!Array.isArray(payload.rows)) throw new Error("La API no devolvió filas válidas.");
+        return {
+          rows: payload.rows,
+          updatedAt: payload.updatedAt || new Date().toISOString(),
+          source: payload.source === "stale" ? "stale" : "fresh",
+        };
+      } catch (error) {
+        if (!sheetUrl) throw error;
+      }
+    }
+
+    if (!sheetUrl) throw new Error("No hay fuente de datos disponible.");
+
+    const separator = sheetUrl.includes("?") ? "&" : "?";
+    const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+    return {
+      rows: parseRegistryRows(await response.text()),
+      updatedAt: new Date().toISOString(),
+      source: "fresh",
+    };
+  };
+
   const loadRegistry = async () => {
-    if (!sheetUrl) {
+    if (!apiUrl && !sheetUrl) {
       setRegistryTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
       return;
     }
@@ -1214,17 +1248,15 @@ if (registry) {
       updateStatus("Actualizando el registro…");
       if (!registryHasRenderedData) setSummaryLoading();
       if (registryWarningTarget) registryWarningTarget.hidden = true;
-      const separator = sheetUrl.includes("?") ? "&" : "?";
-      const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
-      const csvText = await response.text();
-      registryRows = parseRegistryRows(csvText);
-      registryUpdatedAt = new Date().toISOString();
+      const dataset = await loadRegistryDataset();
+      registryRows = dataset.rows;
+      registryUpdatedAt = dataset.updatedAt;
       localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
       updateCustomRangeVisibility();
       registryHasRenderedData = true;
       registryHasTerminalError = false;
-      renderRegistryView({ source: "fresh" });
+      renderRegistryView({ source: dataset.source });
+      if (dataset.source === "stale" && registryWarningTarget) registryWarningTarget.hidden = false;
     } catch (error) {
       const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
       if (cached?.rows?.length) {
@@ -1258,6 +1290,7 @@ if (registry) {
 const homeFeed = document.querySelector("[data-home-feed]");
 
 if (homeFeed) {
+  const apiUrl = homeFeed.dataset.apiUrl?.trim();
   const sheetUrl = homeFeed.dataset.sheetUrl?.trim();
   const refreshMs = Number(homeFeed.dataset.refreshMs || 60000);
   const pendingTarget = homeFeed.querySelector("[data-latest-bets]");
@@ -1279,7 +1312,7 @@ if (homeFeed) {
     avgOdd: homeFeed.querySelector('[data-home-stat="avgOdd"]'),
     avgStake: homeFeed.querySelector('[data-home-stat="avgStake"]'),
   };
-  const homeCacheKey = `sigmabet:home:${sheetUrl || "default"}`;
+  const homeCacheKey = `sigmabet:home:${apiUrl || sheetUrl || "default"}`;
   let homeRows = [];
   let homeUpdatedAt = "";
   let homeHasRenderedData = false;
@@ -1781,8 +1814,41 @@ if (homeFeed) {
     }
   };
 
+  const loadHomeDataset = async () => {
+    if (apiUrl) {
+      try {
+        const separator = apiUrl.includes("?") ? "&" : "?";
+        const response = await fetchWithTimeout(`${apiUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+        const contentType = response.headers.get("content-type") || "";
+        if (!response.ok || !contentType.includes("application/json")) {
+          throw new Error(`La API respondió ${response.status}`);
+        }
+        const payload = await response.json();
+        if (!Array.isArray(payload.rows)) throw new Error("La API no devolvió filas válidas.");
+        return {
+          rows: payload.rows,
+          updatedAt: payload.updatedAt || new Date().toISOString(),
+          source: payload.source === "stale" ? "stale" : "fresh",
+        };
+      } catch (error) {
+        if (!sheetUrl) throw error;
+      }
+    }
+
+    if (!sheetUrl) throw new Error("No hay fuente de datos disponible.");
+
+    const separator = sheetUrl.includes("?") ? "&" : "?";
+    const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
+    return {
+      rows: parseHomeRows(await response.text()),
+      updatedAt: new Date().toISOString(),
+      source: "fresh",
+    };
+  };
+
   const loadHomeFeed = async () => {
-    if (!sheetUrl) {
+    if (!apiUrl && !sheetUrl) {
       setHomeTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
       return;
     }
@@ -1790,15 +1856,14 @@ if (homeFeed) {
       if (statusTarget) statusTarget.textContent = "Actualizando el registro…";
       if (!homeHasRenderedData) setHomeStatsLoading();
       if (warningTarget) warningTarget.hidden = true;
-      const separator = sheetUrl.includes("?") ? "&" : "?";
-      const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`Google Sheets respondió ${response.status}`);
-      homeRows = parseHomeRows(await response.text());
-      homeUpdatedAt = new Date().toISOString();
+      const dataset = await loadHomeDataset();
+      homeRows = dataset.rows;
+      homeUpdatedAt = dataset.updatedAt;
       localStorage.setItem(homeCacheKey, JSON.stringify({ rows: homeRows, updatedAt: homeUpdatedAt }));
       homeHasRenderedData = true;
       homeHasTerminalError = false;
-      renderHomeFeed({ source: "fresh" });
+      renderHomeFeed({ source: dataset.source });
+      if (dataset.source === "stale" && warningTarget) warningTarget.hidden = false;
     } catch (error) {
       const cached = JSON.parse(localStorage.getItem(homeCacheKey) || "null");
       if (cached?.rows?.length) {
