@@ -1162,7 +1162,7 @@ if (registry) {
     }
 
     try {
-      updateStatus("Actualizando registro desde Google Sheets...");
+      updateStatus("Actualizando estadísticas…");
       if (registryWarningTarget) registryWarningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
@@ -1498,7 +1498,7 @@ if (homeFeed) {
 
     if (!pendingTarget) return;
     if (!latestSettled.length) {
-      pendingTarget.innerHTML = '<div class="pending-empty"><span>--</span><strong>No hay apuestas finalizadas todavía</strong><em>--</em></div>';
+      pendingTarget.innerHTML = '<div class="pending-empty"><strong>No hay apuestas finalizadas todavía</strong></div>';
       return;
     }
 
@@ -1629,8 +1629,8 @@ if (homeFeed) {
     if (statTargets.yield) {
       statTargets.yield.className = yieldValue > 0 ? "is-positive" : yieldValue < 0 ? "is-negative" : "";
     }
-    if (statTargets.avgOdd) statTargets.avgOdd.textContent = avgOdd ? avgOdd.toFixed(2) : "0.00";
-    if (statTargets.avgStake) statTargets.avgStake.textContent = `${avgStake.toFixed(2)} u`;
+    if (statTargets.avgOdd) statTargets.avgOdd.textContent = settled.length ? avgOdd.toFixed(2) : "Sin datos";
+    if (statTargets.avgStake) statTargets.avgStake.textContent = settled.length ? `${avgStake.toFixed(2)} u` : "Sin datos";
     if (updatedTarget) {
       const updatedDate = homeUpdatedAt ? new Date(homeUpdatedAt) : new Date();
       const desktop = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(updatedDate);
@@ -1669,7 +1669,7 @@ if (homeFeed) {
   const loadHomeFeed = async () => {
     if (!sheetUrl) return;
     try {
-      if (statusTarget) statusTarget.textContent = "Actualizando";
+      if (statusTarget) statusTarget.textContent = "Actualizando estadísticas…";
       if (warningTarget) warningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
