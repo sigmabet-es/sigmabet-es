@@ -850,9 +850,9 @@ if (registry) {
     const profit = formatUnits(row.profit);
     const isPendingRow = ["", "pendiente"].includes(normalize(row.resultado));
     const lines = [
-      "SigmaBet | Pick registrado",
+      "SigmaBet | Apuesta registrada",
       `${displayText(row.partido, "Partido")} · ${displayText(row.competition, "Competición")}`,
-      `Pick: ${isPendingRow ? "Disponible en el Telegram gratuito" : displayText(row.apuesta, "No disponible")}`,
+      `Apuesta: ${isPendingRow ? "Disponible en el Telegram gratuito" : displayText(row.apuesta, "No disponible")}`,
       `Cuota: ${displayText(row.cuota)} · Stake: ${displayText(row.stake)}`,
       `Resultado: ${status} · Unidades: ${profit}`,
       "+18 | Juego responsable. No hay apuestas seguras.",
@@ -1029,11 +1029,11 @@ if (registry) {
   const renderRows = (visibleRows) => {
     if (!rowsTarget) return;
     if (countTarget) {
-      countTarget.textContent = `${visibleRows.length} ${visibleRows.length === 1 ? "pick" : "picks"}`;
+      countTarget.textContent = `${visibleRows.length} ${visibleRows.length === 1 ? "apuesta" : "apuestas"}`;
     }
 
     if (!visibleRows.length) {
-      rowsTarget.innerHTML = '<div class="registry-ledger-empty">No hay picks para los filtros seleccionados.</div>';
+      rowsTarget.innerHTML = '<div class="registry-ledger-empty">No hay apuestas que coincidan con los filtros seleccionados.</div>';
       return;
     }
 
@@ -1046,7 +1046,7 @@ if (registry) {
         const rowClass = `registry-row-${normalize(statusLabel).replace(/\s+/g, "-")}`;
         const timeline = isPendingRow ? [] : selectionParts(row.apuesta, row.resultadoSelecciones);
         const sharePayload = {
-          type: "pick",
+          type: "apuesta",
           date: row.fecha,
           competition: row.competition,
           match: row.partido,
@@ -1113,16 +1113,16 @@ if (registry) {
               ${
                 isPendingRow
                   ? `
-                    <p class="registry-expanded-label">Pick pendiente</p>
+                    <p class="registry-expanded-label">Apuesta pendiente</p>
                     <div class="pending-telegram-note">
                       <span>Apuesta en Telegram gratuito.</span>
                       <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Acceder</a>
                     </div>
                   `
                   : `
-                    <p class="registry-expanded-label">Pick registrado</p>
+                    <p class="registry-expanded-label">Apuesta registrada</p>
                     <div class="pick-timeline">
-                      ${(timeline.length ? timeline : [{ text: row.apuesta || "Pick registrado", status: "" }])
+                      ${(timeline.length ? timeline : [{ text: row.apuesta || "Apuesta registrada", status: "" }])
                         .map((part) => {
                           const selectionLabel = resultLabel(part.status);
                           const selectionClass = part.status ? normalize(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
@@ -1207,7 +1207,7 @@ const homeFeed = document.querySelector("[data-home-feed]");
 if (homeFeed) {
   const sheetUrl = homeFeed.dataset.sheetUrl?.trim();
   const refreshMs = Number(homeFeed.dataset.refreshMs || 60000);
-  const pendingTarget = homeFeed.querySelector("[data-pending-picks]");
+  const pendingTarget = homeFeed.querySelector("[data-latest-bets]");
   const chartTarget = homeFeed.querySelector("[data-performance-chart]");
   const statusTarget = homeFeed.querySelector("[data-home-status]");
   const updatedTarget = homeFeed.querySelector("[data-home-updated]");
@@ -1529,9 +1529,9 @@ if (homeFeed) {
               </div>
             </summary>
             <div class="registry-ledger-expanded">
-              <p class="registry-expanded-label">Pick registrado</p>
+              <p class="registry-expanded-label">Apuesta registrada</p>
               <div class="pick-timeline">
-                ${(selections.length ? selections : ["Pick registrado"])
+                ${(selections.length ? selections : ["Apuesta registrada"])
                   .map((selection) => {
                     const selectionText = typeof selection === "string" ? selection : selection.text;
                     const selectionLabel = typeof selection === "string" ? "" : resultLabelHome(selection.status);
@@ -1808,7 +1808,7 @@ const shareCanvasHelpers = (() => {
     const state = resultColors(payload.result, payload.profit);
     const selections = Array.isArray(payload.selections) && payload.selections.length
       ? payload.selections
-      : [{ text: payload.pick || "Pick registrado", status: payload.result || "" }];
+      : [{ text: payload.pick || "Apuesta registrada", status: payload.result || "" }];
 
     drawGrid(ctx);
     drawBrand(ctx);

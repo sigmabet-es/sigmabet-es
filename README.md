@@ -2,7 +2,7 @@
 
 Web oficial de SigmaBet.
 
-Picks de futbol con datos, analisis, stake recomendado y registro publico.
+Apuestas de futbol con datos, analisis, stake recomendado y registro publico.
 
 ## Estructura publicada
 
