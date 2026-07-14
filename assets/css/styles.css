@@ -4408,6 +4408,16 @@ td {
   min-height: 240px;
 }
 
+.chart-empty-state {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px;
+}
+
 .chart-grid-line {
   fill: none;
   stroke: rgba(245, 245, 245, 0.08);

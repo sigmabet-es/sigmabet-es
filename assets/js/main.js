@@ -548,6 +548,7 @@ if (registry) {
   const chartTarget = registry.querySelector("[data-registry-chart]");
   const countTarget = registry.querySelector("[data-registry-count]");
   const statusTarget = registry.querySelector("[data-registry-status]");
+  const registryOverview = registry.querySelector(".registry-overview");
   const filters = {
     time: registry.querySelector('[data-filter="time"]'),
     from: registry.querySelector('[data-filter="from"]'),
@@ -569,6 +570,9 @@ if (registry) {
   const registryCacheKey = `sigmabet:registry:${sheetUrl || "default"}`;
   let registryRows = [];
   let registryUpdatedAt = "";
+  let registryHasRenderedData = false;
+  let registryHasTerminalError = false;
+  const loadingMarkup = '<span class="stat-skeleton" aria-label="Cargando"></span>';
 
   const normalize = (value) =>
     String(value || "")
@@ -613,6 +617,46 @@ if (registry) {
   const formatOdd = (value) => displayText(value).replace(",", ".");
 
   const formatPercentValue = (value) => `${value.toFixed(2)}%`;
+
+  const formatRegistryUpdatedAt = () =>
+    new Intl.DateTimeFormat("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(registryUpdatedAt ? new Date(registryUpdatedAt) : new Date());
+
+  const setRegistryOverviewVisible = (isVisible) => {
+    if (registryOverview) registryOverview.hidden = !isVisible;
+  };
+
+  const setSummaryLoading = () => {
+    setRegistryOverviewVisible(true);
+    Object.entries(summaryTargets).forEach(([key, target]) => {
+      if (!target) return;
+      target.className = "";
+      if (key === "updated") target.innerHTML = loadingMarkup;
+      else target.innerHTML = loadingMarkup;
+    });
+  };
+
+  const setSummaryUnavailable = () => {
+    setRegistryOverviewVisible(true);
+    Object.entries(summaryTargets).forEach(([key, target]) => {
+      if (!target) return;
+      target.className = "";
+      target.textContent = key === "updated" ? "Sin datos" : "Sin datos";
+    });
+  };
+
+  const setRegistryTerminalState = (message) => {
+    registryHasTerminalError = true;
+    setRegistryOverviewVisible(false);
+    updateStatus(message);
+    if (countTarget) countTarget.textContent = "";
+    if (rowsTarget) rowsTarget.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(message)}</div>`;
+    if (registryWarningTarget) registryWarningTarget.hidden = true;
+  };
 
   const parseDate = (value) => {
     const text = displayText(value, "");
@@ -926,13 +970,9 @@ if (registry) {
     const balanceClass = balance > 0 ? "is-positive" : balance < 0 ? "is-negative" : "";
 
     if (!settled.length) {
-      if (summaryTargets.total) summaryTargets.total.textContent = "Sin datos";
-      if (summaryTargets.hit) summaryTargets.hit.textContent = "Sin datos";
-      if (summaryTargets.balance) summaryTargets.balance.textContent = "Sin datos";
-      if (summaryTargets.yield) summaryTargets.yield.textContent = "Sin datos";
-      if (summaryTargets.avgOdd) summaryTargets.avgOdd.textContent = "Sin datos";
-      if (summaryTargets.avgStake) summaryTargets.avgStake.textContent = "Sin datos";
+      setSummaryUnavailable();
     } else {
+      setRegistryOverviewVisible(true);
       if (summaryTargets.total) summaryTargets.total.textContent = String(settled.length);
       if (summaryTargets.hit) summaryTargets.hit.textContent = formatPercentValue(hitRate);
       if (summaryTargets.balance) summaryTargets.balance.textContent = formatUnits(balance);
@@ -947,12 +987,7 @@ if (registry) {
       summaryTargets.yield.className = yieldValue > 0 ? "is-positive" : yieldValue < 0 ? "is-negative" : "";
     }
     if (summaryTargets.updated) {
-      summaryTargets.updated.textContent = new Intl.DateTimeFormat("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(registryUpdatedAt ? new Date(registryUpdatedAt) : new Date());
+      summaryTargets.updated.textContent = registryUpdatedAt ? formatRegistryUpdatedAt() : "Sin datos";
     }
   };
 
@@ -960,6 +995,11 @@ if (registry) {
     if (!chartTarget) return;
 
     const settled = rows.filter(isSettled).sort((a, b) => (parseDate(a.fecha) || 0) - (parseDate(b.fecha) || 0));
+    if (!settled.length) {
+      chartTarget.innerHTML = '<div class="chart-empty-state">Todavía no existen apuestas cerradas en este periodo.</div>';
+      return;
+    }
+
     let balance = 0;
     const points = settled.map((row) => {
       balance += numberFrom(row.profit);
@@ -1026,14 +1066,14 @@ if (registry) {
     `;
   };
 
-  const renderRows = (visibleRows) => {
+  const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.") => {
     if (!rowsTarget) return;
     if (countTarget) {
       countTarget.textContent = `${visibleRows.length} ${visibleRows.length === 1 ? "apuesta" : "apuestas"}`;
     }
 
     if (!visibleRows.length) {
-      rowsTarget.innerHTML = '<div class="registry-ledger-empty">No hay apuestas que coincidan con los filtros seleccionados.</div>';
+      rowsTarget.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(emptyMessage)}</div>`;
       return;
     }
 
@@ -1143,12 +1183,21 @@ if (registry) {
       .join("");
   };
 
-  const renderRegistryView = () => {
+  const renderRegistryView = ({ source = "fresh" } = {}) => {
     const filteredRows = registryRows.filter(rowMatchesFilters);
     const displayRows = [...filteredRows].reverse();
+    const settledRows = filteredRows.filter(isSettled);
     renderSummary(filteredRows);
     renderRegistryChart(filteredRows);
-    renderRows(displayRows);
+    renderRows(displayRows, "Todavía no existen apuestas cerradas en este periodo.");
+
+    if (source === "stale") {
+      updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
+    } else if (settledRows.length) {
+      updateStatus(`Datos actualizados: ${formatRegistryUpdatedAt()}.`);
+    } else {
+      updateStatus("Todavía no existen apuestas cerradas en este periodo.");
+    }
   };
 
   const updateStatus = (message) => {
@@ -1157,12 +1206,13 @@ if (registry) {
 
   const loadRegistry = async () => {
     if (!sheetUrl) {
-      updateStatus("El registro automático no está disponible ahora mismo.");
+      setRegistryTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
       return;
     }
 
     try {
-      updateStatus("Actualizando estadísticas…");
+      updateStatus("Actualizando el registro…");
+      if (!registryHasRenderedData) setSummaryLoading();
       if (registryWarningTarget) registryWarningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
@@ -1172,24 +1222,27 @@ if (registry) {
       registryUpdatedAt = new Date().toISOString();
       localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
       updateCustomRangeVisibility();
-      renderRegistryView();
-      updateStatus(`Registro conectado. ${registryRows.length} filas leídas desde Tracking.`);
+      registryHasRenderedData = true;
+      registryHasTerminalError = false;
+      renderRegistryView({ source: "fresh" });
     } catch (error) {
       const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
       if (cached?.rows?.length) {
         registryRows = cached.rows;
         registryUpdatedAt = cached.updatedAt;
-        renderRegistryView();
-        updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
+        registryHasRenderedData = true;
+        registryHasTerminalError = false;
+        renderRegistryView({ source: "stale" });
         if (registryWarningTarget) registryWarningTarget.hidden = false;
       } else {
-        updateStatus(`No he podido leer el Google Sheet: ${error.message}`);
+        setRegistryTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
       }
     }
   };
 
   Object.values(filters).forEach((filter) => {
     filter?.addEventListener("change", () => {
+      if (registryHasTerminalError) return;
       updateCustomRangeVisibility();
       renderRegistryView();
     });
@@ -1229,6 +1282,9 @@ if (homeFeed) {
   const homeCacheKey = `sigmabet:home:${sheetUrl || "default"}`;
   let homeRows = [];
   let homeUpdatedAt = "";
+  let homeHasRenderedData = false;
+  let homeHasTerminalError = false;
+  const homeLoadingMarkup = '<span class="stat-skeleton" aria-label="Cargando"></span>';
 
   const normalizeHome = (value) =>
     String(value || "")
@@ -1267,6 +1323,55 @@ if (homeFeed) {
   };
 
   const percentHome = (value) => `${value.toFixed(2)}%`;
+
+  const formatHomeUpdatedAt = () => {
+    const updatedDate = homeUpdatedAt ? new Date(homeUpdatedAt) : new Date();
+    const desktop = new Intl.DateTimeFormat("es-ES", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(updatedDate);
+    const mobile = new Intl.DateTimeFormat("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(updatedDate).replace(",", " ·");
+    return { desktop, mobile };
+  };
+
+  const setHomeStatsLoading = () => {
+    Object.values(statTargets).forEach((target) => {
+      if (!target) return;
+      target.className = "";
+      target.innerHTML = homeLoadingMarkup;
+    });
+    if (updatedTarget) updatedTarget.textContent = "Actualizando el registro…";
+  };
+
+  const setHomeStatsUnavailable = () => {
+    Object.values(statTargets).forEach((target) => {
+      if (!target) return;
+      target.className = "";
+      target.textContent = "Sin datos";
+    });
+  };
+
+  const renderHomeChartState = (message) => {
+    if (chartTarget) chartTarget.innerHTML = `<div class="chart-empty-state">${escapeHome(message)}</div>`;
+  };
+
+  const setHomeTerminalState = (message) => {
+    homeHasTerminalError = true;
+    if (statusTarget) statusTarget.textContent = message;
+    setHomeStatsUnavailable();
+    if (updatedTarget) updatedTarget.textContent = "";
+    if (pendingTarget) pendingTarget.innerHTML = `<div class="pending-empty"><strong>${escapeHome(message)}</strong></div>`;
+    renderHomeChartState(message);
+    if (warningTarget) warningTarget.hidden = true;
+  };
 
   const parseHomeDate = (value) => {
     const text = textHome(value, "");
@@ -1549,6 +1654,16 @@ if (homeFeed) {
 
   const renderChartHome = () => {
     const settled = filteredHomeRows().sort((a, b) => parseHomeDate(a.fecha) - parseHomeDate(b.fecha));
+    if (!settled.length) {
+      setHomeStatsUnavailable();
+      if (updatedTarget && homeUpdatedAt) {
+        const { desktop, mobile } = formatHomeUpdatedAt();
+        updatedTarget.innerHTML = `<span class="last-updated-desktop">Última actualización: ${desktop}</span><span class="last-updated-mobile">Actualizado: ${mobile}</span>`;
+      }
+      renderHomeChartState("Todavía no existen apuestas cerradas en este periodo.");
+      return 0;
+    }
+
     let balance = 0;
     const points = settled.map((row) => {
       balance += numberHome(row.profit);
@@ -1612,17 +1727,10 @@ if (homeFeed) {
 
     const balanceClass = balance > 0 ? "is-positive" : balance < 0 ? "is-negative" : "";
 
-    if (!settled.length) {
-      if (statTargets.settled) statTargets.settled.textContent = "Sin datos";
-      if (statTargets.hit) statTargets.hit.textContent = "Sin datos";
-      if (statTargets.balance) statTargets.balance.textContent = "Sin datos";
-      if (statTargets.yield) statTargets.yield.textContent = "Sin datos";
-    } else {
-      if (statTargets.settled) statTargets.settled.textContent = String(settled.length);
-      if (statTargets.hit) statTargets.hit.textContent = percentHome(hitRate);
-      if (statTargets.balance) statTargets.balance.textContent = unitsHome(balance);
-      if (statTargets.yield) statTargets.yield.textContent = percentHome(yieldValue * 100);
-    }
+    if (statTargets.settled) statTargets.settled.textContent = String(settled.length);
+    if (statTargets.hit) statTargets.hit.textContent = percentHome(hitRate);
+    if (statTargets.balance) statTargets.balance.textContent = unitsHome(balance);
+    if (statTargets.yield) statTargets.yield.textContent = percentHome(yieldValue * 100);
     if (statTargets.balance) {
       statTargets.balance.className = balanceClass;
     }
@@ -1632,9 +1740,7 @@ if (homeFeed) {
     if (statTargets.avgOdd) statTargets.avgOdd.textContent = settled.length ? avgOdd.toFixed(2) : "Sin datos";
     if (statTargets.avgStake) statTargets.avgStake.textContent = settled.length ? `${avgStake.toFixed(2)} u` : "Sin datos";
     if (updatedTarget) {
-      const updatedDate = homeUpdatedAt ? new Date(homeUpdatedAt) : new Date();
-      const desktop = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(updatedDate);
-      const mobile = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(updatedDate).replace(",", " ·");
+      const { desktop, mobile } = formatHomeUpdatedAt();
       updatedTarget.innerHTML = `<span class="last-updated-desktop">Última actualización: ${desktop}</span><span class="last-updated-mobile">Actualizado: ${mobile}</span>`;
     }
     if (chartTarget) {
@@ -1658,18 +1764,31 @@ if (homeFeed) {
         </svg>
       `;
     }
+    return settled.length;
   };
 
-  const renderHomeFeed = () => {
+  const renderHomeFeed = ({ source = "fresh" } = {}) => {
     renderPendingHome(homeRows);
-    renderChartHome();
+    const settledCount = renderChartHome();
     if (customRangeTarget) customRangeTarget.hidden = (rangeTarget?.value || "month") !== "custom";
+
+    if (source === "stale") {
+      if (statusTarget) statusTarget.textContent = "No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.";
+    } else if (settledCount) {
+      if (statusTarget) statusTarget.textContent = `Datos actualizados: ${formatHomeUpdatedAt().mobile}.`;
+    } else if (statusTarget) {
+      statusTarget.textContent = "Todavía no existen apuestas cerradas en este periodo.";
+    }
   };
 
   const loadHomeFeed = async () => {
-    if (!sheetUrl) return;
+    if (!sheetUrl) {
+      setHomeTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
+      return;
+    }
     try {
-      if (statusTarget) statusTarget.textContent = "Actualizando estadísticas…";
+      if (statusTarget) statusTarget.textContent = "Actualizando el registro…";
+      if (!homeHasRenderedData) setHomeStatsLoading();
       if (warningTarget) warningTarget.hidden = true;
       const separator = sheetUrl.includes("?") ? "&" : "?";
       const response = await fetchWithTimeout(`${sheetUrl}${separator}_=${Date.now()}`, { cache: "no-store" });
@@ -1677,25 +1796,33 @@ if (homeFeed) {
       homeRows = parseHomeRows(await response.text());
       homeUpdatedAt = new Date().toISOString();
       localStorage.setItem(homeCacheKey, JSON.stringify({ rows: homeRows, updatedAt: homeUpdatedAt }));
-      renderHomeFeed();
-      if (statusTarget) statusTarget.textContent = "En vivo";
+      homeHasRenderedData = true;
+      homeHasTerminalError = false;
+      renderHomeFeed({ source: "fresh" });
     } catch (error) {
       const cached = JSON.parse(localStorage.getItem(homeCacheKey) || "null");
       if (cached?.rows?.length) {
         homeRows = cached.rows;
         homeUpdatedAt = cached.updatedAt;
-        renderHomeFeed();
-        if (statusTarget) statusTarget.textContent = "Sin conexión";
+        homeHasRenderedData = true;
+        homeHasTerminalError = false;
+        renderHomeFeed({ source: "stale" });
         if (warningTarget) warningTarget.hidden = false;
-      } else if (statusTarget) {
-        statusTarget.textContent = "Error de conexión";
+      } else {
+        setHomeTerminalState("El registro no está disponible temporalmente. Inténtalo de nuevo más tarde.");
       }
     }
   };
 
-  rangeTarget?.addEventListener("change", renderHomeFeed);
-  customDateTargets.from?.addEventListener("change", renderHomeFeed);
-  customDateTargets.to?.addEventListener("change", renderHomeFeed);
+  rangeTarget?.addEventListener("change", () => {
+    if (!homeHasTerminalError) renderHomeFeed();
+  });
+  customDateTargets.from?.addEventListener("change", () => {
+    if (!homeHasTerminalError) renderHomeFeed();
+  });
+  customDateTargets.to?.addEventListener("change", () => {
+    if (!homeHasTerminalError) renderHomeFeed();
+  });
 
   loadHomeFeed();
   if (refreshMs > 0) window.setInterval(loadHomeFeed, refreshMs);
