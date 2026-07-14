@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /material-grafico.html
+Disallow: /senal-sigma.html
 Allow: /
 
 Sitemap: https://sigmabet.es/sitemap.xml

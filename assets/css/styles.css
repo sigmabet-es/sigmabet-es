@@ -39,7 +39,7 @@ body {
   overflow-x: clip;
   background:
     radial-gradient(circle at 18% -10%, rgba(0, 255, 127, 0.08), transparent 28rem),
-    radial-gradient(circle at 88% 12%, rgba(215, 179, 84, 0.045), transparent 24rem),
+    radial-gradient(circle at 88% 12%, rgba(245, 245, 245, 0.028), transparent 24rem),
     linear-gradient(180deg, #080808 0%, #0b0b0b 44%, #070707 100%);
   color: var(--text);
   font: 16px/1.6 inherit;
@@ -3947,7 +3947,8 @@ td {
 
 .home-live,
 .signal-home,
-.qa-home {
+.qa-home,
+.home-responsible {
   width: min(var(--wide), calc(100% - 64px));
   margin-inline: auto;
 }
@@ -4091,6 +4092,11 @@ td {
 .pending-list {
   display: grid;
   gap: 12px;
+}
+
+.pending-list .registry-ledger-item .registry-event {
+  font-size: clamp(18px, 1.4vw, 22px);
+  line-height: 1.2;
 }
 
 .pending-item {
@@ -4640,6 +4646,33 @@ td {
   margin: 42px auto 0;
   color: var(--muted);
   text-align: center;
+}
+
+.home-responsible {
+  border-top: 1px solid rgba(245, 245, 245, 0.08);
+  padding: 70px 0 86px;
+  text-align: center;
+}
+
+.home-responsible h2 {
+  max-width: 840px;
+  margin: 0 auto;
+  color: var(--text);
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 1.02;
+}
+
+.home-responsible p:not(.kicker) {
+  max-width: 760px;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.home-responsible .button-row {
+  justify-content: center;
+  margin-top: 24px;
 }
 
 .rules-list {
@@ -9794,10 +9827,10 @@ body:not(.has-active-signal) .signal-home-status > span {
 .responsible-alert {
   display: grid;
   gap: 8px;
-  border: 1px solid rgba(215, 179, 84, 0.2);
+  border: 1px solid rgba(0, 255, 127, 0.14);
   border-radius: var(--radius);
   background:
-    radial-gradient(circle at 100% 0%, rgba(215, 179, 84, 0.09), transparent 16rem),
+    radial-gradient(circle at 100% 0%, rgba(0, 255, 127, 0.065), transparent 16rem),
     linear-gradient(180deg, rgba(245, 245, 245, 0.026), rgba(245, 245, 245, 0.008)),
     rgba(9, 9, 9, 0.9);
   padding: clamp(20px, 2.6vw, 30px);
@@ -9806,7 +9839,7 @@ body:not(.has-active-signal) .signal-home-status > span {
 .responsible-alert span,
 .responsible-principles span,
 .resource-panel a span {
-  color: rgba(215, 179, 84, 0.82);
+  color: rgba(0, 255, 127, 0.7);
   font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
   font-weight: 850;
@@ -9862,10 +9895,10 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .responsible-warning {
   margin: 12px 0 0;
-  border: 1px solid rgba(215, 179, 84, 0.18);
+  border: 1px solid rgba(245, 245, 245, 0.1);
   border-radius: var(--radius);
-  background: rgba(215, 179, 84, 0.045);
-  color: rgba(215, 179, 84, 0.9);
+  background: rgba(245, 245, 245, 0.035);
+  color: rgba(245, 245, 245, 0.78);
   font-weight: 850;
   padding: 15px 18px;
 }
@@ -9941,5 +9974,21 @@ body:not(.has-active-signal) .signal-home-status > span {
   .responsible-alert p,
   .responsible-warning {
     font-size: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-responsible {
+    width: calc(100vw - 22px);
+    padding: 54px 0 66px;
+  }
+
+  .home-responsible h2 {
+    font-size: clamp(38px, 11vw, 56px);
+  }
+
+  .pending-list .registry-ledger-item .registry-event {
+    font-size: 16px;
+    line-height: 1.15;
   }
 }

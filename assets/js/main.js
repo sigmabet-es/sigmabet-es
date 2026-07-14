@@ -1317,6 +1317,14 @@ if (homeFeed) {
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
     resultado: ["resultado"],
+    resultadoSelecciones: [
+      "resultado selecciones",
+      "resultado de selecciones",
+      "resultados selecciones",
+      "resultado picks",
+      "selecciones resultado",
+      "estado selecciones",
+    ],
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades"],
     tipo: ["tipo", "tipo de apuesta", "tipo de pick"],
@@ -1350,6 +1358,7 @@ if (homeFeed) {
         casa: homeCell(row, headers, "casa"),
         cuota: homeCell(row, headers, "cuota"),
         resultado: homeCell(row, headers, "resultado"),
+        resultadoSelecciones: homeCell(row, headers, "resultadoSelecciones"),
         stake: homeCell(row, headers, "stake"),
         profit: homeCell(row, headers, "profit"),
         tipo: homeCell(row, headers, "tipo"),
@@ -1377,6 +1386,72 @@ if (homeFeed) {
   const isSettledHome = (row) => !["", "pendiente"].includes(normalizeHome(row.resultado));
 
   const isWinHome = (row) => ["ganado", "verde", "win"].includes(normalizeHome(row.resultado));
+
+  const resultLabelHome = (value) => {
+    const clean = normalizeHome(value);
+    if (["ganado", "ganada", "verde", "win"].includes(clean)) return "Ganado";
+    if (["perdido", "perdida", "rojo", "loss"].includes(clean)) return "Perdido";
+    if (["nulo", "void", "push"].includes(clean)) return "Nulo";
+    return "Pendiente";
+  };
+
+  const resultClassHome = (value) => {
+    const clean = normalizeHome(value);
+    if (["ganado", "ganada", "verde", "win"].includes(clean)) return "pill-win";
+    if (["perdido", "perdida", "rojo", "loss"].includes(clean)) return "pill-loss";
+    if (["nulo", "void", "push"].includes(clean)) return "pill-null";
+    return "pill-pending";
+  };
+
+  const homePickParts = (value) =>
+    textHome(value, "")
+      .split(/\s+\+\s+|\r?\n+|;|\|/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+  const homeSelectionStatus = (value) => {
+    const text = String(value || "").trim();
+    const clean = normalizeHome(text);
+    if (!clean) return "";
+    if (/^[✅🟢✓✔]/u.test(text) || ["ganado", "ganada", "verde", "win", "acierto", "acertado", "acertada"].includes(clean)) return "Ganado";
+    if (/^[❌🔴✕✖]/u.test(text) || ["perdido", "perdida", "rojo", "loss", "fallo", "fallado", "fallada"].includes(clean)) return "Perdido";
+    if (/^[➖⚪🟡]/u.test(text) || ["nulo", "void", "push", "cancelado", "cancelada"].includes(clean)) return "Nulo";
+    if (["pendiente", "pending", "por jugar"].includes(clean)) return "Pendiente";
+
+    if (/(^|\b)(ganado|ganada|verde|win|acierto|acertado|acertada)(\b|$)/.test(clean)) return "Ganado";
+    if (/(^|\b)(perdido|perdida|rojo|loss|fallo|fallado|fallada)(\b|$)/.test(clean)) return "Perdido";
+    if (/(^|\b)(nulo|void|push|cancelado|cancelada)(\b|$)/.test(clean)) return "Nulo";
+    if (/(^|\b)(pendiente|pending|por jugar)(\b|$)/.test(clean)) return "Pendiente";
+    return "";
+  };
+
+  const stripHomeSelectionStatus = (value) => {
+    let text = textHome(value, "");
+    text = text.replace(/^[✅🟢✓✔❌🔴✕✖➖⚪🟡]\s*/u, "");
+    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
+    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
+    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
+    return text.trim();
+  };
+
+  const homeSelectionParts = (pickValue, statusValue) => {
+    const picks = homePickParts(pickValue);
+    const rawStatuses = homePickParts(statusValue);
+    const hasUsefulStatuses = rawStatuses.some((part) => homeSelectionStatus(part) || stripHomeSelectionStatus(part) !== part);
+
+    if (rawStatuses.length && hasUsefulStatuses) {
+      return (picks.length ? picks : rawStatuses.map(stripHomeSelectionStatus)).map((pick, index) => {
+        const statusChunk = rawStatuses[index] || "";
+        const stripped = stripHomeSelectionStatus(statusChunk);
+        return {
+          text: stripped && stripped !== statusChunk && !homeSelectionStatus(statusChunk) ? stripped : pick,
+          status: homeSelectionStatus(statusChunk),
+        };
+      });
+    }
+
+    return picks.map((pick) => ({ text: pick, status: "" }));
+  };
 
   const dateInHomeRange = (row) => {
     const mode = rangeTarget?.value || "month";
@@ -1416,31 +1491,57 @@ if (homeFeed) {
   `;
 
   const renderPendingHome = (rows) => {
-    const pending = rows
-      .filter((row) => ["", "pendiente"].includes(normalizeHome(row.resultado)))
-      .sort((a, b) => parseHomeDate(b.fecha) - parseHomeDate(a.fecha))
-      .slice(0, 5);
+    const latestSettled = [...rows]
+      .reverse()
+      .filter(isSettledHome)
+      .slice(0, 3);
 
     if (!pendingTarget) return;
-    if (!pending.length) {
-      pendingTarget.innerHTML = '<div class="pending-empty"><span>--</span><strong>No hay apuestas pendientes</strong><em>--</em></div>';
+    if (!latestSettled.length) {
+      pendingTarget.innerHTML = '<div class="pending-empty"><span>--</span><strong>No hay apuestas finalizadas todavía</strong><em>--</em></div>';
       return;
     }
 
-    pendingTarget.innerHTML = pending
+    pendingTarget.innerHTML = latestSettled
       .map((row) => {
+        const profit = numberHome(row.profit);
+        const profitClass = profit > 0 ? "profit-positive" : profit < 0 ? "profit-negative" : "";
+        const rowClass = `registry-row-${normalizeHome(resultLabelHome(row.resultado))}`;
+        const selections = homeSelectionParts(row.apuesta, row.resultadoSelecciones);
         return `
-          <article class="registry-ledger-item registry-row-pendiente registry-pending-card">
-            ${pendingTelegramMarkup("pending-telegram-banner")}
-            <div class="registry-pending-inner">
-              <div class="registry-ledger-main">
-                <span class="registry-date">${escapeHome(row.fecha)}</span>
-                <strong class="registry-event">${escapeHome(row.partido)}</strong>
-                <span class="registry-competition">${escapeHome(row.competition || row.tipo || "Pendiente")}</span>
+          <details class="registry-ledger-item ${rowClass}">
+            <summary>
+              <div class="registry-ledger-content">
+                <div class="registry-ledger-main">
+                  <span class="registry-date">${escapeHome(row.fecha)}</span>
+                  <strong class="registry-event">${escapeHome(row.partido)}</strong>
+                  <span class="registry-competition">${escapeHome(row.competition || row.tipo || "Fútbol")}</span>
+                </div>
+                <div class="registry-ledger-meta">
+                  <span>Cuota <b>${escapeHome(numberHome(row.cuota).toFixed(2))}</b></span>
+                  <span>Stake <b>${escapeHome(row.stake)}</b></span>
+                </div>
               </div>
-              <span class="pending-status-pill">Pendiente</span>
+              <div class="registry-ledger-result">
+                <span class="pill ${resultClassHome(row.resultado)}">${escapeHome(resultLabelHome(row.resultado))}</span>
+                <strong class="registry-profit ${profitClass}">${unitsHome(row.profit)}</strong>
+                <span class="pending-toggle"></span>
+              </div>
+            </summary>
+            <div class="registry-ledger-expanded">
+              <p class="registry-expanded-label">Pick registrado</p>
+              <div class="pick-timeline">
+                ${(selections.length ? selections : ["Pick registrado"])
+                  .map((selection) => {
+                    const selectionText = typeof selection === "string" ? selection : selection.text;
+                    const selectionLabel = typeof selection === "string" ? "" : resultLabelHome(selection.status);
+                    const selectionClass = selection.status ? normalizeHome(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
+                    return `<div class="pick-step selection-${selectionClass}"><span>${escapeHome(selectionText)}</span></div>`;
+                  })
+                  .join("")}
+              </div>
             </div>
-          </article>
+          </details>
         `;
       })
       .join("");
