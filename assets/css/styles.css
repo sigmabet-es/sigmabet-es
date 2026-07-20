@@ -10734,7 +10734,21 @@ body:not(.has-active-signal) .signal-home-status > span {
 
   .registry-chart-filter {
     display: grid;
-    gap: 12px;
+    gap: 10px;
+  }
+
+  .registry-chart-filter > label:first-child {
+    justify-self: start;
+    width: min(230px, 100%);
+    inline-size: min(230px, 100%);
+  }
+
+  .registry-chart-filter select {
+    height: 40px;
+    border-radius: 10px;
+    padding: 0 34px 0 12px;
+    font-size: 13px;
+    line-height: 40px;
   }
 
   .registry-chart-filter .registry-custom-range {
@@ -10787,25 +10801,25 @@ body:not(.has-active-signal) .signal-home-status > span {
   }
 
   .registry-chart-shell {
-    margin-top: 12px;
+    margin-top: 14px;
   }
 
   .registry-chart.chart-frame {
     min-height: 0;
     border-radius: 14px;
-    padding: 46px 12px 16px;
+    padding: 42px 10px 14px;
   }
 
   .registry-chart-plot {
     box-sizing: border-box;
-    padding-right: 42px;
+    padding-right: 34px;
   }
 
   .registry-chart.chart-frame svg {
     width: 100%;
     height: auto;
     min-height: 0;
-    aspect-ratio: 640 / 270;
+    aspect-ratio: 640 / 330;
   }
 
   .chart-frame svg .chart-line {
@@ -10817,10 +10831,10 @@ body:not(.has-active-signal) .signal-home-status > span {
   }
 
   .chart-unit-axis {
-    top: 46px;
+    top: 42px;
     right: 0;
-    bottom: 16px;
-    width: 34px;
+    bottom: 14px;
+    width: 28px;
     align-items: end;
     color: rgba(245, 245, 245, 0.58);
     font-size: 10px;
@@ -10828,9 +10842,9 @@ body:not(.has-active-signal) .signal-home-status > span {
   }
 
   .registry-streak-overlay {
-    top: 10px;
-    left: 10px;
-    right: 10px;
+    top: 9px;
+    left: 9px;
+    right: 9px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
@@ -10860,16 +10874,17 @@ body:not(.has-active-signal) .signal-home-status > span {
   }
 
   .registry-chart.chart-frame {
-    padding: 44px 10px 14px;
+    padding: 40px 8px 12px;
   }
 
   .registry-chart-plot {
-    padding-right: 38px;
+    padding-right: 30px;
   }
 
   .chart-unit-axis {
-    top: 44px;
-    width: 30px;
+    top: 40px;
+    bottom: 12px;
+    width: 26px;
   }
 
   .registry-streak-overlay {
