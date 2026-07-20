@@ -35,31 +35,55 @@
             </div>
           </div>
 
-          <div class="registry-toolbar" aria-label="Filtros del registro">
-            <label>
-              <span>Tiempo</span>
-              <select aria-label="Filtrar por tiempo" data-filter="time">
-                <option value="Todos">Histórico</option>
-                <option value="7d">Última semana</option>
-                <option value="30d">Último mes</option>
-                <option value="90d">Últimos 3 meses</option>
-                <option value="365d">Último año</option>
-                <option value="custom">Personalizado</option>
-              </select>
-            </label>
-            <div class="registry-custom-range" data-custom-range hidden>
-              <label>
-                <span>Desde</span>
-                <input type="date" aria-label="Fecha desde" data-filter="from" />
-              </label>
-              <label>
-                <span>Hasta</span>
-                <input type="date" aria-label="Fecha hasta" data-filter="to" />
-              </label>
-            </div>
-          </div>
-
           <section class="registry-overview" aria-label="Estadísticas del registro">
+            <div class="registry-chart-card">
+              <div class="registry-chart-head">
+                <div>
+                  <h2>Evolución</h2>
+                  <p>Balance de unidades según los filtros activos.</p>
+                </div>
+                <div class="registry-chart-actions">
+                  <div class="registry-toolbar registry-chart-filter" aria-label="Filtro temporal del gráfico">
+                    <label>
+                      <span>Rango</span>
+                      <select aria-label="Filtrar gráfico por tiempo" data-filter="time">
+                        <option value="Todos" selected>Histórico</option>
+                        <option value="7d">7 días</option>
+                        <option value="30d">30 días</option>
+                        <option value="90d">90 días</option>
+                        <option value="365d">1 año</option>
+                        <option value="custom">Personalizado</option>
+                      </select>
+                    </label>
+                    <div class="registry-custom-range" id="registry-date-panel" data-custom-range hidden>
+                      <label>
+                        <span>Desde</span>
+                        <span class="registry-date-field"><input type="date" aria-label="Fecha desde" data-filter="from" /></span>
+                      </label>
+                      <label>
+                        <span>Hasta</span>
+                        <span class="registry-date-field"><input type="date" aria-label="Fecha hasta" data-filter="to" /></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="registry-chart-shell">
+                <div class="registry-streak-overlay" aria-label="Rachas del periodo">
+                  <span>Mejor racha <b data-summary="winStreak"><span class="stat-skeleton" aria-label="Cargando"></span></b></span>
+                  <span>Peor racha <b data-summary="lossStreak"><span class="stat-skeleton" aria-label="Cargando"></span></b></span>
+                </div>
+                <div class="chart-frame registry-chart" data-registry-chart aria-label="Gráfica de rendimiento del registro">
+                  <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
+                    <path class="chart-grid-line" d="M24 56 H616"></path>
+                    <path class="chart-grid-line" d="M24 120 H616"></path>
+                    <path class="chart-grid-line" d="M24 184 H616"></path>
+                    <path class="chart-zero-line" d="M28 184 H612"></path>
+                  </svg>
+                </div>
+              </div>
+              <p class="registry-chart-updated">Actualizado <b data-summary="updated"><span class="stat-skeleton" aria-label="Cargando"></span></b></p>
+            </div>
             <div class="registry-stat-grid">
               <article><span>Apuestas</span><strong data-summary="total"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
               <article><span>Acierto</span><strong data-summary="hit"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
@@ -67,23 +91,6 @@
               <article><span>Cuota media</span><strong data-summary="avgOdd"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
               <article><span>Beneficio</span><strong data-summary="balance"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
               <article><span>Stake medio</span><strong data-summary="avgStake"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-            </div>
-            <div class="registry-chart-card">
-              <div class="registry-chart-head">
-                <div>
-                  <h2>Evolución</h2>
-                  <p>Balance de unidades según los filtros activos.</p>
-                </div>
-                <span>Actualizado <b data-summary="updated"><span class="stat-skeleton" aria-label="Cargando"></span></b></span>
-              </div>
-              <div class="chart-frame registry-chart" data-registry-chart aria-label="Gráfica de rendimiento del registro">
-                <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
-                  <path class="chart-grid-line" d="M24 56 H616"></path>
-                  <path class="chart-grid-line" d="M24 120 H616"></path>
-                  <path class="chart-grid-line" d="M24 184 H616"></path>
-                  <path class="chart-zero-line" d="M28 184 H612"></path>
-                </svg>
-              </div>
             </div>
           </section>
 
