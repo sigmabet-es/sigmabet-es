@@ -913,14 +913,6 @@ if (registry) {
     const isCustom = filters.time?.value === "custom";
     if (!customRange) return;
     customRange.hidden = !isCustom;
-    if (isCustom) {
-      filters.from?.focus();
-      try {
-        filters.from?.showPicker?.();
-      } catch (error) {
-        // Some browsers only allow focusing the native date control.
-      }
-    }
   };
 
   const rowMatchesTime = (row) => {
