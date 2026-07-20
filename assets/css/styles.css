@@ -10691,3 +10691,156 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding-right: 30px;
   }
 }
+
+/* Final mobile registry controls/chart pass */
+@media (max-width: 760px) {
+  .registry-chart-card {
+    overflow: hidden;
+    padding: 18px;
+  }
+
+  .registry-chart-head {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .registry-chart-actions,
+  .registry-chart-filter,
+  .registry-chart-filter label,
+  .registry-chart-filter select,
+  .registry-chart-filter .registry-custom-range,
+  .registry-chart-filter .registry-custom-range label,
+  .registry-date-field,
+  .registry-date-field input[type="date"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .registry-chart-filter {
+    display: grid;
+    gap: 12px;
+  }
+
+  .registry-chart-filter .registry-custom-range {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .registry-chart-filter .registry-custom-range[hidden] {
+    display: none;
+  }
+
+  .registry-only .registry-toolbar select,
+  .registry-only .registry-toolbar input[type="date"],
+  .registry-date-field input[type="date"] {
+    height: 46px;
+    border-radius: 12px;
+    padding: 0 46px 0 14px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 46px;
+    text-align: left;
+  }
+
+  .registry-date-field::after {
+    right: 15px;
+    width: 14px;
+    height: 14px;
+    border-color: rgba(245, 245, 245, 0.42);
+    border-radius: 4px;
+    background:
+      linear-gradient(rgba(245, 245, 245, 0.22), rgba(245, 245, 245, 0.22)) 3px 4px / 8px 1px no-repeat,
+      rgba(245, 245, 245, 0.035);
+  }
+
+  .registry-date-field input[type="date"]::-webkit-date-and-time-value {
+    min-height: 46px;
+    text-align: left;
+  }
+
+  .registry-chart-shell {
+    margin-top: 12px;
+  }
+
+  .registry-chart.chart-frame {
+    min-height: 0;
+    border-radius: 14px;
+    padding: 42px 34px 16px 12px;
+  }
+
+  .registry-chart-plot {
+    padding-right: 0;
+  }
+
+  .registry-chart.chart-frame svg {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 640 / 270;
+  }
+
+  .chart-frame svg .chart-line {
+    stroke-width: 2.5;
+  }
+
+  .chart-frame svg .chart-zero-line {
+    stroke-width: 1.4;
+  }
+
+  .chart-unit-axis {
+    top: 40px;
+    right: 11px;
+    bottom: 16px;
+    font-size: 10px;
+  }
+
+  .registry-streak-overlay {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .registry-streak-overlay span {
+    justify-content: center;
+    min-width: 0;
+    gap: 5px;
+    padding: 7px 7px;
+    white-space: nowrap;
+  }
+
+  .registry-streak-overlay b {
+    font-size: 9px;
+  }
+
+  .registry-chart-updated {
+    margin-top: 10px;
+    text-align: right;
+  }
+}
+
+@media (max-width: 420px) {
+  .registry-chart-card {
+    padding: 16px;
+  }
+
+  .registry-chart.chart-frame {
+    padding: 42px 30px 14px 10px;
+  }
+
+  .registry-streak-overlay {
+    gap: 5px;
+  }
+
+  .registry-streak-overlay span {
+    gap: 5px;
+    font-size: 7.5px;
+    padding-inline: 6px;
+  }
+}
