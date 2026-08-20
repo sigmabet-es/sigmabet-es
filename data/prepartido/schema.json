@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigmabet.es/data/prepartido/schema.json",
+  "title": "SigmaBet Prepartido",
+  "type": "object",
+  "required": ["competition", "season", "teams", "rounds", "matches"],
+  "properties": {
+    "competition": {
+      "type": "object",
+      "required": ["id", "slug", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "country": { "type": ["string", "null"] },
+        "status": { "type": ["string", "null"] }
+      }
+    },
+    "season": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "status": { "type": ["string", "null"] }
+      }
+    },
+    "lastUpdated": { "type": ["string", "null"] },
+    "teams": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/team" }
+    },
+    "rounds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/round" }
+    },
+    "matches": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/match" }
+    }
+  },
+  "$defs": {
+    "team": {
+      "type": "object",
+      "required": ["id", "slug", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "crest": { "type": ["string", "null"] },
+        "venueId": { "type": ["string", "null"] },
+        "standing": { "$ref": "#/$defs/standing" },
+        "form": {
+          "type": "array",
+          "items": { "enum": ["V", "E", "D"] }
+        },
+        "stats": { "$ref": "#/$defs/teamStats" }
+      }
+    },
+    "round": {
+      "type": "object",
+      "required": ["id", "slug", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "startDate": { "type": ["string", "null"] },
+        "endDate": { "type": ["string", "null"] },
+        "matchIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "match": {
+      "type": "object",
+      "required": ["id", "slug", "competitionId", "seasonId", "roundId", "homeTeamId", "awayTeamId", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "competitionId": { "type": "string" },
+        "seasonId": { "type": "string" },
+        "roundId": { "type": "string" },
+        "homeTeamId": { "type": "string" },
+        "awayTeamId": { "type": "string" },
+        "startDate": { "type": ["string", "null"] },
+        "venue": { "type": ["string", "null"] },
+        "status": { "enum": ["proximo", "en_directo", "finalizado", "aplazado", "suspendido", "data_only", "draft"] },
+        "quality": { "enum": ["data_only", "basic", "analyzed", "complete"] },
+        "seoPriority": { "enum": ["A", "B", "C"] },
+        "robots": { "enum": ["index", "noindex"] },
+        "lastUpdated": { "type": ["string", "null"] },
+        "preview": { "type": ["string", "null"] },
+        "keys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 5
+        },
+        "probabilities": { "$ref": "#/$defs/probabilities" },
+        "mainBet": { "$ref": "#/$defs/bet" },
+        "valueBets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/bet" },
+          "maxItems": 4
+        },
+        "injuries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/playerStatus" }
+        },
+        "lineups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/lineup" }
+        },
+        "news": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/newsItem" }
+        }
+      }
+    },
+    "standing": {
+      "type": "object",
+      "properties": {
+        "position": { "type": ["number", "null"] },
+        "points": { "type": ["number", "null"] },
+        "played": { "type": ["number", "null"] },
+        "wins": { "type": ["number", "null"] },
+        "draws": { "type": ["number", "null"] },
+        "losses": { "type": ["number", "null"] },
+        "goalsFor": { "type": ["number", "null"] },
+        "goalsAgainst": { "type": ["number", "null"] }
+      }
+    },
+    "teamStats": {
+      "type": "object",
+      "properties": {
+        "last10": { "type": "object" },
+        "homeAway": { "type": "object" },
+        "season": { "type": "object" }
+      }
+    },
+    "probabilities": {
+      "type": ["object", "null"],
+      "properties": {
+        "home": { "type": "number", "minimum": 0, "maximum": 100 },
+        "draw": { "type": "number", "minimum": 0, "maximum": 100 },
+        "away": { "type": "number", "minimum": 0, "maximum": 100 },
+        "updatedAt": { "type": ["string", "null"] }
+      }
+    },
+    "bet": {
+      "type": ["object", "null"],
+      "properties": {
+        "type": { "enum": ["principal", "value"] },
+        "market": { "type": "string" },
+        "selection": { "type": "string" },
+        "bookmaker": { "type": ["string", "null"] },
+        "odds": { "type": ["number", "null"] },
+        "sigmaProbability": { "type": ["number", "null"] },
+        "minimumOdds": { "type": ["number", "null"] },
+        "stake": { "type": ["number", "null"] },
+        "publishedAt": { "type": ["string", "null"] },
+        "result": { "enum": ["pendiente", "ganada", "perdida", "nula", "media_ganada", "media_perdida", "no_bet"] }
+      }
+    },
+    "playerStatus": {
+      "type": "object",
+      "required": ["teamId", "name", "status"],
+      "properties": {
+        "teamId": { "type": "string" },
+        "name": { "type": "string" },
+        "position": { "type": ["string", "null"] },
+        "status": { "enum": ["baja", "sancionado", "duda", "recuperado"] },
+        "confidence": { "enum": ["alta", "media", "baja", "pendiente"] },
+        "reason": { "type": ["string", "null"] },
+        "source": { "type": ["string", "null"] },
+        "sourceUrl": { "type": ["string", "null"] },
+        "updatedAt": { "type": ["string", "null"] }
+      }
+    },
+    "lineup": {
+      "type": "object",
+      "properties": {
+        "teamId": { "type": "string" },
+        "type": { "enum": ["probable", "oficial"] },
+        "formation": { "type": ["string", "null"] },
+        "confidence": { "enum": ["alta", "media", "baja", "pendiente"] },
+        "players": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "updatedAt": { "type": ["string", "null"] }
+      }
+    },
+    "newsItem": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "summary": { "type": ["string", "null"] },
+        "source": { "type": ["string", "null"] },
+        "url": { "type": ["string", "null"] },
+        "publishedAt": { "type": ["string", "null"] },
+        "confidence": { "enum": ["alta", "media", "baja", "pendiente"] }
+      }
+    }
+  }
+}

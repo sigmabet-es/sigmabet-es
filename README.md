@@ -18,6 +18,20 @@ Apuestas de futbol con datos, analisis, stake recomendado y registro publico.
 - `robots.txt`
 - `sitemap.xml`
 
+## Plataforma prepartido
+
+La primera capa de inteligencia prepartido está preparada sin publicar partidos inventados:
+
+- `partidos/` hub público de partidos.
+- `competiciones/laliga/` hub de LaLiga.
+- `partidos/plantilla/` plantilla no indexable de ficha de partido.
+- `admin/` panel técnico no indexable para cálculos de value betting.
+- `data/prepartido/` modelo estructurado inicial.
+- `tools/build-prepartido.js` generador estático de páginas de partido.
+- `docs/prepartido.md` documentación operativa.
+
+Para generar páginas reales, carga calendario confirmado en `data/prepartido/laliga.json` y ejecuta `node tools/build-prepartido.js`.
+
 ## Registro y cache
 
 El frontend consulta primero `/api/registro`. Ese endpoint:

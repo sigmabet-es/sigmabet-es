@@ -1,0 +1,22 @@
+{
+  "competition": {
+    "id": "laliga",
+    "slug": "laliga",
+    "name": "LaLiga EA Sports",
+    "country": "España",
+    "status": "ready_for_calendar"
+  },
+  "season": {
+    "id": "laliga-2026-2027",
+    "name": "2026/2027",
+    "status": "pending_provider"
+  },
+  "lastUpdated": null,
+  "teams": [],
+  "rounds": [],
+  "matches": [],
+  "notes": [
+    "No publicar partidos reales hasta disponer de calendario confirmado por proveedor o fuente oficial.",
+    "Los campos desconocidos deben quedar en null o arrays vacíos; nunca se deben inventar lesiones, cuotas, XI, noticias o estadísticas."
+  ]
+}
