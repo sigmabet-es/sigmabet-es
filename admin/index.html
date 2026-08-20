@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin prepartido | SigmaBet</title>
+    <meta name="description" content="Panel técnico interno para preparar análisis prepartido de SigmaBet." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-05" />
+    <script src="/assets/js/main.js?v=20260709-05" defer></script>
+    <script src="/assets/js/prepartido-admin.js?v=20260821-01" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/index.html"><img src="/assets/img/logo.svg?v=20260709-05" alt="" /><span>SigmaBet</span></a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Menú principal" data-nav><a href="/index.html">Inicio</a><a href="/partidos/">Partidos</a><a href="/registro.html">Registro</a><a href="/normas.html">Normas</a><a href="/juego-responsable.html">Juego responsable</a></nav>
+      <div class="header-actions"><a class="button button-small" href="/docs/prepartido.md">Documentación</a></div>
+    </header>
+    <main>
+      <section class="page-hero match-admin-hero">
+        <p class="kicker">Panel privado</p>
+        <h1>Admin prepartido</h1>
+        <p>Base técnica para validar probabilidades y apuestas antes de publicar. Requiere autenticación real en la siguiente fase de backend.</p>
+      </section>
+      <section class="section match-admin" data-admin-prepartido>
+        <article class="match-panel">
+          <h2>Probabilidades 1X2</h2>
+          <div class="admin-grid">
+            <label><span>Local</span><input type="number" inputmode="decimal" min="0" max="100" value="58" data-probability="home" /></label>
+            <label><span>Empate</span><input type="number" inputmode="decimal" min="0" max="100" value="25" data-probability="draw" /></label>
+            <label><span>Visitante</span><input type="number" inputmode="decimal" min="0" max="100" value="17" data-probability="away" /></label>
+          </div>
+          <p class="admin-state" data-probability-state>Calculando…</p>
+        </article>
+        <article class="match-panel">
+          <h2>Calculadora de value bet</h2>
+          <div class="admin-grid">
+            <label><span>Probabilidad SigmaBet</span><input type="number" inputmode="decimal" min="0" max="100" value="57" data-bet="sigmaProbability" /></label>
+            <label><span>Cuota mercado</span><input type="number" inputmode="decimal" min="1" step="0.01" value="1.91" data-bet="odds" /></label>
+            <label><span>Stake</span><input type="number" inputmode="decimal" min="0" max="5" step="0.5" value="1" data-bet="stake" /></label>
+          </div>
+          <dl class="admin-output">
+            <div><dt>Cuota justa</dt><dd data-output="fairOdds">Calculando…</dd></div>
+            <div><dt>Probabilidad implícita</dt><dd data-output="implied">Calculando…</dd></div>
+            <div><dt>Edge</dt><dd data-output="edge">Calculando…</dd></div>
+            <div><dt>SigmaValue</dt><dd data-output="sigmaValue">Calculando…</dd></div>
+            <div><dt>Stake</dt><dd data-output="stake">Calculando…</dd></div>
+          </dl>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

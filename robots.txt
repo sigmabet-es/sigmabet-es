@@ -1,6 +1,10 @@
 User-agent: *
 Disallow: /material-grafico.html
 Disallow: /senal-sigma.html
+Disallow: /admin/
+Disallow: /partidos/plantilla/
+Disallow: /competiciones/laliga/jornada-plantilla/
+Disallow: /equipos/plantilla/
 Allow: /
 
 Sitemap: https://sigmabet.es/sitemap.xml
