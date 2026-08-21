@@ -3,6 +3,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const dataPath = path.join(root, "data", "prepartido", "laliga.json");
+const editorialPath = path.join(root, "data", "prepartido", "editorial.json");
 const outputRoot = root;
 
 const escapeHtml = (value) =>
@@ -39,11 +40,59 @@ const normalize = (value) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-const readData = () => JSON.parse(fs.readFileSync(dataPath, "utf8"));
+const readJson = (file, fallback) => {
+  if (!fs.existsSync(file)) return fallback;
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+};
+const readData = () => readJson(dataPath, {});
+const readEditorial = () => readJson(editorialPath, { matches: {} });
 const mkdirp = (dir) => fs.mkdirSync(dir, { recursive: true });
 const writeFile = (file, content) => {
   mkdirp(path.dirname(file));
   fs.writeFileSync(file, content);
+};
+
+const mergeDefined = (base, override) => {
+  if (!override || typeof override !== "object" || Array.isArray(override)) return base;
+  return Object.entries(override).reduce(
+    (next, [key, value]) => {
+      if (value === undefined) return next;
+      if (Array.isArray(value)) {
+        next[key] = value;
+        return next;
+      }
+      if (value && typeof value === "object" && base?.[key] && typeof base[key] === "object" && !Array.isArray(base[key])) {
+        next[key] = mergeDefined(base[key], value);
+        return next;
+      }
+      next[key] = value;
+      return next;
+    },
+    { ...base }
+  );
+};
+
+const mergeEditorial = (data, editorial) => {
+  const matches = editorial?.matches || {};
+  return {
+    ...data,
+    editorialUpdatedAt: editorial?.updatedAt || null,
+    matches: (data.matches || []).map((match) => {
+      const manual = matches[match.id] || matches[match.slug];
+      if (!manual) return match;
+      const merged = mergeDefined(match, manual);
+      const hasContent =
+        text(merged.analysis, "") ||
+        (Array.isArray(merged.lineups) && merged.lineups.length) ||
+        (Array.isArray(merged.injuries) && merged.injuries.length) ||
+        (merged.mainBet && merged.mainBet.result !== "no_bet");
+      return {
+        ...merged,
+        editorialStatus: hasContent ? "edited" : "empty",
+        lastUpdated: manual.updatedAt || merged.lastUpdated,
+      };
+    }),
+  };
 };
 
 const pageShell = ({ title, description, canonical, robots = "index,follow", body, structuredData }) => `<!doctype html>
@@ -123,18 +172,69 @@ const renderTeamCurrentForm = (team, label) => {
   </article>`;
 };
 
-const renderLineup = (match, team, typeLabel) => {
+const renderLineupCard = (match, team, typeLabel) => {
   const lineup = (match.lineups || []).find((item) => item.teamId === team?.id && item.type !== "oficial");
   const players = Array.isArray(lineup?.players) ? lineup.players : [];
-  return `<article class="match-panel">
-    <h2>Alineación probable ${escapeHtml(typeLabel)}</h2>
-    <p>${escapeHtml(team?.name || "Equipo")} · Formación: ${escapeHtml(text(lineup?.formation))} · Confianza: ${escapeHtml(text(lineup?.confidence, "pendiente"))}</p>
+  return `<article class="lineup-card">
+    <div>
+      <span>${escapeHtml(typeLabel)}</span>
+      <h3>${escapeHtml(team?.name || "Equipo")}</h3>
+      <p>Formación: ${escapeHtml(text(lineup?.formation, "pendiente"))} · Confianza: ${escapeHtml(text(lineup?.confidence, "pendiente"))}</p>
+    </div>
     ${
       players.length
         ? `<ol class="lineup-list">${players.map((player) => `<li>${escapeHtml(player)}</li>`).join("")}</ol>`
-        : '<div class="lineup-placeholder">XI probable</div>'
+        : '<div class="lineup-placeholder">Alineación pendiente</div>'
     }
   </article>`;
+};
+
+const renderLineupsSection = (match, home, away) => {
+  const lineups = Array.isArray(match.lineups) ? match.lineups : [];
+  return `<section id="alineaciones" class="match-soft-section">
+    <div class="match-section-copy">
+      <span>Alineaciones</span>
+      <h2>Alineaciones probables</h2>
+      <p>${
+        lineups.length
+          ? "Once probable sujeto a cambios hasta que existan alineaciones oficiales."
+          : "Alineaciones probables pendientes de confirmación. No se muestran jugadores si no hay información fiable."
+      }</p>
+    </div>
+    <div class="lineup-grid">
+      ${renderLineupCard(match, home, "Local")}
+      ${renderLineupCard(match, away, "Visitante")}
+    </div>
+  </section>`;
+};
+
+const renderInjuriesSection = (match, home, away) => {
+  const injuries = Array.isArray(match.injuries) ? match.injuries : [];
+  const byTeam = (team) => injuries.filter((item) => item.teamId === team.id);
+  const renderItems = (team) => {
+    const items = byTeam(team);
+    if (!items.length) return '<p class="match-empty-copy">Sin bajas confirmadas en la ficha.</p>';
+    return `<ul class="match-status-list">${items
+      .map(
+        (item) => `<li>
+          <strong>${escapeHtml(item.name)}</strong>
+          <span>${escapeHtml(text(item.status))}${item.reason ? ` · ${escapeHtml(item.reason)}` : ""}</span>
+        </li>`
+      )
+      .join("")}</ul>`;
+  };
+
+  return `<section id="bajas" class="match-soft-section">
+    <div class="match-section-copy">
+      <span>Disponibilidad</span>
+      <h2>Bajas, sanciones y dudas</h2>
+      <p>Solo se publican ausencias cuando existe información contrastada.</p>
+    </div>
+    <div class="lineup-grid">
+      <article class="lineup-card"><h3>${escapeHtml(home.name)}</h3>${renderItems(home)}</article>
+      <article class="lineup-card"><h3>${escapeHtml(away.name)}</h3>${renderItems(away)}</article>
+    </div>
+  </section>`;
 };
 
 const matchTimestamp = (match) => new Date(match.startDate || "9999-12-31T00:00:00Z").getTime();
@@ -257,6 +357,42 @@ const renderAnalysisNotice = (match) => {
   </aside>`;
 };
 
+const renderProbabilities = (match) => {
+  const probabilities = match.probabilities || null;
+  if (!probabilities) return "";
+  return `<dl class="match-probability-strip">
+    <div><dt>Local</dt><dd>${escapeHtml(percent(probabilities.home))}</dd></div>
+    <div><dt>Empate</dt><dd>${escapeHtml(percent(probabilities.draw))}</dd></div>
+    <div><dt>Visitante</dt><dd>${escapeHtml(percent(probabilities.away))}</dd></div>
+  </dl>`;
+};
+
+const renderAnalysisSection = (match) => {
+  const keys = Array.isArray(match.keys) ? match.keys.filter(Boolean).slice(0, 5) : [];
+  return `<section id="analisis" class="match-soft-section">
+    <div class="match-section-copy">
+      <span>Análisis SigmaBet</span>
+      <h2>Lectura del partido</h2>
+      <p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p>
+    </div>
+    ${renderProbabilities(match)}
+    ${
+      keys.length
+        ? `<ul class="match-key-list">${keys.map((key) => `<li>${escapeHtml(key)}</li>`).join("")}</ul>`
+        : ""
+    }
+  </section>`;
+};
+
+const renderBetSection = (match) => `<section id="apuestas" class="match-soft-section">
+  <div class="match-section-copy">
+    <span>Apuestas</span>
+    <h2>Apuesta con valor</h2>
+    <p>Predicción no significa apuesta. Si no existe valor claro, no se publica entrada.</p>
+  </div>
+  ${renderBet(match.mainBet)}
+</section>`;
+
 const renderCrest = (team) =>
   team?.crest
     ? `<img src="${escapeHtml(team.crest)}" alt="" loading="lazy" />`
@@ -298,12 +434,13 @@ const renderMatch = (data, match) => {
         </div>
         ${renderAnalysisNotice(match)}
       </header>
-      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
+      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#bajas">Bajas</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
       ${renderH2h(data, match, home, away)}
       <section id="resultados" class="match-results-grid">${renderRecentTeamResults(data, match, home)}${renderRecentTeamResults(data, match, away)}</section>
-      <section id="alineaciones" class="match-soft-section"><h2>Alineaciones y bajas</h2><p>Se añadirán alineaciones probables, bajas, sanciones y dudas cuando exista información contrastada.</p></section>
-      <section id="analisis" class="match-soft-section"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p></section>
-      <section id="apuestas" class="match-soft-section"><h2>Apuestas con valor</h2><p>Predicción no significa apuesta. Si no existe valor claro, no se publica apuesta.</p></section>
+      ${renderLineupsSection(match, home, away)}
+      ${renderInjuriesSection(match, home, away)}
+      ${renderAnalysisSection(match)}
+      ${renderBetSection(match)}
     </article>`;
 
   const structuredData = {
@@ -323,7 +460,7 @@ const renderMatch = (data, match) => {
 };
 
 const build = () => {
-  const data = readData();
+  const data = mergeEditorial(readData(), readEditorial());
   const publicMatches = data.matches.filter((match) => match.slug);
 
   publicMatches.forEach((match) => {

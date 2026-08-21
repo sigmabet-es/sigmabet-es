@@ -11255,6 +11255,126 @@ body:not(.has-active-signal) .signal-home-status > span {
   color: var(--muted);
 }
 
+.match-section-copy {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.match-section-copy span,
+.lineup-card span,
+.match-probability-strip dt {
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.match-section-copy p {
+  margin: 0;
+}
+
+.lineup-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lineup-card {
+  min-width: 0;
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.018), transparent),
+    rgba(6, 6, 6, 0.56);
+  padding: clamp(14px, 1.8vw, 20px);
+}
+
+.lineup-card h3 {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: clamp(18px, 2.4vw, 26px);
+}
+
+.lineup-card p {
+  margin: 8px 0 0;
+}
+
+.match-status-list,
+.match-key-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match-status-list li,
+.match-key-list li {
+  border-top: 1px solid rgba(245, 245, 245, 0.07);
+  padding-top: 9px;
+  color: var(--muted);
+}
+
+.match-status-list strong {
+  display: block;
+  color: var(--text);
+}
+
+.match-status-list span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.match-key-list {
+  max-width: 780px;
+}
+
+.match-key-list li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.match-key-list li::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 16px rgba(0, 255, 127, 0.28);
+}
+
+.match-probability-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 620px;
+  margin: 0 0 16px;
+}
+
+.match-probability-strip div {
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 14px;
+  background: rgba(245, 245, 245, 0.018);
+  padding: 12px;
+}
+
+.match-probability-strip dd {
+  margin: 5px 0 0;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 900;
+}
+
 .match-results-card {
   padding: clamp(16px, 2vw, 24px);
   border-radius: 16px;
@@ -12046,10 +12166,12 @@ body:not(.has-active-signal) .signal-home-status > span {
   .match-vs-board,
   .match-kickoff-strip,
   .match-grid,
+  .lineup-grid,
   .match-hub-grid,
   .match-methodology-grid,
   .match-admin,
   .match-results-grid,
+  .match-probability-strip,
   .daily-match-teams,
   .daily-match-form,
   .match-current-form {
