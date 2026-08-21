@@ -102,6 +102,11 @@ const matchMergeKey = (match) =>
 
 const mergeTeamResults = (data, teamResults) => {
   const rows = Array.isArray(teamResults?.matches) ? teamResults.matches : [];
+  const externalTeams = Array.isArray(teamResults?.teams) ? teamResults.teams : [];
+  const teamsById = new Map((data.teams || []).map((team) => [team.id, team]));
+  externalTeams.forEach((team) => {
+    if (team?.id && !teamsById.has(team.id)) teamsById.set(team.id, team);
+  });
   const byKey = new Map(rows.map((match) => [matchMergeKey(match), match]));
   const usedKeys = new Set();
 
@@ -131,6 +136,7 @@ const mergeTeamResults = (data, teamResults) => {
 
   return {
     ...data,
+    teams: [...teamsById.values()],
     teamResultsUpdatedAt: teamResults?.updatedAt || null,
     matches: [...matches, ...historicalMatches],
   };
@@ -390,6 +396,7 @@ const renderInjuriesSection = (match, home, away) => {
   const byTeam = (team) => injuries.filter((item) => item.teamId === team.id);
   const statusLabel = (status) => {
     const normalized = normalize(status);
+    if (normalized.includes("lesion")) return "Lesionado";
     if (normalized.includes("duda")) return "Duda";
     if (normalized.includes("sanc")) return "Sanción";
     if (normalized.includes("decision")) return "Decisión";
@@ -412,7 +419,7 @@ const renderInjuriesSection = (match, home, away) => {
       </div>`;
     }
     return `<div class="availability-summary">
-        ${["Baja", "Duda", "Sanción"].map((label) => `<span>${label} <strong>${counts[label] || 0}</strong></span>`).join("")}
+        ${["Lesionado", "Baja", "Duda", "Sanción"].map((label) => `<span>${label} <strong>${counts[label] || 0}</strong></span>`).join("")}
       </div>
       <ul class="availability-list">${items
       .map(

@@ -1,4 +1,4 @@
 {
-  "editorialCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRq30bjf5P-qHcMNlznnuOLoLYJ6hbtCBx93HQqFL8mVHpFF0XjXTiNkEy8f9eAAA/pub?gid=1905746214&single=true&output=csv",
-  "teamResultsCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ1Tyntr4LvjB1G79tSQlyxJQMNti-FHkh55pYz9YjRvxsok2cfYnUfQQc03sTSQ/pub?gid=1040556326&single=true&output=csv"
+  "editorialCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRq30bjf5P-qHcMNlznnuOLoLYJ6hbtCBx93HQqFL8mVHpFF0XjXTiNkEy8f9eAAA/pub?output=csv",
+  "teamResultsCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ1Tyntr4LvjB1G79tSQlyxJQMNti-FHkh55pYz9YjRvxsok2cfYnUfQQc03sTSQ/pubhtml"
 }

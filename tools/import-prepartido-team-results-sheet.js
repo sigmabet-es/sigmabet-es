@@ -44,7 +44,10 @@ const normalize = (value) =>
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}_\s-]+/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const slugify = (value) =>
   normalize(value)
@@ -117,7 +120,20 @@ const getCell = (row, headers, key) => {
   return index >= 0 ? row[index] : "";
 };
 
+const pubhtmlToCsv = async (source) => {
+  const response = await fetch(source, {
+    cache: "no-store",
+    headers: { "user-agent": "SigmaBet team results importer" },
+  });
+  if (!response.ok) throw new Error(`La hoja de resultados respondió ${response.status}`);
+  const html = await response.text();
+  const gid = html.match(/gid=(\d+)/)?.[1];
+  if (!gid) throw new Error("No se encontró ningún gid en el enlace pubhtml de resultados.");
+  return `${source.replace(/\/pubhtml.*$/i, "/pub")}?gid=${gid}&single=true&output=csv`;
+};
+
 const readSource = async (source) => {
+  if (/^https?:\/\//i.test(source) && /\/pubhtml/i.test(source)) return readSource(await pubhtmlToCsv(source));
   if (/^https?:\/\//i.test(source)) {
     const separator = source.includes("?") ? "&" : "?";
     const response = await fetch(`${source}${separator}_=${Date.now()}`, {
@@ -138,7 +154,31 @@ const buildTeamIndex = (data) => {
   return index;
 };
 
-const findTeam = (index, value) => index.get(normalize(value)) || null;
+const findTeam = (index, value) => {
+  const clean = normalize(value);
+  if (!clean) return null;
+  const exact = index.get(clean);
+  if (exact) return exact;
+  const teams = [...new Set(index.values())];
+  return teams.find((team) => {
+    const name = normalize(team.name);
+    return name.includes(clean) || clean.includes(name);
+  }) || null;
+};
+const externalTeamFrom = (value) => {
+  const name = text(value);
+  const slug = slugify(name);
+  return {
+    id: `external-${slug}`,
+    slug,
+    name,
+    crest: null,
+    venueId: null,
+    standing: null,
+    form: [],
+    stats: {},
+  };
+};
 
 const buildStats = (row, headers) => ({
   firstHalfGoals: { home: numberFrom(getCell(row, headers, "golesLocal1T")), away: numberFrom(getCell(row, headers, "golesVisitante1T")) },
@@ -170,18 +210,27 @@ const main = async (source) => {
   const headers = rows[headerIndex];
   const matches = [];
   const unknownTeams = new Set();
+  const externalTeams = new Map();
+  const resolveTeam = (value) => {
+    const existing = findTeam(teamIndex, value);
+    if (existing) return existing;
+    const name = text(value);
+    if (!name) return null;
+    unknownTeams.add(name);
+    const team = externalTeamFrom(name);
+    if (!externalTeams.has(team.id)) externalTeams.set(team.id, team);
+    return externalTeams.get(team.id);
+  };
 
   rows.slice(headerIndex + 1).forEach((row) => {
     if (!row.some((cell) => String(cell).trim())) return;
     const localDate = parseDate(getCell(row, headers, "fecha"));
-    const home = findTeam(teamIndex, getCell(row, headers, "local"));
-    const away = findTeam(teamIndex, getCell(row, headers, "visitante"));
+    const home = resolveTeam(getCell(row, headers, "local"));
+    const away = resolveTeam(getCell(row, headers, "visitante"));
     const homeGoals = numberFrom(getCell(row, headers, "golesLocal"));
     const awayGoals = numberFrom(getCell(row, headers, "golesVisitante"));
 
     if (!localDate || (!home && !away)) return;
-    if (!home) unknownTeams.add(text(getCell(row, headers, "local")));
-    if (!away) unknownTeams.add(text(getCell(row, headers, "visitante")));
     if (!home || !away || homeGoals === null || awayGoals === null) return;
 
     matches.push({
@@ -207,9 +256,9 @@ const main = async (source) => {
     });
   });
 
-  fs.writeFileSync(outputPath, `${JSON.stringify({ updatedAt: new Date().toISOString(), matches }, null, 2)}\n`);
+  fs.writeFileSync(outputPath, `${JSON.stringify({ updatedAt: new Date().toISOString(), teams: [...externalTeams.values()], matches }, null, 2)}\n`);
   console.log(`Resultados importados: ${matches.length}`);
-  if (unknownTeams.size) console.warn(`Equipos no reconocidos: ${[...unknownTeams].filter(Boolean).join(", ")}`);
+  if (unknownTeams.size) console.warn(`Equipos externos añadidos al historial: ${[...unknownTeams].filter(Boolean).join(", ")}`);
 };
 
 if (require.main === module) {

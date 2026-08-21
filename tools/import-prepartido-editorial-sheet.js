@@ -44,7 +44,10 @@ const normalize = (value) =>
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}_\s-]+/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const text = (value, fallback = "") => {
   const clean = String(value ?? "").trim();
@@ -72,7 +75,8 @@ const splitList = (value) =>
 
 const statusFrom = (value) => {
   const clean = normalize(value);
-  if (["baja", "lesionado", "lesion"].includes(clean)) return "baja";
+  if (clean === "baja") return "baja";
+  if (["lesionado", "lesion"].includes(clean)) return "lesionado";
   if (["sancionado", "sancion"].includes(clean)) return "sancionado";
   if (["recuperado", "vuelve"].includes(clean)) return "recuperado";
   return "duda";
@@ -149,7 +153,20 @@ const parseInjuries = (value, teamId) =>
     })
     .filter(Boolean);
 
+const pubhtmlToCsv = async (source) => {
+  const response = await fetch(source, {
+    cache: "no-store",
+    headers: { "user-agent": "SigmaBet prepartido editorial importer" },
+  });
+  if (!response.ok) throw new Error(`La hoja respondió ${response.status}`);
+  const html = await response.text();
+  const gid = html.match(/gid=(\d+)/)?.[1];
+  if (!gid) throw new Error("No se encontró ningún gid en el enlace pubhtml de previas.");
+  return `${source.replace(/\/pubhtml.*$/i, "/pub")}?gid=${gid}&single=true&output=csv`;
+};
+
 const readSource = async (source) => {
+  if (/^https?:\/\//i.test(source) && /\/pubhtml/i.test(source)) return readSource(await pubhtmlToCsv(source));
   if (/^https?:\/\//i.test(source)) {
     const separator = source.includes("?") ? "&" : "?";
     const response = await fetch(`${source}${separator}_=${Date.now()}`, {
