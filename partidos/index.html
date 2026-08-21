@@ -15,6 +15,7 @@
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-05" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
+    <script src="/assets/js/partidos.js?v=20260821-01" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -24,32 +25,30 @@
       <div class="header-actions"><a class="header-x-link" href="https://x.com/SigmaBetES" target="_blank" rel="noreferrer" aria-label="SigmaBet en X">X</a><a class="button button-small" href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Telegram gratis</a></div>
     </header>
     <main>
-      <section class="page-hero match-hub-hero">
-        <p class="kicker">Inteligencia prepartido</p>
-        <h1>Partidos de fútbol analizados por SigmaBet</h1>
-        <p>Fichas prepartido con datos importantes, contexto, probabilidades, cuota justa y apuestas con valor cuando exista una oportunidad real.</p>
-      </section>
-      <section class="section match-hub-grid" aria-label="Competiciones cubiertas">
-        <article class="match-panel match-feature-panel">
-          <span>Primera competición</span>
-          <h2>LaLiga EA Sports</h2>
-          <p>La primera fase se centrará en LaLiga. Las páginas de partido se publicarán cuando exista calendario confirmado y contenido suficiente para aportar valor real.</p>
-          <a class="button button-ghost" href="/competiciones/laliga/">Ver hub de LaLiga</a>
-        </article>
-        <article class="match-panel">
-          <h2>Estado del sistema</h2>
-          <ul class="match-clean-list">
-            <li>Arquitectura de datos preparada.</li>
-            <li>Plantilla de partido lista para contenido real.</li>
-            <li>Sitemap y robots preparados para nuevas rutas.</li>
-            <li>Sin partidos inventados en producción.</li>
-          </ul>
-        </article>
-      </section>
-      <section class="section match-panel">
-        <h2>Partidos publicados</h2>
-        <p>Ahora mismo no hay partidos reales publicados porque falta conectar el calendario confirmado. Cuando se cargue una jornada, cada encuentro tendrá su URL permanente.</p>
-        <a class="text-link" href="/partidos/plantilla/">Ver plantilla técnica no indexable</a>
+      <section class="matches-today-shell" data-matches-app data-source="/data/prepartido/laliga.json">
+        <div class="matches-today-head">
+          <p class="kicker" data-competition-label>Inteligencia prepartido</p>
+          <h1>Partidos de hoy</h1>
+          <p data-matches-status>Actualizando calendario…</p>
+        </div>
+
+        <div class="match-day-nav" aria-label="Navegación por fecha">
+          <button type="button" aria-label="Día anterior" data-date-prev>&lt;</button>
+          <button class="match-day-current" type="button" data-date-label>Hoy</button>
+          <button type="button" aria-label="Día siguiente" data-date-next>&gt;</button>
+          <input class="sr-only" type="date" aria-label="Elegir fecha" data-date-input />
+        </div>
+
+        <section class="daily-match-list" aria-label="Partidos del día" data-matches-list>
+          <div class="daily-empty-state">
+            <strong>Cargando partidos…</strong>
+          </div>
+        </section>
+
+        <div class="matches-today-foot">
+          <a class="text-link" href="/competiciones/laliga/">Ver LaLiga</a>
+          <a class="text-link" href="/partidos/plantilla/">Ver plantilla técnica</a>
+        </div>
       </section>
     </main>
     <footer class="site-footer">

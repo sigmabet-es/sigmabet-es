@@ -32,6 +32,12 @@ const edge = (probability, odds) => {
   const implied = Number(impliedProbability(odds));
   return Number.isFinite(sigma) && Number.isFinite(implied) ? `${(sigma - implied).toFixed(2)} pp` : "Dato no disponible";
 };
+const normalize = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 const readData = () => JSON.parse(fs.readFileSync(dataPath, "utf8"));
 const mkdirp = (dir) => fs.mkdirSync(dir, { recursive: true });
@@ -97,6 +103,39 @@ const renderBet = (bet) => {
   </article>`;
 };
 
+const renderFormRow = (team) => {
+  const form = Array.isArray(team?.form) ? team.form.slice(-5) : [];
+  if (!form.length) return '<span class="match-mini-form-empty">Sin datos</span>';
+  return form.map((item) => `<span class="form-${escapeHtml(normalize(item))}">${escapeHtml(item)}</span>`).join("");
+};
+
+const renderTeamCurrentForm = (team, label) => {
+  const stats = team?.stats?.last5 || {};
+  return `<article>
+    <span>${escapeHtml(team?.name || label)}</span>
+    <div class="form-row">${renderFormRow(team)}</div>
+    <dl>
+      <div><dt>Balance</dt><dd>${escapeHtml(text(stats.record))}</dd></div>
+      <div><dt>Goles</dt><dd>${escapeHtml(text(stats.goals))}</dd></div>
+      <div><dt>Portería a cero</dt><dd>${escapeHtml(text(stats.cleanSheets))}</dd></div>
+    </dl>
+  </article>`;
+};
+
+const renderLineup = (match, team, typeLabel) => {
+  const lineup = (match.lineups || []).find((item) => item.teamId === team?.id && item.type !== "oficial");
+  const players = Array.isArray(lineup?.players) ? lineup.players : [];
+  return `<article class="match-panel">
+    <h2>Alineación probable ${escapeHtml(typeLabel)}</h2>
+    <p>${escapeHtml(team?.name || "Equipo")} · Formación: ${escapeHtml(text(lineup?.formation))} · Confianza: ${escapeHtml(text(lineup?.confidence, "pendiente"))}</p>
+    ${
+      players.length
+        ? `<ol class="lineup-list">${players.map((player) => `<li>${escapeHtml(player)}</li>`).join("")}</ol>`
+        : '<div class="lineup-placeholder">XI probable</div>'
+    }
+  </article>`;
+};
+
 const renderMatch = (data, match) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const home = teams.get(match.homeTeamId) || { name: "Equipo local", slug: "" };
@@ -125,12 +164,12 @@ const renderMatch = (data, match) => {
         </dl>
       </header>
       <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#resumen">Resumen</a><a href="#forma">Forma</a><a href="#estadisticas">Estadísticas</a><a href="#h2h">H2H</a><a href="#bajas">Bajas</a><a href="#alineaciones">Alineaciones</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
+      <section id="forma" class="match-panel"><h2>Rendimiento actual: últimos 5 partidos</h2><div class="match-current-form">${renderTeamCurrentForm(home, "Local")}${renderTeamCurrentForm(away, "Visitante")}</div></section>
+      <section id="alineaciones" class="match-grid">${renderLineup(match, home, "local")}${renderLineup(match, away, "visitante")}</section>
       <section id="resumen" class="match-grid">${renderBet(match.mainBet)}<article class="match-panel"><h2>Previa SigmaBet</h2><p>${escapeHtml(text(match.preview))}</p></article></section>
-      <section id="forma" class="match-panel"><h2>Cómo llegan</h2><p>Dato no disponible hasta conectar proveedor de calendario, resultados y clasificación.</p></section>
       <section id="estadisticas" class="match-panel"><h2>Estadísticas comparadas</h2><p>Se mostrarán temporada, últimos 10, últimos 5 y casa/fuera cuando existan datos fiables.</p></section>
       <section id="h2h" class="match-panel"><h2>H2H</h2><p>Dato no disponible. El H2H no se sobreponderará cuando las plantillas o contexto hayan cambiado.</p></section>
       <section id="bajas" class="match-panel"><h2>Bajas, sanciones y dudas</h2><p>Dato no disponible. Solo se publicará información rastreable a fuentes fiables.</p></section>
-      <section id="alineaciones" class="match-panel"><h2>XI probable</h2><p>Dato no disponible. No se confundirá XI probable con alineación oficial.</p></section>
       <section id="analisis" class="match-panel"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis))}</p></section>
       <section id="apuestas" class="match-panel"><h2>Apuestas con valor</h2><p>Predicción no significa apuesta. El equipo más probable no siempre es la mejor entrada.</p></section>
       <aside class="match-telegram"><h2>Sigue las apuestas de SigmaBet en Telegram</h2><p>Consulta qué selecciones termina jugando SigmaBet y recibe actualizaciones de cuotas, alineaciones y mercados.</p><a class="button" href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Entrar en Telegram</a></aside>
