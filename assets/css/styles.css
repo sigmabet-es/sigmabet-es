@@ -10953,29 +10953,31 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .match-detail-hero {
   display: grid;
-  gap: 18px;
-  padding: clamp(18px, 3.8vw, 34px);
+  gap: clamp(16px, 2.4vw, 24px);
+  padding: clamp(20px, 3.6vw, 38px);
   overflow: hidden;
   background:
-    radial-gradient(circle at 12% 18%, rgba(0, 255, 127, 0.08), transparent 22rem),
-    linear-gradient(180deg, rgba(245, 245, 245, 0.026), transparent 260px),
-    rgba(11, 11, 11, 0.96);
+    radial-gradient(circle at 8% 8%, rgba(0, 255, 127, 0.1), transparent 20rem),
+    radial-gradient(circle at 96% 22%, rgba(255, 255, 255, 0.035), transparent 18rem),
+    linear-gradient(180deg, rgba(245, 245, 245, 0.03), transparent 280px),
+    rgba(10, 10, 10, 0.96);
 }
 
 .match-detail-hero h1 {
   margin: 0;
   color: var(--text);
-  font-size: clamp(36px, 6vw, 70px);
+  max-width: 1100px;
+  font-size: clamp(34px, 5.5vw, 70px);
   line-height: 0.95;
 }
 
 .match-kickoff-strip {
   display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1.05fr 1.2fr 1.15fr 0.86fr;
+  gap: 10px;
 }
 
-.match-kickoff-strip div,
+.match-kickoff-strip .match-meta-item,
 .match-vs-board section,
 .match-analysis-empty,
 .match-h2h-summary div,
@@ -10985,12 +10987,17 @@ body:not(.has-active-signal) .signal-home-status > span {
   background: rgba(245, 245, 245, 0.018);
 }
 
-.match-kickoff-strip div {
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.18);
+.match-kickoff-strip .match-meta-item {
+  display: grid;
+  align-content: start;
+  min-height: 76px;
+  padding: 13px 14px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.026), transparent),
+    rgba(0, 0, 0, 0.18);
 }
 
-.match-kickoff-strip span,
+.match-kickoff-strip .match-meta-item > span,
 .match-vs-board span,
 .match-analysis-empty span,
 .match-section-head span,
@@ -11004,12 +11011,78 @@ body:not(.has-active-signal) .signal-home-status > span {
   text-transform: uppercase;
 }
 
+.match-kickoff-strip .match-meta-item > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.match-kickoff-strip svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  color: var(--green);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  opacity: 0.82;
+}
+
 .match-kickoff-strip strong {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   color: var(--text);
   font-size: 14px;
   line-height: 1.25;
+}
+
+.match-kickoff-strip small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.ref-card-stats {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ref-card-stats b {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.ref-card-stats b::before {
+  content: "";
+  width: 9px;
+  height: 13px;
+  border-radius: 2px;
+}
+
+.card-yellow::before {
+  background: #e6c447;
+}
+
+.card-red::before {
+  background: #d65050;
+}
+
+.ref-card-empty {
+  color: var(--muted);
+  font-size: 14px;
+  text-transform: none;
 }
 
 .match-vs-board {
@@ -11022,11 +11095,13 @@ body:not(.has-active-signal) .signal-home-status > span {
 .match-vs-board section {
   display: grid;
   gap: 12px;
-  min-height: 132px;
+  min-height: 172px;
   align-content: start;
-  padding: 18px;
-  border-color: transparent;
-  background: transparent;
+  padding: clamp(16px, 2.2vw, 24px);
+  border-color: rgba(245, 245, 245, 0.045);
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.018), transparent),
+    rgba(0, 0, 0, 0.12);
 }
 
 .match-vs-board section:last-child {
@@ -11045,8 +11120,8 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .match-vs-board img,
 .match-team-fallback {
-  width: clamp(58px, 7vw, 86px);
-  height: clamp(58px, 7vw, 86px);
+  width: clamp(54px, 6vw, 78px);
+  height: clamp(54px, 6vw, 78px);
   object-fit: contain;
   filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
 }
@@ -11071,8 +11146,10 @@ body:not(.has-active-signal) .signal-home-status > span {
   min-width: 106px;
   place-items: center;
   border: 1px solid rgba(245, 245, 245, 0.08);
-  border-radius: 18px;
-  background: rgba(0, 0, 0, 0.28);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(245, 245, 245, 0.045), transparent 7rem),
+    rgba(0, 0, 0, 0.3);
   color: var(--text);
   font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: clamp(19px, 2.8vw, 34px);
@@ -11930,11 +12007,13 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .match-result-list li {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
   align-items: center;
-  border-top: 1px solid rgba(245, 245, 245, 0.07);
-  padding-top: 10px;
+  border: 1px solid rgba(245, 245, 245, 0.055);
+  border-radius: 12px;
+  background: rgba(245, 245, 245, 0.018);
+  padding: 10px;
 }
 
 .match-result-list li[hidden] {
@@ -11943,8 +12022,8 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .match-result-list li > span {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   place-items: center;
   border-radius: 999px;
   font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -11956,10 +12035,12 @@ body:not(.has-active-signal) .signal-home-status > span {
   min-width: 0;
   color: var(--text);
   font-size: 14px;
+  line-height: 1.2;
 }
 
 .match-result-list small {
-  margin-top: 3px;
+  margin-top: 5px;
+  white-space: normal;
 }
 
 .match-empty-copy,

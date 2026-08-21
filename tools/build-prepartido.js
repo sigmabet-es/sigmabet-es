@@ -15,6 +15,17 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
+const icons = {
+  calendar:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4M3.5 9.5h17M6.5 5h11A2.5 2.5 0 0 1 20 7.5v10A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-10A2.5 2.5 0 0 1 6.5 5Z"/></svg>',
+  stadium:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10c0-3.3 3.6-6 8-6s8 2.7 8 6v7.5c0 1.4-3.6 2.5-8 2.5s-8-1.1-8-2.5V10Z"/><path d="M4 10c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5M8 12v7M16 12v7M12 12.5V20"/></svg>',
+  whistle:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9.5h6.5a4.5 4.5 0 1 1-4.2 6.1H8.5A4.5 4.5 0 1 1 9 9.5Z"/><path d="M15.5 9.5 19 5h2M8.5 15.5h2.8"/></svg>',
+  card:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3.5h8a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z"/></svg>',
+};
+
 const text = (value, fallback = "Dato no disponible") => {
   const clean = String(value ?? "").trim();
   return clean || fallback;
@@ -381,8 +392,6 @@ const renderLineupsSection = (match, home, away) => {
         ${renderLineupTeamSummary(match, away, "Visitante", "away")}
       </div>
       <div class="lineup-versus-pitch">
-        ${home?.crest ? `<img class="lineup-watermark lineup-watermark-home" src="${escapeHtml(home.crest)}" alt="" loading="lazy" />` : ""}
-        ${away?.crest ? `<img class="lineup-watermark lineup-watermark-away" src="${escapeHtml(away.crest)}" alt="" loading="lazy" />` : ""}
         <div class="pitch-lines" aria-hidden="true"></div>
         ${renderFacingLineup(match, home, "home")}
         ${renderFacingLineup(match, away, "away")}
@@ -495,6 +504,38 @@ const h2hMatches = (data, match, scope = "all") =>
     .filter((item) => scope === "all" || (scope === "home" ? item.homeTeamId === match.homeTeamId : item.awayTeamId === match.homeTeamId))
     .slice(0, 10);
 
+const refereeCardAverages = (data, referee) => {
+  const clean = normalize(referee);
+  if (!clean) return null;
+  const rows = (data.matches || []).filter((item) => {
+    const stats = item.stats || {};
+    return (
+      isFinished(item) &&
+      normalize(item.referee) === clean &&
+      stats.yellowCards &&
+      stats.redCards &&
+      Number.isFinite(Number(stats.yellowCards.home)) &&
+      Number.isFinite(Number(stats.yellowCards.away)) &&
+      Number.isFinite(Number(stats.redCards.home)) &&
+      Number.isFinite(Number(stats.redCards.away))
+    );
+  });
+  if (!rows.length) return null;
+  const totals = rows.reduce(
+    (acc, item) => {
+      acc.yellow += Number(item.stats.yellowCards.home) + Number(item.stats.yellowCards.away);
+      acc.red += Number(item.stats.redCards.home) + Number(item.stats.redCards.away);
+      return acc;
+    },
+    { yellow: 0, red: 0 }
+  );
+  return {
+    matches: rows.length,
+    yellow: totals.yellow / rows.length,
+    red: totals.red / rows.length,
+  };
+};
+
 const renderFormPills = (data, match, teamId) => {
   const results = teamMatches(data, match, teamId, "all", 5).map((item) => resultForTeam(item, teamId));
   if (!results.length) return '<span class="match-form-empty">Sin resultados previos</span>';
@@ -507,10 +548,16 @@ const renderResultRow = (data, item, teamId) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const result = resultForTeam(item, teamId);
   const scope = item.homeTeamId === teamId ? "home" : "away";
+  const date = item.localDate || String(item.startDate).slice(0, 10);
+  const round = text(item.roundId, "")
+    .replace("laliga-2026-2027-", "")
+    .replace("-", " ");
   return `<li data-scope-row="${scope}">
     <span class="form-${escapeHtml(normalize(result))}">${escapeHtml(result)}</span>
-    <strong>${escapeHtml(teamName(teams, item.homeTeamId))} ${escapeHtml(scoreText(item))} ${escapeHtml(teamName(teams, item.awayTeamId))}</strong>
-    <small>${escapeHtml(item.localDate || String(item.startDate).slice(0, 10))} · ${escapeHtml(item.roundId.replace("laliga-2026-2027-", "").replace("-", " "))}</small>
+    <div>
+      <strong>${escapeHtml(teamName(teams, item.homeTeamId))} ${escapeHtml(scoreText(item))} ${escapeHtml(teamName(teams, item.awayTeamId))}</strong>
+      <small>${escapeHtml(date)}${round ? ` · ${escapeHtml(round)}` : ""}</small>
+    </div>
   </li>`;
 };
 
@@ -617,6 +664,12 @@ const renderCrest = (team) =>
     ? `<img src="${escapeHtml(team.crest)}" alt="" loading="lazy" />`
     : `<span class="match-team-fallback">${escapeHtml(String(team?.name || "?").slice(0, 2))}</span>`;
 
+const renderMetaItem = ({ icon, label, value, extra = "" }) => `<div class="match-meta-item">
+  <span>${icons[icon] || ""}${escapeHtml(label)}</span>
+  <strong>${value}</strong>
+  ${extra}
+</div>`;
+
 const renderMatch = (data, match) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const home = teams.get(match.homeTeamId) || { name: "Equipo local", slug: "" };
@@ -625,6 +678,7 @@ const renderMatch = (data, match) => {
   const title = `${home.name} vs ${away.name}: análisis y pronóstico | SigmaBet`;
   const description = `Análisis del ${home.name} vs ${away.name} con estadísticas, H2H, bajas, posibles alineaciones, probabilidades y apuestas con valor de SigmaBet.`;
   const canonical = `https://sigmabet.es/partidos/${match.slug}/`;
+  const refereeCards = refereeCardAverages(data, match.referee);
   const body = `
     <nav class="match-breadcrumb" aria-label="Migas de pan"><a href="/index.html">Inicio</a><span>/</span><a href="/competiciones/laliga/">LaLiga</a><span>/</span><span>${escapeHtml(round.name)}</span></nav>
     <article class="match-page">
@@ -632,9 +686,21 @@ const renderMatch = (data, match) => {
         <p class="kicker">${escapeHtml(data.competition.name)} · ${escapeHtml(round.name)}</p>
         <h1>${escapeHtml(home.name)} vs ${escapeHtml(away.name)}</h1>
         <div class="match-kickoff-strip">
-          <div><span>Hora local</span><strong data-local-time data-time-status="${escapeHtml(match.timeStatus || "confirmed")}" data-start-date="${escapeHtml(match.startDate || "")}">${escapeHtml(match.timeStatus === "pending" ? "Horario pendiente" : text(match.localTime || match.startDate))}</strong></div>
-          <div><span>Estadio</span><strong>${escapeHtml(text(match.venue, "Estadio pendiente"))}</strong></div>
-          <div><span>Árbitro</span><strong>${escapeHtml(text(match.referee, "Árbitro pendiente"))}</strong></div>
+          ${renderMetaItem({
+            icon: "calendar",
+            label: "Fecha",
+            value: `<span data-local-time data-time-status="${escapeHtml(match.timeStatus || "confirmed")}" data-start-date="${escapeHtml(match.startDate || "")}">${escapeHtml(match.timeStatus === "pending" ? "Horario pendiente" : text(match.localTime || match.startDate))}</span>`,
+          })}
+          ${renderMetaItem({ icon: "stadium", label: "Estadio", value: escapeHtml(text(match.venue, "Estadio pendiente")) })}
+          ${renderMetaItem({ icon: "whistle", label: "Árbitro", value: escapeHtml(text(match.referee, "Árbitro pendiente")) })}
+          ${renderMetaItem({
+            icon: "card",
+            label: "Media tarjetas",
+            value: refereeCards
+              ? `<span class="ref-card-stats"><b class="card-yellow">${refereeCards.yellow.toFixed(2)}</b><b class="card-red">${refereeCards.red.toFixed(2)}</b></span>`
+              : '<span class="ref-card-empty">Sin datos</span>',
+            extra: refereeCards ? `<small>${refereeCards.matches} partidos con datos</small>` : "",
+          })}
         </div>
         <div class="match-vs-board">
           <section>
