@@ -222,6 +222,42 @@ const initials = (value) =>
     .join("")
     .toUpperCase();
 
+const teamKit = (teamId) => {
+  const kits = {
+    "athletic-club": ["#e0192d", "#ffffff", "#111111"],
+    "atletico-de-madrid": ["#d7192d", "#ffffff", "#111111"],
+    "ca-osasuna": ["#b8122a", "#10163a", "#ffffff"],
+    celta: ["#9bd7ff", "#ffffff", "#0a1b2f"],
+    "deportivo-alaves": ["#0055a4", "#ffffff", "#101010"],
+    "elche-cf": ["#ffffff", "#1aa36f", "#111111"],
+    "fc-barcelona": ["#a50044", "#004d98", "#ffffff"],
+    "getafe-cf": ["#004ea8", "#004ea8", "#ffffff"],
+    "levante-ud": ["#b00032", "#1f3f8f", "#ffffff"],
+    "malaga-cf": ["#77c8ef", "#ffffff", "#111111"],
+    "racing-club": ["#0a8f45", "#ffffff", "#111111"],
+    "rayo-vallecano": ["#ffffff", "#d7192d", "#111111"],
+    "rc-deportivo": ["#005bac", "#ffffff", "#111111"],
+    "rcd-espanyol": ["#0050a4", "#ffffff", "#111111"],
+    "real-betis": ["#00a651", "#ffffff", "#06120a"],
+    "real-madrid": ["#ffffff", "#f3f3f3", "#111111"],
+    "real-sociedad": ["#2362b8", "#ffffff", "#111111"],
+    "sevilla-fc": ["#ffffff", "#d7192d", "#111111"],
+    "valencia-cf": ["#ffffff", "#111111", "#111111"],
+    "villarreal-cf": ["#ffe000", "#ffe000", "#111111"],
+  };
+  const [primary, secondary, textColor] = kits[teamId] || ["#00ff7f", "#ffffff", "#06120a"];
+  return `--kit-primary:${primary};--kit-secondary:${secondary};--kit-text:${textColor};`;
+};
+
+const parseLineupPlayer = (player, fallbackNumber) => {
+  const raw = text(player, "");
+  const numbered = raw.match(/^\(?(\d{1,2})\)?[\s.)-]+(.+)$/);
+  return {
+    number: numbered ? numbered[1] : String(fallbackNumber),
+    name: numbered ? text(numbered[2], raw) : raw,
+  };
+};
+
 const splitLineupRows = (players, formation) => {
   const shape = text(formation, "")
     .split("-")
@@ -243,13 +279,51 @@ const splitLineupRows = (players, formation) => {
 };
 
 const renderPitchPlayer = (player, index) => `<li class="pitch-player">
-  <span class="pitch-shirt"><b>${index + 1}</b></span>
-  <strong>${escapeHtml(player)}</strong>
+  <span class="pitch-shirt"><b>${escapeHtml(player.number || index + 1)}</b></span>
+  <strong>${escapeHtml(player.name || "")}</strong>
 </li>`;
+
+const getLineup = (match, team) => (match.lineups || []).find((item) => item.teamId === team?.id && item.type !== "oficial");
+
+const renderLineupTeamSummary = (match, team, typeLabel, side) => {
+  const lineup = getLineup(match, team);
+  return `<div class="lineup-matchup-team lineup-matchup-${escapeHtml(side)}">
+    ${renderCrest(team)}
+    <div>
+      <span>${escapeHtml(typeLabel)}</span>
+      <h3>${escapeHtml(team?.name || "Equipo")}</h3>
+      <p>${escapeHtml(text(lineup?.formation, "Formación pendiente"))} · Confianza ${escapeHtml(text(lineup?.confidence, "pendiente"))}</p>
+    </div>
+  </div>`;
+};
+
+const renderFacingLineup = (match, team, side) => {
+  const lineup = getLineup(match, team);
+  const rawPlayers = Array.isArray(lineup?.players) ? lineup.players : [];
+  const players = rawPlayers.map((player, index) => parseLineupPlayer(player, index + 1));
+  const rows = splitLineupRows(players, lineup?.formation);
+  const facingRows = side === "home" ? [...rows].reverse() : rows;
+
+  if (!players.length) {
+    return `<div class="facing-lineup facing-${escapeHtml(side)}" style="${escapeHtml(teamKit(team?.id))}">
+      <div class="lineup-placeholder">Alineación pendiente</div>
+    </div>`;
+  }
+
+  return `<ol class="facing-lineup facing-${escapeHtml(side)}" style="${escapeHtml(teamKit(team?.id))};--line-count:${facingRows.length}">
+    ${facingRows
+      .map(
+        (row) => `<li class="facing-column facing-column-${escapeHtml(row.type)}"><ol>${row.players
+          .map((player, index) => renderPitchPlayer(player, index))
+          .join("")}</ol></li>`
+      )
+      .join("")}
+  </ol>`;
+};
 
 const renderLineupCard = (match, team, typeLabel) => {
   const lineup = (match.lineups || []).find((item) => item.teamId === team?.id && item.type !== "oficial");
-  const players = Array.isArray(lineup?.players) ? lineup.players : [];
+  const players = Array.isArray(lineup?.players) ? lineup.players.map((player, index) => parseLineupPlayer(player, index + 1)) : [];
   const rows = splitLineupRows(players, lineup?.formation);
   let playerIndex = players.length;
   return `<article class="lineup-card lineup-pitch-card">
@@ -290,14 +364,24 @@ const renderLineupsSection = (match, home, away) => {
       <h2>Alineaciones probables</h2>
       <p>${
         lineups.length
-          ? "Once probable sujeto a cambios hasta que existan alineaciones oficiales."
+          ? "Once probable sujeto a cambios hasta que existan alineaciones oficiales. Los dorsales se toman del Excel cuando vienen indicados."
           : "Alineaciones probables pendientes de confirmación. No se muestran jugadores si no hay información fiable."
       }</p>
     </div>
-    <div class="lineup-grid">
-      ${renderLineupCard(match, home, "Local")}
-      ${renderLineupCard(match, away, "Visitante")}
-    </div>
+    <article class="lineup-matchup-card">
+      <div class="lineup-matchup-head">
+        ${renderLineupTeamSummary(match, home, "Local", "home")}
+        <span class="lineup-matchup-vs">VS</span>
+        ${renderLineupTeamSummary(match, away, "Visitante", "away")}
+      </div>
+      <div class="lineup-versus-pitch">
+        ${home?.crest ? `<img class="lineup-watermark lineup-watermark-home" src="${escapeHtml(home.crest)}" alt="" loading="lazy" />` : ""}
+        ${away?.crest ? `<img class="lineup-watermark lineup-watermark-away" src="${escapeHtml(away.crest)}" alt="" loading="lazy" />` : ""}
+        <div class="pitch-lines" aria-hidden="true"></div>
+        ${renderFacingLineup(match, home, "home")}
+        ${renderFacingLineup(match, away, "away")}
+      </div>
+    </article>
   </section>`;
 };
 

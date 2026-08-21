@@ -11301,6 +11301,170 @@ body:not(.has-active-signal) .signal-home-status > span {
   margin: 8px 0 0;
 }
 
+.lineup-matchup-card {
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 255, 127, 0.07), transparent 18rem),
+    linear-gradient(180deg, rgba(245, 245, 245, 0.018), transparent 210px),
+    rgba(7, 8, 8, 0.76);
+  padding: clamp(14px, 1.7vw, 20px);
+}
+
+.lineup-matchup-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.lineup-matchup-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lineup-matchup-team img,
+.lineup-matchup-team .match-team-fallback {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.lineup-matchup-away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.lineup-matchup-away img,
+.lineup-matchup-away .match-team-fallback {
+  order: 2;
+}
+
+.lineup-matchup-team h3 {
+  margin: 3px 0 0;
+  color: var(--text);
+  font-size: clamp(20px, 2.5vw, 30px);
+  line-height: 1.05;
+}
+
+.lineup-matchup-team p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.lineup-matchup-vs {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(245, 245, 245, 0.08);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.26);
+  color: var(--text);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.lineup-versus-pitch {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: clamp(430px, 39vw, 560px);
+  overflow: hidden;
+  border: 1px solid rgba(245, 245, 245, 0.11);
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 1px), rgba(245, 245, 245, 0.2) 50%, transparent calc(50% + 1px)),
+    radial-gradient(circle at 50% 50%, transparent 0 62px, rgba(245, 245, 245, 0.18) 63px 65px, transparent 66px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0 11%, transparent 11% 22%, rgba(255, 255, 255, 0.04) 22% 33%, transparent 33% 44%, rgba(255, 255, 255, 0.045) 44% 55%, transparent 55% 66%, rgba(255, 255, 255, 0.04) 66% 77%, transparent 77% 88%, rgba(255, 255, 255, 0.045) 88%),
+    #163b2a;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.42);
+}
+
+.lineup-versus-pitch::before,
+.lineup-versus-pitch::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  bottom: 30%;
+  width: 10%;
+  border: 2px solid rgba(245, 245, 245, 0.2);
+  z-index: -1;
+}
+
+.lineup-versus-pitch::before {
+  left: -1px;
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+}
+
+.lineup-versus-pitch::after {
+  right: -1px;
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+}
+
+.lineup-watermark-away {
+  right: 18px;
+  left: auto;
+}
+
+.facing-lineup {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--line-count, 5), minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(4px, 0.8vw, 10px);
+  margin: 0;
+  padding: clamp(28px, 4vw, 44px) clamp(14px, 2.3vw, 28px);
+  list-style: none;
+}
+
+.facing-home {
+  padding-right: clamp(8px, 1.5vw, 18px);
+}
+
+.facing-away {
+  padding-left: clamp(8px, 1.5vw, 18px);
+}
+
+.facing-column > ol {
+  display: grid;
+  height: 100%;
+  align-content: space-around;
+  justify-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facing-column-goalkeeper > ol,
+.facing-column-attack > ol {
+  align-content: center;
+}
+
+.facing-lineup .pitch-player {
+  min-width: 48px;
+}
+
+.facing-lineup .pitch-shirt {
+  width: clamp(34px, 3.4vw, 46px);
+  height: clamp(38px, 3.8vw, 52px);
+}
+
+.facing-lineup .pitch-player strong {
+  max-width: 82px;
+  font-size: clamp(10px, 0.95vw, 12px);
+}
+
 .lineup-pitch-card {
   display: grid;
   gap: 14px;
@@ -11441,10 +11605,10 @@ body:not(.has-active-signal) .signal-home-status > span {
   height: clamp(42px, 4.8vw, 58px);
   place-items: center;
   background:
-    linear-gradient(90deg, var(--green) 0 27%, #f7fff9 27% 73%, var(--green) 73%),
-    var(--green);
+    linear-gradient(90deg, var(--kit-primary, var(--green)) 0 24%, var(--kit-secondary, #f7fff9) 24% 50%, var(--kit-primary, var(--green)) 50% 76%, var(--kit-secondary, #f7fff9) 76%),
+    var(--kit-primary, var(--green));
   clip-path: polygon(14% 0, 35% 0, 42% 10%, 58% 10%, 65% 0, 86% 0, 100% 22%, 82% 38%, 82% 100%, 18% 100%, 18% 38%, 0 22%);
-  color: #07110b;
+  color: var(--kit-text, #07110b);
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.42));
 }
 
@@ -12561,6 +12725,76 @@ body:not(.has-active-signal) .signal-home-status > span {
 
   .lineup-card-head {
     display: grid;
+  }
+
+  .lineup-matchup-head {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .lineup-matchup-team {
+    gap: 8px;
+  }
+
+  .lineup-matchup-team img,
+  .lineup-matchup-team .match-team-fallback {
+    width: 34px;
+    height: 34px;
+  }
+
+  .lineup-matchup-team h3 {
+    font-size: 15px;
+  }
+
+  .lineup-matchup-team p {
+    font-size: 10px;
+  }
+
+  .lineup-matchup-vs {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 10px;
+  }
+
+  .lineup-versus-pitch {
+    min-height: 390px;
+    border-radius: 14px;
+  }
+
+  .facing-lineup {
+    gap: 2px;
+    padding: 26px 5px;
+  }
+
+  .facing-home {
+    padding-right: 3px;
+  }
+
+  .facing-away {
+    padding-left: 3px;
+  }
+
+  .facing-column > ol {
+    gap: 5px;
+  }
+
+  .facing-lineup .pitch-player {
+    min-width: 32px;
+  }
+
+  .facing-lineup .pitch-shirt {
+    width: 25px;
+    height: 29px;
+  }
+
+  .facing-lineup .pitch-shirt b {
+    font-size: 10px;
+  }
+
+  .facing-lineup .pitch-player strong {
+    max-width: 42px;
+    font-size: 8.5px;
   }
 
   .lineup-card-meta {

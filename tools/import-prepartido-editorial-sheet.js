@@ -66,7 +66,7 @@ const boolFrom = (value) => {
 
 const splitList = (value) =>
   String(value || "")
-    .split("|")
+    .split(/\n|\|/)
     .map((item) => item.trim())
     .filter(Boolean);
 
