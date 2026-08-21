@@ -23,6 +23,10 @@ Esta capa amplía SigmaBet sin sustituir el diseño actual. La web sigue siendo 
 - `assets/js/prepartido-admin.js`: cálculos de cuota justa, probabilidad implícita, edge y SigmaValue.
 - `tools/build-prepartido.js`: generador preparado para emitir páginas estáticas desde datos reales y contenido editorial.
 - `tools/prepartido-editorial-template.js`: genera una plantilla editable para un partido concreto.
+- `tools/import-prepartido-editorial-sheet.js`: importa una hoja publicada como CSV y actualiza la capa editorial.
+- `tools/sync-prepartido.js`: sincroniza la hoja conectada y regenera todas las fichas con un único comando.
+- `data/prepartido/sources.json`: configuración del enlace CSV de Google Sheets.
+- `docs/prepartido-editorial-sheet-template.csv`: plantilla de columnas para replicar en Google Sheets.
 
 ## Entidades
 
@@ -75,6 +79,46 @@ node tools/build-prepartido.js
 ```
 
 Si una ficha no tiene contenido editorial, se muestra el calendario y contexto básico con mensajes claros de que no hay análisis o alineaciones disponibles.
+
+## Cómo completar previas desde Google Sheets
+
+Esta es la vía recomendada para trabajar cada día.
+
+1. Crear una hoja de Google Sheets con las columnas de `docs/prepartido-editorial-sheet-template.csv`.
+2. Publicar esa pestaña como CSV.
+3. Pegar el enlace una sola vez en `data/prepartido/sources.json`:
+
+```json
+{
+  "editorialCsvUrl": "URL_CSV_PUBLICADA"
+}
+```
+
+4. Rellenar una fila por partido usando el `slug` de la ficha.
+5. Separar listas con `|`.
+   - Claves: `Clave 1 | Clave 2 | Clave 3`.
+   - XI: `Jugador 1 | Jugador 2 | ... | Jugador 11`.
+6. Separar bajas con `|` y cada baja con `;`.
+   - Ejemplo: `Jugador A; baja; lesión muscular | Jugador B; duda; molestias`.
+7. Sincronizar y regenerar todo con un único comando:
+
+```bash
+node tools/sync-prepartido.js
+```
+
+La hoja es la fuente cómoda para editar. `editorial.json` queda como salida interna versionada para publicar la web.
+
+Si se quiere importar una hoja puntual sin tocar la configuración:
+
+```bash
+node tools/import-prepartido-editorial-sheet.js "URL_CSV_PUBLICADA"
+```
+
+También puede guardarse la URL en una variable de entorno:
+
+```bash
+SIGMABET_PREPARTIDO_EDITORIAL_CSV_URL="URL_CSV_PUBLICADA" node tools/import-prepartido-editorial-sheet.js
+```
 
 ## Proveedores pendientes
 
