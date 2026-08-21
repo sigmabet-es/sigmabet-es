@@ -152,7 +152,7 @@ const pageShell = ({ title, description, canonical, robots = "index,follow", bod
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="${escapeHtml(canonical)}" />
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-02" />
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-03" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
     <script src="/assets/js/prepartido-match.js?v=20260821-01" defer></script>
     ${structuredData ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>` : ""}
@@ -213,18 +213,70 @@ const renderTeamCurrentForm = (team, label) => {
   </article>`;
 };
 
+const initials = (value) =>
+  text(value, "?")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+
+const splitLineupRows = (players, formation) => {
+  const shape = text(formation, "")
+    .split("-")
+    .map((part) => Number.parseInt(part, 10))
+    .filter((part) => Number.isFinite(part) && part > 0);
+  const rows = shape.length ? [1, ...shape] : [1, 4, 3, 3];
+  let cursor = 0;
+  return rows
+    .map((amount, index) => {
+      const rowPlayers = players.slice(cursor, cursor + amount);
+      cursor += amount;
+      return {
+        type: index === 0 ? "goalkeeper" : index === rows.length - 1 ? "attack" : "line",
+        players: rowPlayers,
+      };
+    })
+    .filter((row) => row.players.length)
+    .reverse();
+};
+
+const renderPitchPlayer = (player, index) => `<li class="pitch-player">
+  <span class="pitch-shirt"><b>${index + 1}</b></span>
+  <strong>${escapeHtml(player)}</strong>
+</li>`;
+
 const renderLineupCard = (match, team, typeLabel) => {
   const lineup = (match.lineups || []).find((item) => item.teamId === team?.id && item.type !== "oficial");
   const players = Array.isArray(lineup?.players) ? lineup.players : [];
-  return `<article class="lineup-card">
-    <div>
-      <span>${escapeHtml(typeLabel)}</span>
-      <h3>${escapeHtml(team?.name || "Equipo")}</h3>
-      <p>Formación: ${escapeHtml(text(lineup?.formation, "pendiente"))} · Confianza: ${escapeHtml(text(lineup?.confidence, "pendiente"))}</p>
+  const rows = splitLineupRows(players, lineup?.formation);
+  let playerIndex = players.length;
+  return `<article class="lineup-card lineup-pitch-card">
+    <div class="lineup-card-head">
+      <div>
+        <span>${escapeHtml(typeLabel)}</span>
+        <h3>${escapeHtml(team?.name || "Equipo")}</h3>
+      </div>
+      <div class="lineup-card-meta">
+        <strong>${escapeHtml(text(lineup?.formation, "Formación pendiente"))}</strong>
+        <small>Confianza ${escapeHtml(text(lineup?.confidence, "pendiente"))}</small>
+      </div>
     </div>
     ${
       players.length
-        ? `<ol class="lineup-list">${players.map((player) => `<li>${escapeHtml(player)}</li>`).join("")}</ol>`
+        ? `<div class="lineup-pitch" aria-label="Alineación probable de ${escapeHtml(team?.name || "Equipo")}">
+            ${team?.crest ? `<img class="lineup-watermark" src="${escapeHtml(team.crest)}" alt="" loading="lazy" />` : ""}
+            <div class="pitch-lines" aria-hidden="true"></div>
+            <ol class="pitch-lineup">${rows
+              .map((row) => {
+                playerIndex -= row.players.length;
+                return `<li class="pitch-row pitch-row-${escapeHtml(row.type)}"><ol>${row.players
+                  .map((player, index) => renderPitchPlayer(player, playerIndex + index))
+                  .join("")}</ol></li>`;
+              })
+              .join("")}</ol>
+          </div>`
         : '<div class="lineup-placeholder">Alineación pendiente</div>'
     }
   </article>`;
@@ -252,15 +304,44 @@ const renderLineupsSection = (match, home, away) => {
 const renderInjuriesSection = (match, home, away) => {
   const injuries = Array.isArray(match.injuries) ? match.injuries : [];
   const byTeam = (team) => injuries.filter((item) => item.teamId === team.id);
+  const statusLabel = (status) => {
+    const normalized = normalize(status);
+    if (normalized.includes("duda")) return "Duda";
+    if (normalized.includes("sanc")) return "Sanción";
+    if (normalized.includes("decision")) return "Decisión";
+    return "Baja";
+  };
   const renderItems = (team) => {
     const items = byTeam(team);
-    if (!items.length) return '<p class="match-empty-copy">Sin bajas confirmadas en la ficha.</p>';
-    return `<ul class="match-status-list">${items
+    const counts = items.reduce(
+      (acc, item) => {
+        const label = statusLabel(item.status);
+        acc[label] = (acc[label] || 0) + 1;
+        return acc;
+      },
+      {}
+    );
+    if (!items.length) {
+      return `<div class="availability-empty">
+        <span class="availability-ok">OK</span>
+        <p>Sin bajas confirmadas en la ficha.</p>
+      </div>`;
+    }
+    return `<div class="availability-summary">
+        ${["Baja", "Duda", "Sanción"].map((label) => `<span>${label} <strong>${counts[label] || 0}</strong></span>`).join("")}
+      </div>
+      <ul class="availability-list">${items
       .map(
-        (item) => `<li>
-          <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(text(item.status))}${item.reason ? ` · ${escapeHtml(item.reason)}` : ""}</span>
+        (item) => {
+          const label = statusLabel(item.status);
+          return `<li class="availability-item availability-${escapeHtml(normalize(label))}">
+          <span class="availability-avatar">${escapeHtml(initials(item.name))}</span>
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <small><b>${escapeHtml(label)}</b>${item.reason ? ` · ${escapeHtml(item.reason)}` : ""}${item.position ? ` · ${escapeHtml(item.position)}` : ""}</small>
+          </div>
         </li>`
+        }
       )
       .join("")}</ul>`;
   };
@@ -271,9 +352,15 @@ const renderInjuriesSection = (match, home, away) => {
       <h2>Bajas, sanciones y dudas</h2>
       <p>Solo se publican ausencias cuando existe información contrastada.</p>
     </div>
-    <div class="lineup-grid">
-      <article class="lineup-card"><h3>${escapeHtml(home.name)}</h3>${renderItems(home)}</article>
-      <article class="lineup-card"><h3>${escapeHtml(away.name)}</h3>${renderItems(away)}</article>
+    <div class="availability-grid">
+      <article class="availability-card">
+        <div class="availability-team-head">${renderCrest(home)}<h3>${escapeHtml(home.name)}</h3></div>
+        ${renderItems(home)}
+      </article>
+      <article class="availability-card">
+        <div class="availability-team-head">${renderCrest(away)}<h3>${escapeHtml(away.name)}</h3></div>
+        ${renderItems(away)}
+      </article>
     </div>
   </section>`;
 };

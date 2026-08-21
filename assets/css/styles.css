@@ -11301,6 +11301,317 @@ body:not(.has-active-signal) .signal-home-status > span {
   margin: 8px 0 0;
 }
 
+.lineup-pitch-card {
+  display: grid;
+  gap: 14px;
+  padding: clamp(14px, 1.6vw, 18px);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 255, 127, 0.08), transparent 17rem),
+    linear-gradient(180deg, rgba(245, 245, 245, 0.018), transparent 190px),
+    rgba(7, 8, 8, 0.76);
+}
+
+.lineup-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.lineup-card-meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(245, 245, 245, 0.08);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+  padding: 8px 11px;
+}
+
+.lineup-card-meta strong {
+  color: var(--text);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.lineup-card-meta small {
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.lineup-pitch {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: clamp(430px, 45vw, 560px);
+  overflow: hidden;
+  border: 1px solid rgba(245, 245, 245, 0.11);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0 9%, transparent 9% 18%, rgba(255, 255, 255, 0.04) 18% 27%, transparent 27% 36%, rgba(255, 255, 255, 0.04) 36% 45%, transparent 45% 54%, rgba(255, 255, 255, 0.04) 54% 63%, transparent 63% 72%, rgba(255, 255, 255, 0.04) 72% 81%, transparent 81%),
+    radial-gradient(circle at 50% 50%, transparent 0 62px, rgba(245, 245, 245, 0.13) 63px 65px, transparent 66px),
+    linear-gradient(90deg, transparent calc(50% - 1px), rgba(245, 245, 245, 0.11) 50%, transparent calc(50% + 1px)),
+    #193f2c;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.38);
+}
+
+.lineup-pitch::before,
+.lineup-pitch::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  height: 12%;
+  border: 2px solid rgba(245, 245, 245, 0.18);
+  z-index: -1;
+}
+
+.lineup-pitch::before {
+  top: -1px;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+}
+
+.lineup-pitch::after {
+  bottom: -1px;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+
+.lineup-watermark {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  opacity: 0.08;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.pitch-lines {
+  position: absolute;
+  inset: 14px;
+  border: 2px solid rgba(245, 245, 245, 0.16);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.pitch-lineup {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: clamp(30px, 4vw, 44px) clamp(18px, 3vw, 34px);
+  list-style: none;
+}
+
+.pitch-row > ol {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pitch-row-goalkeeper > ol {
+  justify-content: center;
+}
+
+.pitch-player {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 62px;
+  text-align: center;
+}
+
+.pitch-shirt {
+  display: grid;
+  width: clamp(38px, 4.4vw, 52px);
+  height: clamp(42px, 4.8vw, 58px);
+  place-items: center;
+  background:
+    linear-gradient(90deg, var(--green) 0 27%, #f7fff9 27% 73%, var(--green) 73%),
+    var(--green);
+  clip-path: polygon(14% 0, 35% 0, 42% 10%, 58% 10%, 65% 0, 86% 0, 100% 22%, 82% 38%, 82% 100%, 18% 100%, 18% 38%, 0 22%);
+  color: #07110b;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.42));
+}
+
+.pitch-shirt b {
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 950;
+}
+
+.pitch-player strong {
+  max-width: 108px;
+  color: var(--text);
+  font-size: clamp(11px, 1.15vw, 13px);
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.availability-card {
+  min-width: 0;
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.018), transparent 180px),
+    rgba(7, 7, 7, 0.72);
+  padding: clamp(14px, 1.7vw, 20px);
+}
+
+.availability-team-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(245, 245, 245, 0.07);
+}
+
+.availability-team-head img,
+.availability-team-head .match-team-fallback {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.availability-team-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.availability-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0;
+}
+
+.availability-summary span {
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 999px;
+  background: rgba(245, 245, 245, 0.035);
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
+.availability-summary strong {
+  color: var(--text);
+}
+
+.availability-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.availability-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid rgba(245, 245, 245, 0.06);
+  border-radius: 12px;
+  background: rgba(245, 245, 245, 0.025);
+  padding: 8px;
+}
+
+.availability-avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(245, 245, 245, 0.08);
+  color: var(--text);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.availability-item strong {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.availability-item small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.availability-item small b {
+  color: #ff6b6b;
+}
+
+.availability-duda small b {
+  color: #e7c85d;
+}
+
+.availability-sancion small b,
+.availability-decision small b {
+  color: #c8c8c8;
+}
+
+.availability-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  border: 1px solid rgba(0, 255, 127, 0.1);
+  border-radius: 12px;
+  background: rgba(0, 255, 127, 0.035);
+  padding: 12px;
+}
+
+.availability-empty p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.availability-ok {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(0, 255, 127, 0.1);
+  color: var(--green);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+}
+
 .match-status-list,
 .match-key-list {
   display: grid;
@@ -12167,6 +12478,7 @@ body:not(.has-active-signal) .signal-home-status > span {
   .match-kickoff-strip,
   .match-grid,
   .lineup-grid,
+  .availability-grid,
   .match-hub-grid,
   .match-methodology-grid,
   .match-admin,
@@ -12245,6 +12557,45 @@ body:not(.has-active-signal) .signal-home-status > span {
 
   .match-section-head {
     display: grid;
+  }
+
+  .lineup-card-head {
+    display: grid;
+  }
+
+  .lineup-card-meta {
+    justify-items: start;
+    width: fit-content;
+  }
+
+  .lineup-pitch {
+    min-height: 430px;
+  }
+
+  .pitch-lineup {
+    padding: 30px 14px;
+  }
+
+  .pitch-row > ol {
+    gap: 5px;
+  }
+
+  .pitch-player {
+    min-width: 48px;
+  }
+
+  .pitch-shirt {
+    width: 34px;
+    height: 38px;
+  }
+
+  .pitch-shirt b {
+    font-size: 13px;
+  }
+
+  .pitch-player strong {
+    max-width: 70px;
+    font-size: 10px;
   }
 
   .match-scope-controls {
