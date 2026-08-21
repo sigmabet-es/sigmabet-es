@@ -10933,6 +10933,7 @@ body:not(.has-active-signal) .signal-home-status > span {
 }
 
 .match-hero,
+.match-detail-hero,
 .match-panel,
 .match-bet-card,
 .match-telegram {
@@ -10948,6 +10949,119 @@ body:not(.has-active-signal) .signal-home-status > span {
   display: grid;
   gap: 18px;
   padding: clamp(22px, 4vw, 42px);
+}
+
+.match-detail-hero {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3.8vw, 34px);
+}
+
+.match-detail-hero h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(36px, 6vw, 70px);
+  line-height: 0.95;
+}
+
+.match-kickoff-strip {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.match-kickoff-strip div,
+.match-vs-board section,
+.match-analysis-empty,
+.match-h2h-summary div,
+.match-results-card {
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: var(--radius);
+  background: rgba(245, 245, 245, 0.025);
+}
+
+.match-kickoff-strip div {
+  padding: 12px;
+}
+
+.match-kickoff-strip span,
+.match-vs-board span,
+.match-analysis-empty span,
+.match-section-head span,
+.match-h2h-summary small,
+.match-result-list small {
+  display: block;
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.match-kickoff-strip strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.match-vs-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.match-vs-board section {
+  display: grid;
+  gap: 12px;
+  min-height: 132px;
+  padding: 16px;
+}
+
+.match-vs-board section:last-child {
+  text-align: right;
+}
+
+.match-vs-board section:last-child .form-row {
+  justify-content: flex-end;
+}
+
+.match-vs-board strong {
+  color: var(--text);
+  font-size: clamp(26px, 4vw, 42px);
+  line-height: 1;
+}
+
+.match-vs-board > b {
+  display: grid;
+  min-width: 78px;
+  place-items: center;
+  border: 1px solid rgba(0, 255, 127, 0.16);
+  border-radius: var(--radius);
+  background: rgba(0, 255, 127, 0.05);
+  color: var(--green);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 18px;
+}
+
+.match-analysis-empty {
+  border-color: rgba(245, 245, 245, 0.095);
+  padding: 16px;
+}
+
+.match-analysis-empty strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--text);
+  font-size: clamp(20px, 2.5vw, 28px);
+}
+
+.match-analysis-empty p {
+  max-width: 740px;
+  margin: 8px 0 0;
+  color: var(--muted);
 }
 
 .match-hero h1,
@@ -11062,6 +11176,143 @@ body:not(.has-active-signal) .signal-home-status > span {
 .match-anchor-nav a:hover {
   border-color: rgba(0, 255, 127, 0.28);
   color: var(--green);
+}
+
+.match-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.match-results-card {
+  padding: clamp(16px, 2vw, 24px);
+}
+
+.match-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.match-section-head h2,
+.match-section-head h3 {
+  margin: 5px 0 0;
+  color: var(--text);
+  font-size: clamp(22px, 2.8vw, 32px);
+  line-height: 1.05;
+}
+
+.match-scope-controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid rgba(245, 245, 245, 0.075);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.match-scope-controls button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 7px 9px;
+  text-transform: uppercase;
+}
+
+.match-scope-controls button.is-active {
+  background: rgba(0, 255, 127, 0.1);
+  color: var(--green);
+}
+
+.match-h2h-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.match-h2h-summary div {
+  padding: 12px;
+}
+
+.match-h2h-summary strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 28px;
+}
+
+.match-result-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match-result-list li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid rgba(245, 245, 245, 0.07);
+  padding-top: 10px;
+}
+
+.match-result-list li[hidden] {
+  display: none;
+}
+
+.match-result-list li > span {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.match-result-list strong {
+  min-width: 0;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.match-result-list small {
+  margin-top: 3px;
+}
+
+.match-empty-copy,
+.match-form-empty {
+  color: var(--muted);
+}
+
+.match-form-empty {
+  align-self: center;
+  font-size: 12px;
+}
+
+.form-row .match-form-empty {
+  display: inline;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .match-grid,
@@ -11652,10 +11903,13 @@ body:not(.has-active-signal) .signal-home-status > span {
   }
 
   .match-scoreboard,
+  .match-vs-board,
+  .match-kickoff-strip,
   .match-grid,
   .match-hub-grid,
   .match-methodology-grid,
   .match-admin,
+  .match-results-grid,
   .daily-match-teams,
   .daily-match-form,
   .match-current-form {
@@ -11687,6 +11941,27 @@ body:not(.has-active-signal) .signal-home-status > span {
 
   .match-scoreboard b {
     justify-self: start;
+  }
+
+  .match-vs-board > b {
+    min-height: 56px;
+  }
+
+  .match-vs-board section:last-child {
+    text-align: left;
+  }
+
+  .match-vs-board section:last-child .form-row {
+    justify-content: flex-start;
+  }
+
+  .match-section-head {
+    display: grid;
+  }
+
+  .match-scope-controls {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .match-meta-grid,

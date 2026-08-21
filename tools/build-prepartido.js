@@ -64,6 +64,7 @@ const pageShell = ({ title, description, canonical, robots = "index,follow", bod
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-02" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
+    <script src="/assets/js/prepartido-match.js?v=20260821-01" defer></script>
     ${structuredData ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>` : ""}
   </head>
   <body>
@@ -136,6 +137,126 @@ const renderLineup = (match, team, typeLabel) => {
   </article>`;
 };
 
+const matchTimestamp = (match) => new Date(match.startDate || "9999-12-31T00:00:00Z").getTime();
+const isFinished = (match) =>
+  match.status === "finalizado" &&
+  match.score &&
+  Number.isFinite(Number(match.score.home)) &&
+  Number.isFinite(Number(match.score.away));
+
+const scoreText = (match) => (isFinished(match) ? `${match.score.home} - ${match.score.away}` : "VS");
+
+const resultForTeam = (match, teamId) => {
+  if (!isFinished(match)) return null;
+  const homeScore = Number(match.score.home);
+  const awayScore = Number(match.score.away);
+  if (homeScore === awayScore) return "E";
+  const homeWon = homeScore > awayScore;
+  return (teamId === match.homeTeamId && homeWon) || (teamId === match.awayTeamId && !homeWon) ? "V" : "D";
+};
+
+const completedBefore = (data, beforeMatch) =>
+  data.matches
+    .filter((item) => item.id !== beforeMatch.id && isFinished(item) && matchTimestamp(item) < matchTimestamp(beforeMatch))
+    .sort((a, b) => matchTimestamp(b) - matchTimestamp(a));
+
+const teamMatches = (data, match, teamId, scope = "all", limit = 5) =>
+  completedBefore(data, match)
+    .filter((item) => item.homeTeamId === teamId || item.awayTeamId === teamId)
+    .filter((item) => scope === "all" || (scope === "home" ? item.homeTeamId === teamId : item.awayTeamId === teamId))
+    .slice(0, limit);
+
+const h2hMatches = (data, match, scope = "all") =>
+  completedBefore(data, match)
+    .filter(
+      (item) =>
+        (item.homeTeamId === match.homeTeamId && item.awayTeamId === match.awayTeamId) ||
+        (item.homeTeamId === match.awayTeamId && item.awayTeamId === match.homeTeamId)
+    )
+    .filter((item) => scope === "all" || (scope === "home" ? item.homeTeamId === match.homeTeamId : item.awayTeamId === match.homeTeamId))
+    .slice(0, 10);
+
+const renderFormPills = (data, match, teamId) => {
+  const results = teamMatches(data, match, teamId, "all", 5).map((item) => resultForTeam(item, teamId));
+  if (!results.length) return '<span class="match-form-empty">Sin resultados previos</span>';
+  return results.map((item) => `<span class="form-${escapeHtml(normalize(item))}">${escapeHtml(item)}</span>`).join("");
+};
+
+const teamName = (teams, id) => teams.get(id)?.name || "Equipo";
+
+const renderResultRow = (data, item, teamId) => {
+  const teams = new Map(data.teams.map((team) => [team.id, team]));
+  const result = resultForTeam(item, teamId);
+  const scope = item.homeTeamId === teamId ? "home" : "away";
+  return `<li data-scope-row="${scope}">
+    <span class="form-${escapeHtml(normalize(result))}">${escapeHtml(result)}</span>
+    <strong>${escapeHtml(teamName(teams, item.homeTeamId))} ${escapeHtml(scoreText(item))} ${escapeHtml(teamName(teams, item.awayTeamId))}</strong>
+    <small>${escapeHtml(item.localDate || String(item.startDate).slice(0, 10))} · ${escapeHtml(item.roundId.replace("laliga-2026-2027-", "").replace("-", " "))}</small>
+  </li>`;
+};
+
+const renderScopeControls = () => `<div class="match-scope-controls" role="group" aria-label="Filtrar resultados">
+  <button type="button" class="is-active" data-scope-filter="all">Todos</button>
+  <button type="button" data-scope-filter="home">Local</button>
+  <button type="button" data-scope-filter="away">Visitante</button>
+</div>`;
+
+const renderRecentTeamResults = (data, match, team) => {
+  const rows = teamMatches(data, match, team.id, "all", 10);
+  return `<article class="match-results-card" data-filter-section>
+    <div class="match-section-head">
+      <div><span>Últimos resultados</span><h3>${escapeHtml(team.name)}</h3></div>
+      ${renderScopeControls()}
+    </div>
+    ${
+      rows.length
+        ? `<ul class="match-result-list">${rows.map((item) => renderResultRow(data, item, team.id)).join("")}</ul>`
+        : '<p class="match-empty-copy">No hay resultados de liga suficientes en temporada actual o anterior para este equipo.</p>'
+    }
+  </article>`;
+};
+
+const renderH2h = (data, match, home, away) => {
+  const rows = h2hMatches(data, match, "all");
+  const summary = rows.reduce(
+    (acc, item) => {
+      const result = resultForTeam(item, home.id);
+      if (result === "V") acc.home += 1;
+      if (result === "D") acc.away += 1;
+      if (result === "E") acc.draw += 1;
+      return acc;
+    },
+    { home: 0, draw: 0, away: 0 }
+  );
+
+  return `<section id="h2h" class="match-panel match-h2h-panel" data-filter-section>
+    <div class="match-section-head">
+      <div><span>H2H</span><h2>Últimos enfrentamientos directos</h2></div>
+      ${renderScopeControls()}
+    </div>
+    <div class="match-h2h-summary">
+      <div><small>${escapeHtml(home.name)}</small><strong>${summary.home}</strong></div>
+      <div><small>Empates</small><strong>${summary.draw}</strong></div>
+      <div><small>${escapeHtml(away.name)}</small><strong>${summary.away}</strong></div>
+    </div>
+    ${
+      rows.length
+        ? `<ul class="match-result-list">${rows.map((item) => renderResultRow(data, item, home.id)).join("")}</ul>`
+        : '<p class="match-empty-copy">No hay H2H disponible en temporada actual o anterior para este cruce.</p>'
+    }
+  </section>`;
+};
+
+const renderAnalysisNotice = (match) => {
+  const hasAnalysis = text(match.analysis, "") || (match.mainBet && match.mainBet.result !== "no_bet");
+  if (hasAnalysis) return "";
+  return `<aside class="match-analysis-empty">
+    <span>Análisis SigmaBet</span>
+    <strong>No hay ningún análisis disponible para este encuentro.</strong>
+    <p>La ficha muestra calendario y contexto básico. Cuando haya análisis propio, aparecerá aquí con sus datos y criterio.</p>
+  </aside>`;
+};
+
 const renderMatch = (data, match) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const home = teams.get(match.homeTeamId) || { name: "Equipo local", slug: "" };
@@ -147,30 +268,35 @@ const renderMatch = (data, match) => {
   const body = `
     <nav class="match-breadcrumb" aria-label="Migas de pan"><a href="/index.html">Inicio</a><span>/</span><a href="/competiciones/laliga/">LaLiga</a><span>/</span><span>${escapeHtml(round.name)}</span></nav>
     <article class="match-page">
-      <header class="match-hero">
+      <header class="match-detail-hero">
         <p class="kicker">${escapeHtml(data.competition.name)} · ${escapeHtml(round.name)}</p>
-        <h1>${escapeHtml(home.name)} vs ${escapeHtml(away.name)}: análisis y pronóstico</h1>
-        <p>${escapeHtml(text(match.preview, "Ficha prepartido preparada para incorporar datos confirmados, análisis SigmaBet, probabilidades y apuestas con valor."))}</p>
-        <div class="match-scoreboard">
-          <div><span>Local</span><strong>${escapeHtml(home.name)}</strong></div>
-          <b>VS</b>
-          <div><span>Visitante</span><strong>${escapeHtml(away.name)}</strong></div>
+        <h1>${escapeHtml(home.name)} vs ${escapeHtml(away.name)}</h1>
+        <div class="match-kickoff-strip">
+          <div><span>Hora local</span><strong data-local-time data-time-status="${escapeHtml(match.timeStatus || "confirmed")}" data-start-date="${escapeHtml(match.startDate || "")}">${escapeHtml(match.timeStatus === "pending" ? "Horario pendiente" : text(match.localTime || match.startDate))}</strong></div>
+          <div><span>Estadio</span><strong>${escapeHtml(text(match.venue, "Estadio pendiente"))}</strong></div>
+          <div><span>Árbitro</span><strong>${escapeHtml(text(match.referee, "Árbitro pendiente"))}</strong></div>
         </div>
-        <dl class="match-meta-grid">
-          <div><dt>Fecha</dt><dd>${escapeHtml(text(match.startDate))}</dd></div>
-          <div><dt>Estadio</dt><dd>${escapeHtml(text(match.venue))}</dd></div>
-          <div><dt>Estado</dt><dd>${escapeHtml(text(match.status))}</dd></div>
-          <div><dt>Actualizado</dt><dd>${escapeHtml(text(match.lastUpdated))}</dd></div>
-        </dl>
+        <div class="match-vs-board">
+          <section>
+            <span>Local</span>
+            <strong>${escapeHtml(home.name)}</strong>
+            <div class="form-row">${renderFormPills(data, match, home.id)}</div>
+          </section>
+          <b>${escapeHtml(scoreText(match))}</b>
+          <section>
+            <span>Visitante</span>
+            <strong>${escapeHtml(away.name)}</strong>
+            <div class="form-row">${renderFormPills(data, match, away.id)}</div>
+          </section>
+        </div>
+        ${renderAnalysisNotice(match)}
       </header>
-      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#resumen">Resumen</a><a href="#forma">Forma</a><a href="#estadisticas">Estadísticas</a><a href="#h2h">H2H</a><a href="#bajas">Bajas</a><a href="#alineaciones">Alineaciones</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
-      <section id="forma" class="match-panel"><h2>Rendimiento actual: últimos 5 partidos</h2><div class="match-current-form">${renderTeamCurrentForm(home, "Local")}${renderTeamCurrentForm(away, "Visitante")}</div></section>
+      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
+      ${renderH2h(data, match, home, away)}
+      <section id="resultados" class="match-results-grid">${renderRecentTeamResults(data, match, home)}${renderRecentTeamResults(data, match, away)}</section>
       <section id="alineaciones" class="match-grid">${renderLineup(match, home, "local")}${renderLineup(match, away, "visitante")}</section>
-      <section id="resumen" class="match-grid">${renderBet(match.mainBet)}<article class="match-panel"><h2>Previa SigmaBet</h2><p>${escapeHtml(text(match.preview))}</p></article></section>
-      <section id="estadisticas" class="match-panel"><h2>Estadísticas comparadas</h2><p>Se mostrarán temporada, últimos 10, últimos 5 y casa/fuera cuando existan datos fiables.</p></section>
-      <section id="h2h" class="match-panel"><h2>H2H</h2><p>Dato no disponible. El H2H no se sobreponderará cuando las plantillas o contexto hayan cambiado.</p></section>
       <section id="bajas" class="match-panel"><h2>Bajas, sanciones y dudas</h2><p>Dato no disponible. Solo se publicará información rastreable a fuentes fiables.</p></section>
-      <section id="analisis" class="match-panel"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis))}</p></section>
+      <section id="analisis" class="match-panel"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p></section>
       <section id="apuestas" class="match-panel"><h2>Apuestas con valor</h2><p>Predicción no significa apuesta. El equipo más probable no siempre es la mejor entrada.</p></section>
       <aside class="match-telegram"><h2>Sigue las apuestas de SigmaBet en Telegram</h2><p>Consulta qué selecciones termina jugando SigmaBet y recibe actualizaciones de cuotas, alineaciones y mercados.</p><a class="button" href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Entrar en Telegram</a></aside>
     </article>`;

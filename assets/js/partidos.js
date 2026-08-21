@@ -68,9 +68,10 @@ if (matchesApp) {
 
   const teamById = (id) => dataset?.teams?.find((team) => team.id === id) || null;
   const roundById = (id) => dataset?.rounds?.find((round) => round.id === id) || null;
-  const matchDateKey = (match) => String(match.startDate || "").slice(0, 10);
+  const matchDateKey = (match) => match.localDate || String(match.startDate || "").slice(0, 10);
   const datesWithMatches = () => new Set((dataset?.matches || []).map(matchDateKey).filter(Boolean));
   const matchTime = (match) => {
+    if (match.timeStatus === "pending") return "Horario pendiente";
     if (!match.startDate) return "Hora pendiente";
     const parsed = new Date(match.startDate);
     if (Number.isNaN(parsed.getTime())) return "Hora pendiente";
