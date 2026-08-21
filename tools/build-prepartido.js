@@ -4,6 +4,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const dataPath = path.join(root, "data", "prepartido", "laliga.json");
 const editorialPath = path.join(root, "data", "prepartido", "editorial.json");
+const teamResultsPath = path.join(root, "data", "prepartido", "team-results.json");
 const outputRoot = root;
 
 const escapeHtml = (value) =>
@@ -46,6 +47,7 @@ const readJson = (file, fallback) => {
 };
 const readData = () => readJson(dataPath, {});
 const readEditorial = () => readJson(editorialPath, { matches: {} });
+const readTeamResults = () => readJson(teamResultsPath, { matches: [] });
 const mkdirp = (dir) => fs.mkdirSync(dir, { recursive: true });
 const writeFile = (file, content) => {
   mkdirp(path.dirname(file));
@@ -92,6 +94,45 @@ const mergeEditorial = (data, editorial) => {
         lastUpdated: manual.updatedAt || merged.lastUpdated,
       };
     }),
+  };
+};
+
+const matchMergeKey = (match) =>
+  [match.localDate || String(match.startDate || "").slice(0, 10), match.homeTeamId, match.awayTeamId].join("|");
+
+const mergeTeamResults = (data, teamResults) => {
+  const rows = Array.isArray(teamResults?.matches) ? teamResults.matches : [];
+  const byKey = new Map(rows.map((match) => [matchMergeKey(match), match]));
+  const usedKeys = new Set();
+
+  const matches = (data.matches || []).map((match) => {
+    const key = matchMergeKey(match);
+    const result = byKey.get(key);
+    if (!result) return match;
+    usedKeys.add(key);
+    return mergeDefined(match, {
+      score: result.score || match.score,
+      status: result.score ? "finalizado" : match.status,
+      stats: result.stats || match.stats,
+      venue: match.venue || result.venue,
+      referee: match.referee || result.referee,
+      source: result.source || match.source,
+      notes: result.notes || match.notes,
+    });
+  });
+
+  const historicalMatches = rows
+    .filter((match) => !usedKeys.has(matchMergeKey(match)))
+    .map((match) => ({
+      ...match,
+      slug: null,
+      robots: "noindex",
+    }));
+
+  return {
+    ...data,
+    teamResultsUpdatedAt: teamResults?.updatedAt || null,
+    matches: [...matches, ...historicalMatches],
   };
 };
 
@@ -460,7 +501,7 @@ const renderMatch = (data, match) => {
 };
 
 const build = () => {
-  const data = mergeEditorial(readData(), readEditorial());
+  const data = mergeEditorial(mergeTeamResults(readData(), readTeamResults()), readEditorial());
   const publicMatches = data.matches.filter((match) => match.slug);
 
   publicMatches.forEach((match) => {

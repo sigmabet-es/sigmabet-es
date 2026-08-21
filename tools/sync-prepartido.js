@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { importEditorialSheet } = require("./import-prepartido-editorial-sheet");
+const { importTeamResultsSheet } = require("./import-prepartido-team-results-sheet");
 
 const root = path.resolve(__dirname, "..");
 const sourcesPath = path.join(root, "data", "prepartido", "sources.json");
@@ -23,11 +24,18 @@ const run = (command, args) => {
 const main = async () => {
   const sources = readSources();
   const editorialCsvUrl = process.env.SIGMABET_PREPARTIDO_EDITORIAL_CSV_URL || sources.editorialCsvUrl || "";
+  const teamResultsCsvUrl = process.env.SIGMABET_PREPARTIDO_TEAM_RESULTS_CSV_URL || sources.teamResultsCsvUrl || "";
 
   if (!editorialCsvUrl.trim()) {
     console.warn("No hay Google Sheet conectado. Añade editorialCsvUrl en data/prepartido/sources.json.");
   } else {
     await importEditorialSheet(editorialCsvUrl.trim());
+  }
+
+  if (!teamResultsCsvUrl.trim()) {
+    console.warn("No hay hoja de resultados conectada. Añade teamResultsCsvUrl en data/prepartido/sources.json.");
+  } else {
+    await importTeamResultsSheet(teamResultsCsvUrl.trim());
   }
 
   run("node", ["tools/build-prepartido.js"]);
