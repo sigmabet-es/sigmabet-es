@@ -88,6 +88,7 @@ const officialOverrides = {
 };
 
 const pad = (value) => String(value).padStart(2, "0");
+const teamCrests = {};
 const slugify = (value) =>
   String(value)
     .normalize("NFD")
@@ -125,6 +126,8 @@ const parseEvent = (eventJson, roundNumber) => {
   const [rawHome, rawAway] = event.name.split(" - ");
   const home = findTeam(rawHome);
   const away = findTeam(rawAway);
+  if (event.performer?.[0]?.image) teamCrests[home.id] = String(event.performer[0].image).trim();
+  if (event.performer?.[1]?.image) teamCrests[away.id] = String(event.performer[1].image).trim();
   const start = normalizeStart(event.startDate);
   const id = `laliga-2026-2027-j${roundNumber}-${home.id}-${away.id}`;
   const base = {
@@ -178,6 +181,9 @@ const readEvents = (block) =>
   );
 
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+data.teams?.forEach((team) => {
+  if (team.crest) teamCrests[team.id] = team.crest;
+});
 const html = fs.readFileSync(htmlPath, "utf8");
 const blocks = readCalendarBlocks(html);
 const existingJ1 = data.matches
@@ -231,7 +237,7 @@ const teams = Object.values(teamMap)
     id,
     slug: id,
     name,
-    crest: null,
+    crest: teamCrests[id] || null,
     venueId: null,
     standing: null,
     form: [],

@@ -257,6 +257,11 @@ const renderAnalysisNotice = (match) => {
   </aside>`;
 };
 
+const renderCrest = (team) =>
+  team?.crest
+    ? `<img src="${escapeHtml(team.crest)}" alt="" loading="lazy" />`
+    : `<span class="match-team-fallback">${escapeHtml(String(team?.name || "?").slice(0, 2))}</span>`;
+
 const renderMatch = (data, match) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const home = teams.get(match.homeTeamId) || { name: "Equipo local", slug: "" };
@@ -279,12 +284,14 @@ const renderMatch = (data, match) => {
         <div class="match-vs-board">
           <section>
             <span>Local</span>
+            ${renderCrest(home)}
             <strong>${escapeHtml(home.name)}</strong>
             <div class="form-row">${renderFormPills(data, match, home.id)}</div>
           </section>
-          <b>${escapeHtml(scoreText(match))}</b>
+          <b class="${isFinished(match) ? "is-result" : ""}">${escapeHtml(scoreText(match))}</b>
           <section>
             <span>Visitante</span>
+            ${renderCrest(away)}
             <strong>${escapeHtml(away.name)}</strong>
             <div class="form-row">${renderFormPills(data, match, away.id)}</div>
           </section>
@@ -294,11 +301,9 @@ const renderMatch = (data, match) => {
       <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
       ${renderH2h(data, match, home, away)}
       <section id="resultados" class="match-results-grid">${renderRecentTeamResults(data, match, home)}${renderRecentTeamResults(data, match, away)}</section>
-      <section id="alineaciones" class="match-grid">${renderLineup(match, home, "local")}${renderLineup(match, away, "visitante")}</section>
-      <section id="bajas" class="match-panel"><h2>Bajas, sanciones y dudas</h2><p>Dato no disponible. Solo se publicará información rastreable a fuentes fiables.</p></section>
-      <section id="analisis" class="match-panel"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p></section>
-      <section id="apuestas" class="match-panel"><h2>Apuestas con valor</h2><p>Predicción no significa apuesta. El equipo más probable no siempre es la mejor entrada.</p></section>
-      <aside class="match-telegram"><h2>Sigue las apuestas de SigmaBet en Telegram</h2><p>Consulta qué selecciones termina jugando SigmaBet y recibe actualizaciones de cuotas, alineaciones y mercados.</p><a class="button" href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Entrar en Telegram</a></aside>
+      <section id="alineaciones" class="match-soft-section"><h2>Alineaciones y bajas</h2><p>Se añadirán alineaciones probables, bajas, sanciones y dudas cuando exista información contrastada.</p></section>
+      <section id="analisis" class="match-soft-section"><h2>Análisis SigmaBet</h2><p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p></section>
+      <section id="apuestas" class="match-soft-section"><h2>Apuestas con valor</h2><p>Predicción no significa apuesta. Si no existe valor claro, no se publica apuesta.</p></section>
     </article>`;
 
   const structuredData = {

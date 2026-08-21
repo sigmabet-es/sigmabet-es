@@ -10955,6 +10955,11 @@ body:not(.has-active-signal) .signal-home-status > span {
   display: grid;
   gap: 18px;
   padding: clamp(18px, 3.8vw, 34px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(0, 255, 127, 0.08), transparent 22rem),
+    linear-gradient(180deg, rgba(245, 245, 245, 0.026), transparent 260px),
+    rgba(11, 11, 11, 0.96);
 }
 
 .match-detail-hero h1 {
@@ -10975,13 +10980,14 @@ body:not(.has-active-signal) .signal-home-status > span {
 .match-analysis-empty,
 .match-h2h-summary div,
 .match-results-card {
-  border: 1px solid rgba(245, 245, 245, 0.075);
-  border-radius: var(--radius);
-  background: rgba(245, 245, 245, 0.025);
+  border: 1px solid rgba(245, 245, 245, 0.06);
+  border-radius: 14px;
+  background: rgba(245, 245, 245, 0.018);
 }
 
 .match-kickoff-strip div {
   padding: 12px;
+  background: rgba(0, 0, 0, 0.18);
 }
 
 .match-kickoff-strip span,
@@ -11017,7 +11023,10 @@ body:not(.has-active-signal) .signal-home-status > span {
   display: grid;
   gap: 12px;
   min-height: 132px;
-  padding: 16px;
+  align-content: start;
+  padding: 18px;
+  border-color: transparent;
+  background: transparent;
 }
 
 .match-vs-board section:last-child {
@@ -11034,20 +11043,62 @@ body:not(.has-active-signal) .signal-home-status > span {
   line-height: 1;
 }
 
+.match-vs-board img,
+.match-team-fallback {
+  width: clamp(58px, 7vw, 86px);
+  height: clamp(58px, 7vw, 86px);
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
+}
+
+.match-vs-board section:last-child img,
+.match-vs-board section:last-child .match-team-fallback {
+  justify-self: end;
+}
+
+.match-team-fallback {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(245, 245, 245, 0.09);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 900;
+}
+
 .match-vs-board > b {
   display: grid;
-  min-width: 78px;
+  min-width: 106px;
   place-items: center;
-  border: 1px solid rgba(0, 255, 127, 0.16);
-  border-radius: var(--radius);
-  background: rgba(0, 255, 127, 0.05);
-  color: var(--green);
+  border: 1px solid rgba(245, 245, 245, 0.08);
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text);
   font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 18px;
+  font-size: clamp(19px, 2.8vw, 34px);
+}
+
+.match-vs-board > b.is-result {
+  border-color: rgba(0, 255, 127, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 255, 127, 0.12), transparent 8rem),
+    rgba(0, 0, 0, 0.34);
+  color: var(--green);
+}
+
+.match-vs-board > b.is-result::before {
+  content: "Resultado";
+  margin-bottom: 6px;
+  color: var(--muted-2);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .match-analysis-empty {
-  border-color: rgba(245, 245, 245, 0.095);
+  border-color: rgba(0, 255, 127, 0.1);
+  background: rgba(0, 255, 127, 0.035);
   padding: 16px;
 }
 
@@ -11184,8 +11235,32 @@ body:not(.has-active-signal) .signal-home-status > span {
   gap: 14px;
 }
 
+.match-soft-section {
+  border-top: 1px solid rgba(245, 245, 245, 0.075);
+  padding: clamp(18px, 2.2vw, 28px) 0;
+}
+
+.match-soft-section:first-of-type {
+  margin-top: 4px;
+}
+
+.match-soft-section h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.match-soft-section p {
+  max-width: 780px;
+  color: var(--muted);
+}
+
 .match-results-card {
   padding: clamp(16px, 2vw, 24px);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.02), transparent),
+    rgba(8, 8, 8, 0.78);
 }
 
 .match-section-head {
@@ -11641,26 +11716,91 @@ body:not(.has-active-signal) .signal-home-status > span {
 
 .daily-match-teams {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(94px, auto) minmax(0, 1fr);
+  gap: 14px;
   align-items: center;
 }
 
-.daily-match-teams strong {
+.daily-team {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.daily-team-away {
+  grid-template-columns: minmax(0, 1fr) auto;
+  text-align: right;
+}
+
+.daily-team-away img,
+.daily-team-away .daily-team-fallback {
+  order: 2;
+}
+
+.daily-team img,
+.daily-team-fallback {
+  width: clamp(38px, 4vw, 54px);
+  height: clamp(38px, 4vw, 54px);
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
+}
+
+.daily-team-fallback {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(245, 245, 245, 0.1);
+  border-radius: 999px;
+  background: rgba(245, 245, 245, 0.03);
+  color: var(--muted);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.daily-team strong {
+  min-width: 0;
   color: var(--text);
   font-size: clamp(21px, 4vw, 34px);
   line-height: 1.05;
 }
 
-.daily-match-teams strong:last-child {
+.daily-team-away strong {
   text-align: right;
 }
 
-.daily-match-teams em {
-  color: var(--green);
+.daily-match-center {
+  display: grid;
+  min-height: 66px;
+  min-width: 94px;
+  place-items: center;
+  border: 1px solid rgba(245, 245, 245, 0.08);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 245, 0.032), transparent),
+    rgba(0, 0, 0, 0.24);
+  text-align: center;
+}
+
+.daily-match-center strong {
+  color: var(--text);
   font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
-  font-style: normal;
+  font-size: clamp(17px, 2.2vw, 28px);
+  line-height: 1;
+}
+
+.daily-match-center.has-score strong {
+  color: var(--green);
+}
+
+.daily-match-center span {
+  margin-top: 6px;
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -11918,6 +12058,32 @@ body:not(.has-active-signal) .signal-home-status > span {
 
   .daily-match-teams strong:last-child {
     text-align: left;
+  }
+
+  .daily-team,
+  .daily-team-away {
+    grid-template-columns: auto minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .daily-team-away img,
+  .daily-team-away .daily-team-fallback {
+    order: 0;
+  }
+
+  .daily-team-away strong {
+    text-align: left;
+  }
+
+  .daily-team img,
+  .daily-team-fallback {
+    width: 40px;
+    height: 40px;
+  }
+
+  .daily-match-center {
+    min-height: 54px;
+    justify-self: stretch;
   }
 
   .match-day-nav {

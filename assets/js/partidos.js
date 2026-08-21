@@ -143,6 +143,11 @@ if (matchesApp) {
       .join("");
   };
 
+  const teamCrest = (team) =>
+    team?.crest
+      ? `<img src="${escapeHtml(team.crest)}" alt="" loading="lazy" />`
+      : `<span class="daily-team-fallback">${escapeHtml(String(team?.name || "?").slice(0, 2))}</span>`;
+
   const renderMatchCard = (match) => {
     const home = teamById(match.homeTeamId);
     const away = teamById(match.awayTeamId);
@@ -153,20 +158,28 @@ if (matchesApp) {
       match.score && Number.isFinite(Number(match.score.home)) && Number.isFinite(Number(match.score.away))
         ? `${match.score.home} - ${match.score.away}`
         : "";
+    const centerLabel = score || matchTime(match);
     return `
       <a class="daily-match-card" href="${escapeHtml(href)}">
         <div class="daily-match-top">
           <span>${escapeHtml(round?.name || dataset?.competition?.name || "LaLiga")}</span>
-          <b>${escapeHtml(matchTime(match))}</b>
+          <span class="daily-match-status">${escapeHtml(statusLabel(match.status))}</span>
         </div>
         <div class="daily-match-teams">
-          <strong>${escapeHtml(home?.name || "Equipo local")}</strong>
-          <em>vs</em>
-          <strong>${escapeHtml(away?.name || "Equipo visitante")}</strong>
+          <div class="daily-team daily-team-home">
+            ${teamCrest(home)}
+            <strong>${escapeHtml(home?.name || "Equipo local")}</strong>
+          </div>
+          <div class="daily-match-center${score ? " has-score" : ""}">
+            <strong>${escapeHtml(centerLabel)}</strong>
+            <span>${score ? "Resultado" : "Hora local"}</span>
+          </div>
+          <div class="daily-team daily-team-away">
+            ${teamCrest(away)}
+            <strong>${escapeHtml(away?.name || "Equipo visitante")}</strong>
+          </div>
         </div>
         <div class="daily-match-bottom">
-          <span class="daily-match-status">${escapeHtml(statusLabel(match.status))}</span>
-          ${score ? `<span class="daily-match-score">${escapeHtml(score)}</span>` : ""}
           <span>${hasBet ? "Apuesta SigmaBet" : "Previa"}</span>
         </div>
         <div class="daily-match-form" aria-label="Forma últimos 5">
