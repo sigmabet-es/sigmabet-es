@@ -1,4 +1,176 @@
 {
-  "updatedAt": "2026-08-21T00:00:00+01:00",
-  "matches": {}
+  "updatedAt": "2026-08-21T01:28:54.016Z",
+  "matches": {
+    "real-betis-real-sociedad-2026-08-21": {
+      "quality": "basic",
+      "seoPriority": "C",
+      "robots": "noindex",
+      "updatedAt": "2026-08-21T01:28:54.009Z",
+      "preview": "Resumen corto de la previa.",
+      "analysis": "No hay ningún análisis disponible para este encuentro.",
+      "keys": [
+        "Clave 1",
+        "Clave 2",
+        "Clave 3"
+      ],
+      "probabilities": null,
+      "mainBet": {
+        "type": "principal",
+        "market": "No Bet",
+        "selection": "Sin apuesta recomendada",
+        "bookmaker": null,
+        "odds": null,
+        "sigmaProbability": null,
+        "minimumOdds": null,
+        "stake": null,
+        "publishedAt": null,
+        "result": "no_bet"
+      },
+      "valueBets": [],
+      "injuries": [
+        {
+          "teamId": "real-betis",
+          "name": "Abdessamad Ezzalzouli",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Rodilla",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Aitor Ruibal",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Menisco",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Diego Conde",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Hombro",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Giovani Lo Celso",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Gonzalo Petit",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Muslo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Gonçalo Guedes",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Molestias físicas",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Jon Gorrotxategi",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Pablo Marín",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Álvaro Odriozola",
+          "position": null,
+          "status": "baja",
+          "confidence": "pendiente",
+          "reason": "LCA",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        }
+      ],
+      "lineups": [
+        {
+          "teamId": "real-betis",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "pendiente",
+          "players": [
+            "Á. Valles",
+            "H. Bellerín",
+            "M. Bartra",
+            "Natan",
+            "F. García",
+            "F. Bernal",
+            "M. Roca",
+            "Antony",
+            "P. Fornals",
+            "R. Riquelme",
+            "C. Hernández"
+          ],
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "media",
+          "players": [
+            "Á. Remiro",
+            "S. Gómez",
+            "J. Martín",
+            "I. Zubeldia",
+            "J. Aramburu",
+            "Y. Herrera",
+            "L. Sucic",
+            "A. Barrenetxea",
+            "C. Soler",
+            "T. Kubo",
+            "O. S. Óskarsson"
+          ],
+          "updatedAt": null
+        }
+      ],
+      "news": []
+    }
+  }
 }
