@@ -11211,6 +11211,16 @@ body:not(.has-active-signal) .signal-home-status > span {
   backdrop-filter: blur(18px);
 }
 
+.match-day-nav::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(0, 255, 127, 0.07), transparent 40%, rgba(245, 245, 245, 0.04));
+  pointer-events: none;
+}
+
 .match-day-nav button {
   min-height: 46px;
   border: 1px solid rgba(245, 245, 245, 0.085);
@@ -11231,6 +11241,104 @@ body:not(.has-active-signal) .signal-home-status > span {
 .match-day-current {
   font-size: 14px;
   text-transform: uppercase;
+}
+
+.match-calendar-popover {
+  position: absolute;
+  left: 58px;
+  top: calc(100% + 10px);
+  width: min(336px, calc(100vw - 42px));
+  border: 1px solid rgba(245, 245, 245, 0.12);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(0, 255, 127, 0.1), transparent 18rem),
+    linear-gradient(180deg, rgba(245, 245, 245, 0.055), transparent),
+    rgba(10, 10, 10, 0.98);
+  padding: 12px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(20px);
+}
+
+.match-calendar-popover[hidden] {
+  display: none;
+}
+
+.match-calendar-head {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.match-day-nav .match-calendar-head button {
+  min-height: 36px;
+  border-radius: 10px;
+}
+
+.match-calendar-head strong {
+  color: var(--text);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.match-calendar-weekdays,
+.match-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.match-calendar-weekdays {
+  margin-bottom: 5px;
+}
+
+.match-calendar-weekdays span {
+  color: var(--muted-2);
+  font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.match-day-nav .match-calendar-day {
+  position: relative;
+  display: grid;
+  min-height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.match-calendar-day.is-outside {
+  color: rgba(245, 245, 245, 0.28);
+}
+
+.match-calendar-day.is-today {
+  border-color: rgba(245, 245, 245, 0.22);
+}
+
+.match-calendar-day.is-selected {
+  border-color: rgba(0, 255, 127, 0.38);
+  background: rgba(0, 255, 127, 0.14);
+  color: var(--green);
+}
+
+.match-calendar-day.has-matches::after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 10px rgba(0, 255, 127, 0.55);
+  transform: translateX(-50%);
 }
 
 .daily-match-list {
@@ -11311,6 +11419,12 @@ body:not(.has-active-signal) .signal-home-status > span {
   border-radius: 999px;
   color: var(--green);
   padding: 5px 8px;
+}
+
+.daily-match-score {
+  margin-right: auto;
+  color: var(--text);
+  font-size: 12px;
 }
 
 .daily-match-form {
@@ -11555,6 +11669,12 @@ body:not(.has-active-signal) .signal-home-status > span {
   .match-day-nav {
     top: 74px;
     grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+
+  .match-calendar-popover {
+    left: 50%;
+    width: min(326px, calc(100vw - 34px));
+    transform: translateX(-50%);
   }
 
   .match-current-form dl {

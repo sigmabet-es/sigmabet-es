@@ -13,7 +13,7 @@
     <meta property="og:image" content="https://sigmabet.es/assets/img/banner.webp" />
     <link rel="canonical" href="https://sigmabet.es/partidos/" />
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-05" />
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-02" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
     <script src="/assets/js/partidos.js?v=20260821-01" defer></script>
   </head>
@@ -36,7 +36,15 @@
           <button type="button" aria-label="Día anterior" data-date-prev>&lt;</button>
           <button class="match-day-current" type="button" data-date-label>Hoy</button>
           <button type="button" aria-label="Día siguiente" data-date-next>&gt;</button>
-          <input class="sr-only" type="date" aria-label="Elegir fecha" data-date-input />
+          <div class="match-calendar-popover" data-calendar-popover hidden>
+            <div class="match-calendar-head">
+              <button type="button" aria-label="Mes anterior" data-calendar-prev>&lt;</button>
+              <strong data-calendar-month>Agosto 2026</strong>
+              <button type="button" aria-label="Mes siguiente" data-calendar-next>&gt;</button>
+            </div>
+            <div class="match-calendar-weekdays" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+            <div class="match-calendar-grid" data-calendar-grid></div>
+          </div>
         </div>
 
         <section class="daily-match-list" aria-label="Partidos del día" data-matches-list>

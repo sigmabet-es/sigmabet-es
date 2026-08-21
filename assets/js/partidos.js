@@ -4,11 +4,15 @@ if (matchesApp) {
   const dataUrl = matchesApp.dataset.source || "/data/prepartido/laliga.json";
   const listTarget = matchesApp.querySelector("[data-matches-list]");
   const dateLabel = matchesApp.querySelector("[data-date-label]");
-  const dateInput = matchesApp.querySelector("[data-date-input]");
   const previousButton = matchesApp.querySelector("[data-date-prev]");
   const nextButton = matchesApp.querySelector("[data-date-next]");
   const statusTarget = matchesApp.querySelector("[data-matches-status]");
   const competitionTarget = matchesApp.querySelector("[data-competition-label]");
+  const calendarPopover = matchesApp.querySelector("[data-calendar-popover]");
+  const calendarGrid = matchesApp.querySelector("[data-calendar-grid]");
+  const calendarMonthTarget = matchesApp.querySelector("[data-calendar-month]");
+  const calendarPrev = matchesApp.querySelector("[data-calendar-prev]");
+  const calendarNext = matchesApp.querySelector("[data-calendar-next]");
   const params = new URLSearchParams(window.location.search);
 
   const pad = (value) => String(value).padStart(2, "0");
@@ -21,6 +25,7 @@ if (matchesApp) {
   const selected = parseDate(params.get("fecha")) || new Date();
   selected.setHours(0, 0, 0, 0);
   let selectedDate = selected;
+  let calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
   let dataset = null;
 
   const escapeHtml = (value) =>
@@ -64,6 +69,7 @@ if (matchesApp) {
   const teamById = (id) => dataset?.teams?.find((team) => team.id === id) || null;
   const roundById = (id) => dataset?.rounds?.find((round) => round.id === id) || null;
   const matchDateKey = (match) => String(match.startDate || "").slice(0, 10);
+  const datesWithMatches = () => new Set((dataset?.matches || []).map(matchDateKey).filter(Boolean));
   const matchTime = (match) => {
     if (!match.startDate) return "Hora pendiente";
     const parsed = new Date(match.startDate);
@@ -82,6 +88,52 @@ if (matchesApp) {
     return "Data only";
   };
 
+  const closeCalendar = () => {
+    if (!calendarPopover) return;
+    calendarPopover.hidden = true;
+    dateLabel?.setAttribute("aria-expanded", "false");
+  };
+
+  const openCalendar = () => {
+    if (!calendarPopover) return;
+    calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    renderCalendar();
+    calendarPopover.hidden = false;
+    dateLabel?.setAttribute("aria-expanded", "true");
+  };
+
+  const renderCalendar = () => {
+    if (!calendarGrid || !calendarMonthTarget) return;
+    const markedDates = datesWithMatches();
+    const todayKey = toDateKey(new Date());
+    const selectedKey = toDateKey(selectedDate);
+    const monthLabel = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(calendarMonth);
+    const firstDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
+    const start = new Date(firstDay);
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
+    start.setDate(firstDay.getDate() - mondayOffset);
+
+    calendarMonthTarget.textContent = monthLabel;
+    const days = Array.from({ length: 42 }, (_, index) => {
+      const current = new Date(start);
+      current.setDate(start.getDate() + index);
+      const key = toDateKey(current);
+      const outside = current.getMonth() !== calendarMonth.getMonth();
+      const label = current.getDate();
+      return `
+        <button
+          type="button"
+          class="match-calendar-day${outside ? " is-outside" : ""}${key === selectedKey ? " is-selected" : ""}${key === todayKey ? " is-today" : ""}${markedDates.has(key) ? " has-matches" : ""}"
+          data-calendar-date="${escapeHtml(key)}"
+          aria-label="${escapeHtml(longDate(current))}"
+        >
+          <span>${escapeHtml(label)}</span>
+        </button>
+      `;
+    });
+    calendarGrid.innerHTML = days.join("");
+  };
+
   const renderForm = (team) => {
     const form = Array.isArray(team?.form) ? team.form.slice(-5) : [];
     if (!form.length) return '<span class="match-mini-form-empty">Sin forma</span>';
@@ -96,6 +148,10 @@ if (matchesApp) {
     const round = roundById(match.roundId);
     const href = match.slug ? `/partidos/${match.slug}/` : "/partidos/plantilla/";
     const hasBet = match.mainBet && match.mainBet.result !== "no_bet";
+    const score =
+      match.score && Number.isFinite(Number(match.score.home)) && Number.isFinite(Number(match.score.away))
+        ? `${match.score.home} - ${match.score.away}`
+        : "";
     return `
       <a class="daily-match-card" href="${escapeHtml(href)}">
         <div class="daily-match-top">
@@ -109,6 +165,7 @@ if (matchesApp) {
         </div>
         <div class="daily-match-bottom">
           <span class="daily-match-status">${escapeHtml(statusLabel(match.status))}</span>
+          ${score ? `<span class="daily-match-score">${escapeHtml(score)}</span>` : ""}
           <span>${hasBet ? "Apuesta SigmaBet" : "Previa"}</span>
         </div>
         <div class="daily-match-form" aria-label="Forma últimos 5">
@@ -127,9 +184,9 @@ if (matchesApp) {
       .sort((a, b) => String(a.startDate || "").localeCompare(String(b.startDate || "")));
 
     if (dateLabel) dateLabel.textContent = labelForDate(selectedDate);
-    if (dateInput) dateInput.value = dateKey;
     if (statusTarget) statusTarget.textContent = longDate(selectedDate);
     if (competitionTarget) competitionTarget.textContent = dataset.competition?.name || "Competiciones";
+    renderCalendar();
     setUrlDate();
 
     if (!listTarget) return;
@@ -149,23 +206,50 @@ if (matchesApp) {
   const moveDay = (days) => {
     selectedDate = new Date(selectedDate);
     selectedDate.setDate(selectedDate.getDate() + days);
+    calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    closeCalendar();
     render();
   };
 
   previousButton?.addEventListener("click", () => moveDay(-1));
   nextButton?.addEventListener("click", () => moveDay(1));
-  dateLabel?.addEventListener("click", () => {
-    try {
-      dateInput?.showPicker?.();
-    } catch (error) {
-      dateInput?.click();
+  dateLabel?.setAttribute("aria-haspopup", "dialog");
+  dateLabel?.setAttribute("aria-expanded", "false");
+  dateLabel?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!calendarPopover || calendarPopover.hidden) {
+      openCalendar();
+    } else {
+      closeCalendar();
     }
   });
-  dateInput?.addEventListener("change", () => {
-    const nextDate = parseDate(dateInput.value);
+  calendarPrev?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  calendarNext?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  calendarGrid?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-calendar-date]");
+    if (!button) return;
+    const nextDate = parseDate(button.dataset.calendarDate);
     if (!nextDate) return;
     selectedDate = nextDate;
+    calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    closeCalendar();
     render();
+  });
+  document.addEventListener("click", (event) => {
+    if (!calendarPopover || calendarPopover.hidden) return;
+    if (calendarPopover.contains(event.target) || dateLabel?.contains(event.target)) return;
+    closeCalendar();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeCalendar();
   });
 
   fetch(dataUrl, { cache: "no-store" })

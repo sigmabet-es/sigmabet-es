@@ -62,7 +62,7 @@ const pageShell = ({ title, description, canonical, robots = "index,follow", bod
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="${escapeHtml(canonical)}" />
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-05" />
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-02" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
     ${structuredData ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>` : ""}
   </head>
@@ -193,7 +193,7 @@ const renderMatch = (data, match) => {
 
 const build = () => {
   const data = readData();
-  const publicMatches = data.matches.filter((match) => match.slug && match.robots !== "noindex");
+  const publicMatches = data.matches.filter((match) => match.slug);
 
   publicMatches.forEach((match) => {
     writeFile(path.join(outputRoot, "partidos", match.slug, "index.html"), renderMatch(data, match));
