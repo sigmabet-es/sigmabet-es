@@ -544,6 +544,138 @@ const renderFormPills = (data, match, teamId) => {
 
 const teamName = (teams, id) => teams.get(id)?.name || "Equipo";
 
+const competitionLabel = (match) =>
+  normalize(match.competitionId).includes("laliga") ? "LaLiga EA Sports" : text(match.competitionId, "Competición");
+
+const formatShortDate = (date) => {
+  const value = String(date || "").slice(0, 10);
+  if (!value) return "Sin fecha";
+  const [, month, day] = value.split("-");
+  return day && month ? `${day}.${month}.${value.slice(2, 4)}` : value;
+};
+
+const formatDayMonth = (date) => {
+  const value = String(date || "").slice(0, 10);
+  const [, month, day] = value.split("-");
+  const names = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+  const index = Number.parseInt(month, 10) - 1;
+  return day && names[index] ? `${Number.parseInt(day, 10)} ${names[index]}` : "";
+};
+
+const sideStat = (stats, key, side) => {
+  const value = stats?.[key]?.[side];
+  return Number.isFinite(Number(value)) ? Number(value) : null;
+};
+
+const formatStat = (value, decimals = 0) => {
+  if (value === null || value === undefined || value === "") return "—";
+  return Number.isFinite(Number(value)) ? Number(value).toFixed(decimals) : "—";
+};
+
+const renderResultBadges = (data, match, focusTeamId) => {
+  const teams = new Map(data.teams.map((team) => [team.id, team]));
+  const isFocusHome = match.homeTeamId === focusTeamId;
+  const rivalId = isFocusHome ? match.awayTeamId : match.homeTeamId;
+  const rival = teams.get(rivalId);
+  const result = resultForTeam(match, focusTeamId);
+  const score = scoreText(match);
+  const halfHome = sideStat(match.stats, "firstHalfGoals", "home");
+  const halfAway = sideStat(match.stats, "firstHalfGoals", "away");
+  const half = halfHome === null || halfAway === null ? "—" : `${halfHome} - ${halfAway}`;
+  const side = isFocusHome ? "home" : "away";
+  return {
+    scope: side,
+    result,
+    rival,
+    score,
+    half,
+    xg: sideStat(match.stats, "xg", side),
+    corners: sideStat(match.stats, "corners", side),
+    yellow: sideStat(match.stats, "yellowCards", side),
+    red: sideStat(match.stats, "redCards", side),
+  };
+};
+
+const renderResultTable = (data, rows, focusTeamId, mode = "team") => {
+  if (!rows.length) return "";
+  const teams = new Map(data.teams.map((team) => [team.id, team]));
+  return `<div class="match-table-wrap">
+    <table class="match-result-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Competición</th>
+          <th>${mode === "h2h" ? "Partido" : "Rival"}</th>
+          <th>Marcador</th>
+          <th>1T</th>
+          <th>xG</th>
+          <th>Córners</th>
+          <th><span class="card-dot card-yellow"></span></th>
+          <th><span class="card-dot card-red"></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows
+          .map((item) => {
+            const badges = renderResultBadges(data, item, focusTeamId);
+            const home = teams.get(item.homeTeamId);
+            const away = teams.get(item.awayTeamId);
+            const matchLabel =
+              mode === "h2h"
+                ? `<span class="result-teams">${renderCrest(home)}<b>${escapeHtml(teamName(teams, item.homeTeamId))}</b><em>vs</em>${renderCrest(away)}<b>${escapeHtml(teamName(teams, item.awayTeamId))}</b></span>`
+                : `<span class="result-teams">${renderCrest(badges.rival)}<b>${escapeHtml(badges.rival?.name || "Equipo")}</b></span>`;
+            return `<tr data-scope-row="${escapeHtml(badges.scope)}">
+              <td>${escapeHtml(formatShortDate(item.localDate || item.startDate))}</td>
+              <td>${escapeHtml(competitionLabel(item))}</td>
+              <td>${matchLabel}</td>
+              <td><strong>${escapeHtml(badges.score)}</strong><span class="form-${escapeHtml(normalize(badges.result))}">${escapeHtml(badges.result || "")}</span></td>
+              <td>${escapeHtml(badges.half)}</td>
+              <td>${escapeHtml(formatStat(badges.xg, 2))}</td>
+              <td>${escapeHtml(formatStat(badges.corners))}</td>
+              <td>${escapeHtml(formatStat(badges.yellow))}</td>
+              <td>${escapeHtml(formatStat(badges.red))}</td>
+            </tr>`;
+          })
+          .join("")}
+      </tbody>
+    </table>
+  </div>`;
+};
+
+const averageMatchStat = (rows, key) => {
+  const values = rows
+    .map((item) => {
+      const home = sideStat(item.stats, key, "home");
+      const away = sideStat(item.stats, key, "away");
+      return home === null || away === null ? null : home + away;
+    })
+    .filter((value) => value !== null);
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+};
+
+const averageMatchGoals = (rows) => {
+  const values = rows
+    .map((item) => {
+      if (!isFinished(item)) return null;
+      return Number(item.score.home) + Number(item.score.away);
+    })
+    .filter((value) => value !== null);
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+};
+
+const averageTeamStat = (rows, teamId, key) => {
+  const values = rows
+    .map((item) => {
+      const side = item.homeTeamId === teamId ? "home" : "away";
+      return sideStat(item.stats, key, side);
+    })
+    .filter((value) => value !== null);
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+};
+
 const renderResultRow = (data, item, teamId) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const result = resultForTeam(item, teamId);
@@ -571,12 +703,12 @@ const renderRecentTeamResults = (data, match, team) => {
   const rows = teamMatches(data, match, team.id, "all", 10);
   return `<article class="match-results-card" data-filter-section>
     <div class="match-section-head">
-      <div><span>Últimos resultados</span><h3>${escapeHtml(team.name)}</h3></div>
+      <div class="match-card-title">${renderCrest(team)}<div><span>Últimos partidos</span><h3>${escapeHtml(team.name)}</h3></div></div>
       ${renderScopeControls()}
     </div>
     ${
       rows.length
-        ? `<ul class="match-result-list">${rows.map((item) => renderResultRow(data, item, team.id)).join("")}</ul>`
+        ? renderResultTable(data, rows, team.id)
         : '<p class="match-empty-copy">No hay resultados de liga suficientes en temporada actual o anterior para este equipo.</p>'
     }
   </article>`;
@@ -597,7 +729,7 @@ const renderH2h = (data, match, home, away) => {
 
   return `<section id="h2h" class="match-panel match-h2h-panel" data-filter-section>
     <div class="match-section-head">
-      <div><span>H2H</span><h2>Últimos enfrentamientos directos</h2></div>
+      <div><span>Resumen</span><h2>Enfrentamientos directos</h2></div>
       ${renderScopeControls()}
     </div>
     <div class="match-h2h-summary">
@@ -605,9 +737,16 @@ const renderH2h = (data, match, home, away) => {
       <div><small>Empates</small><strong>${summary.draw}</strong></div>
       <div><small>${escapeHtml(away.name)}</small><strong>${summary.away}</strong></div>
     </div>
+    <div class="match-insight-strip">
+      <div><small>Promedio goles</small><strong>${escapeHtml(formatStat(averageMatchGoals(rows), 2))}</strong></div>
+      <div><small>Tarjetas amarillas</small><strong>${escapeHtml(formatStat(averageMatchStat(rows, "yellowCards"), 2))}</strong></div>
+      <div><small>Córners</small><strong>${escapeHtml(formatStat(averageMatchStat(rows, "corners"), 2))}</strong></div>
+      <div><small>xG ${escapeHtml(home.name)}</small><strong>${escapeHtml(formatStat(averageTeamStat(rows, home.id, "xg"), 2))}</strong></div>
+      <div><small>xG ${escapeHtml(away.name)}</small><strong>${escapeHtml(formatStat(averageTeamStat(rows, away.id, "xg"), 2))}</strong></div>
+    </div>
     ${
       rows.length
-        ? `<ul class="match-result-list">${rows.map((item) => renderResultRow(data, item, home.id)).join("")}</ul>`
+        ? renderResultTable(data, rows, home.id, "h2h")
         : '<p class="match-empty-copy">No hay H2H disponible en temporada actual o anterior para este cruce.</p>'
     }
   </section>`;
@@ -670,6 +809,44 @@ const renderMetaItem = ({ icon, label, value, extra = "" }) => `<div class="matc
   ${extra}
 </div>`;
 
+const renderScoreHero = (data, match, home, away) => {
+  const homeLineup = getLineup(match, home);
+  const awayLineup = getLineup(match, away);
+  const score = scoreText(match);
+  const centerLabel = isFinished(match)
+    ? "Resultado"
+    : `<span data-local-time data-time-status="${escapeHtml(match.timeStatus || "confirmed")}" data-start-date="${escapeHtml(match.startDate || "")}">${escapeHtml(
+        match.timeStatus === "pending" ? "Horario pendiente" : text(match.localTime || match.startDate)
+      )}</span>`;
+  const centerSub = isFinished(match) ? formatShortDate(match.localDate) : formatDayMonth(match.localDate);
+
+  return `<div class="match-score-hero">
+    <section class="match-score-team match-score-home">
+      ${renderCrest(home)}
+      <div>
+        <span>Local</span>
+        <strong>${escapeHtml(home.name)}</strong>
+        <small>${escapeHtml(text(homeLineup?.formation, "Formación pendiente"))}</small>
+        <div class="form-row">${renderFormPills(data, match, home.id)}</div>
+      </div>
+    </section>
+    <div class="match-score-center ${isFinished(match) ? "is-result" : ""}">
+      <strong>${escapeHtml(score)}</strong>
+      <small>${centerLabel}</small>
+      ${centerSub ? `<em>${escapeHtml(centerSub)}</em>` : ""}
+    </div>
+    <section class="match-score-team match-score-away">
+      <div>
+        <span>Visitante</span>
+        <strong>${escapeHtml(away.name)}</strong>
+        <small>${escapeHtml(text(awayLineup?.formation, "Formación pendiente"))}</small>
+        <div class="form-row">${renderFormPills(data, match, away.id)}</div>
+      </div>
+      ${renderCrest(away)}
+    </section>
+  </div>`;
+};
+
 const renderMatch = (data, match) => {
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   const home = teams.get(match.homeTeamId) || { name: "Equipo local", slug: "" };
@@ -702,24 +879,10 @@ const renderMatch = (data, match) => {
             extra: refereeCards ? `<small>${refereeCards.matches} partidos con datos</small>` : "",
           })}
         </div>
-        <div class="match-vs-board">
-          <section>
-            <span>Local</span>
-            ${renderCrest(home)}
-            <strong>${escapeHtml(home.name)}</strong>
-            <div class="form-row">${renderFormPills(data, match, home.id)}</div>
-          </section>
-          <b class="${isFinished(match) ? "is-result" : ""}">${escapeHtml(scoreText(match))}</b>
-          <section>
-            <span>Visitante</span>
-            ${renderCrest(away)}
-            <strong>${escapeHtml(away.name)}</strong>
-            <div class="form-row">${renderFormPills(data, match, away.id)}</div>
-          </section>
-        </div>
+        ${renderScoreHero(data, match, home, away)}
         ${renderAnalysisNotice(match)}
       </header>
-      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#bajas">Bajas</a><a href="#analisis">Análisis</a><a href="#apuestas">Apuestas</a></nav>
+      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a class="is-active" href="#h2h">Resumen</a><a href="#h2h">H2H</a><a href="#resultados">Resultados</a><a href="#alineaciones">Alineaciones</a><a href="#bajas">Bajas</a><a href="#analisis">Análisis</a><a href="#apuestas">Pronóstico</a></nav>
       ${renderH2h(data, match, home, away)}
       <section id="resultados" class="match-results-grid">${renderRecentTeamResults(data, match, home)}${renderRecentTeamResults(data, match, away)}</section>
       ${renderLineupsSection(match, home, away)}
