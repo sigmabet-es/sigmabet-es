@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-21T16:39:38.851Z",
+  "updatedAt": "2026-08-26T15:42:38.951Z",
   "teams": [
     {
       "id": "external-girona",
@@ -717,6 +717,1731 @@
         },
         "offsides": {
           "home": 0,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-22-real-betis-deportivo-alaves",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "real-betis",
+      "awayTeamId": "deportivo-alaves",
+      "startDate": "2025-08-22T00:00:00+02:00",
+      "localDate": "2025-08-22",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Benito Villamarín",
+      "referee": "Miguel Angel Ortiz Arias",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.95,
+          "away": 1.12
+        },
+        "possession": {
+          "home": 49,
+          "away": 51
+        },
+        "shots": {
+          "home": 16,
+          "away": 11
+        },
+        "shotsOnTarget": {
+          "home": 5,
+          "away": 5
+        },
+        "corners": {
+          "home": 5,
+          "away": 2
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 10,
+          "away": 17
+        },
+        "offsides": {
+          "home": 2,
+          "away": 3
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-23-external-mallorca-celta",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "external-mallorca",
+      "awayTeamId": "celta",
+      "startDate": "2025-08-23T00:00:00+02:00",
+      "localDate": "2025-08-23",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadi de Son Moix",
+      "referee": "Jose Luis Guzman Mansilla",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 0.68,
+          "away": 0.74
+        },
+        "possession": {
+          "home": 50,
+          "away": 50
+        },
+        "shots": {
+          "home": 12,
+          "away": 8
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 2
+        },
+        "corners": {
+          "home": 3,
+          "away": 4
+        },
+        "yellowCards": {
+          "home": 3,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 12,
+          "away": 12
+        },
+        "offsides": {
+          "home": 1,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-23-atletico-de-madrid-elche-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "atletico-de-madrid",
+      "awayTeamId": "elche-cf",
+      "startDate": "2025-08-23T00:00:00+02:00",
+      "localDate": "2025-08-23",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Riyadh Air Metropolitano",
+      "referee": "César Soto Grado",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.74,
+          "away": 0.57
+        },
+        "possession": {
+          "home": 58,
+          "away": 42
+        },
+        "shots": {
+          "home": 13,
+          "away": 6
+        },
+        "shotsOnTarget": {
+          "home": 6,
+          "away": 2
+        },
+        "corners": {
+          "home": 10,
+          "away": 2
+        },
+        "yellowCards": {
+          "home": 0,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 14,
+          "away": 7
+        },
+        "offsides": {
+          "home": 3,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-23-levante-ud-fc-barcelona",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "levante-ud",
+      "awayTeamId": "fc-barcelona",
+      "startDate": "2025-08-23T00:00:00+02:00",
+      "localDate": "2025-08-23",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Ciudad de Valencia",
+      "referee": "Alejandro Hernandez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 3
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 2,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 3
+        },
+        "xg": {
+          "home": 2.14,
+          "away": 1.93
+        },
+        "possession": {
+          "home": 18,
+          "away": 82
+        },
+        "shots": {
+          "home": 8,
+          "away": 26
+        },
+        "shotsOnTarget": {
+          "home": 5,
+          "away": 10
+        },
+        "corners": {
+          "home": 0,
+          "away": 11
+        },
+        "yellowCards": {
+          "home": 3,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 10,
+          "away": 8
+        },
+        "offsides": {
+          "home": 6,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-24-ca-osasuna-valencia-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "ca-osasuna",
+      "awayTeamId": "valencia-cf",
+      "startDate": "2025-08-24T00:00:00+02:00",
+      "localDate": "2025-08-24",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio El Sadar",
+      "referee": "Jesus Gil Manzano",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 0.83,
+          "away": 0.41
+        },
+        "possession": {
+          "home": 56,
+          "away": 44
+        },
+        "shots": {
+          "home": 16,
+          "away": 4
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 1
+        },
+        "corners": {
+          "home": 3,
+          "away": 4
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 1
+        },
+        "fouls": {
+          "home": 14,
+          "away": 13
+        },
+        "offsides": {
+          "home": 2,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-24-villarreal-cf-external-girona",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "villarreal-cf",
+      "awayTeamId": "external-girona",
+      "startDate": "2025-08-24T00:00:00+02:00",
+      "localDate": "2025-08-24",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio de la Ceramica",
+      "referee": "Guillermo Cuadra Fernández",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 5,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 4,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 2.3,
+          "away": 0.14
+        },
+        "possession": {
+          "home": 53,
+          "away": 47
+        },
+        "shots": {
+          "home": 19,
+          "away": 5
+        },
+        "shotsOnTarget": {
+          "home": 7,
+          "away": 2
+        },
+        "corners": {
+          "home": 8,
+          "away": 1
+        },
+        "yellowCards": {
+          "home": 1,
+          "away": 2
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 8,
+          "away": 9
+        },
+        "offsides": {
+          "home": 3,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-24-real-sociedad-rcd-espanyol",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "real-sociedad",
+      "awayTeamId": "rcd-espanyol",
+      "startDate": "2025-08-24T00:00:00+02:00",
+      "localDate": "2025-08-24",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Reale Arena",
+      "referee": "Alejandro Quintero Gonzalez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 2
+        },
+        "secondHalfGoals": {
+          "home": 2,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.09,
+          "away": 1.81
+        },
+        "possession": {
+          "home": 62,
+          "away": 38
+        },
+        "shots": {
+          "home": 15,
+          "away": 14
+        },
+        "shotsOnTarget": {
+          "home": 7,
+          "away": 3
+        },
+        "corners": {
+          "home": 5,
+          "away": 2
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 2
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 16,
+          "away": 18
+        },
+        "offsides": {
+          "home": 1,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-24-external-real-oviedo-real-madrid",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "external-real-oviedo",
+      "awayTeamId": "real-madrid",
+      "startDate": "2025-08-24T00:00:00+02:00",
+      "localDate": "2025-08-24",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Carlos Tartiere",
+      "referee": "Ricardo De Burgos Bengoetxea",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 0,
+        "away": 3
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 2
+        },
+        "xg": {
+          "home": 0.5,
+          "away": 2.68
+        },
+        "possession": {
+          "home": 35,
+          "away": 65
+        },
+        "shots": {
+          "home": 6,
+          "away": 26
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 10
+        },
+        "corners": {
+          "home": 1,
+          "away": 9
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 8,
+          "away": 7
+        },
+        "offsides": {
+          "home": 2,
+          "away": 2
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-25-athletic-club-rayo-vallecano",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "athletic-club",
+      "awayTeamId": "rayo-vallecano",
+      "startDate": "2025-08-25T00:00:00+02:00",
+      "localDate": "2025-08-25",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "San Mamés",
+      "referee": "Juan Martinez Munuera",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.51,
+          "away": 0.29
+        },
+        "possession": {
+          "home": 41,
+          "away": 59
+        },
+        "shots": {
+          "home": 11,
+          "away": 6
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 1
+        },
+        "corners": {
+          "home": 3,
+          "away": 6
+        },
+        "yellowCards": {
+          "home": 0,
+          "away": 4
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 13,
+          "away": 13
+        },
+        "offsides": {
+          "home": 0,
+          "away": 7
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-25-sevilla-fc-getafe-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J2",
+      "homeTeamId": "sevilla-fc",
+      "awayTeamId": "getafe-cf",
+      "startDate": "2025-08-25T00:00:00+02:00",
+      "localDate": "2025-08-25",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Ramón Sánchez Pizjuan",
+      "referee": "Isidro Diaz de Mera Escuderos",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 1
+        },
+        "xg": {
+          "home": 0.51,
+          "away": 0.71
+        },
+        "possession": {
+          "home": 71,
+          "away": 29
+        },
+        "shots": {
+          "home": 12,
+          "away": 9
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 6
+        },
+        "corners": {
+          "home": 5,
+          "away": 3
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 2
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 10,
+          "away": 24
+        },
+        "offsides": {
+          "home": 4,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-29-elche-cf-levante-ud",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "elche-cf",
+      "awayTeamId": "levante-ud",
+      "startDate": "2025-08-29T00:00:00+02:00",
+      "localDate": "2025-08-29",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio Martínez Valero",
+      "referee": "Iosu Galech Apezteguia",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 2,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.12,
+          "away": 0.71
+        },
+        "possession": {
+          "home": 67,
+          "away": 33
+        },
+        "shots": {
+          "home": 16,
+          "away": 11
+        },
+        "shotsOnTarget": {
+          "home": 5,
+          "away": 1
+        },
+        "corners": {
+          "home": 4,
+          "away": 2
+        },
+        "yellowCards": {
+          "home": 1,
+          "away": 2
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 14,
+          "away": 17
+        },
+        "offsides": {
+          "home": 1,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-29-valencia-cf-getafe-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "valencia-cf",
+      "awayTeamId": "getafe-cf",
+      "startDate": "2025-08-29T00:00:00+02:00",
+      "localDate": "2025-08-29",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Mestalla",
+      "referee": "Alejandro Hernandez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 3,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 2,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.08,
+          "away": 0.74
+        },
+        "possession": {
+          "home": 58,
+          "away": 42
+        },
+        "shots": {
+          "home": 7,
+          "away": 11
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 1
+        },
+        "corners": {
+          "home": 8,
+          "away": 6
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 0
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 18,
+          "away": 7
+        },
+        "offsides": {
+          "home": 0,
+          "away": 5
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-30-deportivo-alaves-atletico-de-madrid",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "deportivo-alaves",
+      "awayTeamId": "atletico-de-madrid",
+      "startDate": "2025-08-30T00:00:00+02:00",
+      "localDate": "2025-08-30",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio de Mendizorroza",
+      "referee": "Victor Garcia Verdura",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 0.91,
+          "away": 1.06
+        },
+        "possession": {
+          "home": 40,
+          "away": 60
+        },
+        "shots": {
+          "home": 5,
+          "away": 15
+        },
+        "shotsOnTarget": {
+          "home": 2,
+          "away": 6
+        },
+        "corners": {
+          "home": 1,
+          "away": 6
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 10,
+          "away": 17
+        },
+        "offsides": {
+          "home": 0,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-30-external-real-oviedo-real-sociedad",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "external-real-oviedo",
+      "awayTeamId": "real-sociedad",
+      "startDate": "2025-08-30T00:00:00+02:00",
+      "localDate": "2025-08-30",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Carlos Tartiere",
+      "referee": "Adrian Cordero Vega",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 0.5,
+          "away": 1.07
+        },
+        "possession": {
+          "home": 43,
+          "away": 57
+        },
+        "shots": {
+          "home": 8,
+          "away": 18
+        },
+        "shotsOnTarget": {
+          "home": 1,
+          "away": 6
+        },
+        "corners": {
+          "home": 1,
+          "away": 10
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 7,
+          "away": 18
+        },
+        "offsides": {
+          "home": 2,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-30-external-girona-sevilla-fc",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "external-girona",
+      "awayTeamId": "sevilla-fc",
+      "startDate": "2025-08-30T00:00:00+02:00",
+      "localDate": "2025-08-30",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadi Montilivi",
+      "referee": "Miguel Angel Ortiz Arias",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 0,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "xg": {
+          "home": 2.13,
+          "away": 1.32
+        },
+        "possession": {
+          "home": 59,
+          "away": 41
+        },
+        "shots": {
+          "home": 20,
+          "away": 13
+        },
+        "shotsOnTarget": {
+          "home": 5,
+          "away": 4
+        },
+        "corners": {
+          "home": 11,
+          "away": 3
+        },
+        "yellowCards": {
+          "home": 0,
+          "away": 2
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 5,
+          "away": 14
+        },
+        "offsides": {
+          "home": 2,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-30-real-madrid-external-mallorca",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "real-madrid",
+      "awayTeamId": "external-mallorca",
+      "startDate": "2025-08-30T00:00:00+02:00",
+      "localDate": "2025-08-30",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Bernabéu",
+      "referee": "José María Sánchez Martínez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 2,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.82,
+          "away": 0.72
+        },
+        "possession": {
+          "home": 58,
+          "away": 42
+        },
+        "shots": {
+          "home": 17,
+          "away": 9
+        },
+        "shotsOnTarget": {
+          "home": 7,
+          "away": 5
+        },
+        "corners": {
+          "home": 4,
+          "away": 5
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 0
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 12,
+          "away": 7
+        },
+        "offsides": {
+          "home": 3,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-31-celta-villarreal-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "celta",
+      "awayTeamId": "villarreal-cf",
+      "startDate": "2025-08-31T00:00:00+02:00",
+      "localDate": "2025-08-31",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio Abanca Balaídos",
+      "referee": "Alejandro Quintero Gonzalez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 1
+        },
+        "xg": {
+          "home": 0.96,
+          "away": 1.04
+        },
+        "possession": {
+          "home": 65,
+          "away": 35
+        },
+        "shots": {
+          "home": 10,
+          "away": 8
+        },
+        "shotsOnTarget": {
+          "home": 2,
+          "away": 3
+        },
+        "corners": {
+          "home": 1,
+          "away": 5
+        },
+        "yellowCards": {
+          "home": 1,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 11,
+          "away": 8
+        },
+        "offsides": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-31-real-betis-athletic-club",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "real-betis",
+      "awayTeamId": "athletic-club",
+      "startDate": "2025-08-31T00:00:00+02:00",
+      "localDate": "2025-08-31",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Benito Villamarín",
+      "referee": "Isidro Diaz de Mera Escuderos",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 2
+        },
+        "xg": {
+          "home": 0.62,
+          "away": 1.11
+        },
+        "possession": {
+          "home": 50,
+          "away": 50
+        },
+        "shots": {
+          "home": 9,
+          "away": 15
+        },
+        "shotsOnTarget": {
+          "home": 2,
+          "away": 6
+        },
+        "corners": {
+          "home": 4,
+          "away": 10
+        },
+        "yellowCards": {
+          "home": 1,
+          "away": 4
+        },
+        "redCards": {
+          "home": 0,
+          "away": 1
+        },
+        "fouls": {
+          "home": 9,
+          "away": 16
+        },
+        "offsides": {
+          "home": 3,
+          "away": 2
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-31-rcd-espanyol-ca-osasuna",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "rcd-espanyol",
+      "awayTeamId": "ca-osasuna",
+      "startDate": "2025-08-31T00:00:00+02:00",
+      "localDate": "2025-08-31",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "RCDE Stadium",
+      "referee": "Miguel Sesma Espinosa",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.21,
+          "away": 1.37
+        },
+        "possession": {
+          "home": 45,
+          "away": 55
+        },
+        "shots": {
+          "home": 10,
+          "away": 10
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 3
+        },
+        "corners": {
+          "home": 2,
+          "away": 3
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 13,
+          "away": 14
+        },
+        "offsides": {
+          "home": 2,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-08-31-rayo-vallecano-fc-barcelona",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J3",
+      "homeTeamId": "rayo-vallecano",
+      "awayTeamId": "fc-barcelona",
+      "startDate": "2025-08-31T00:00:00+02:00",
+      "localDate": "2025-08-31",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Estadio de Vallecas",
+      "referee": "Mateo Busquets Ferrer",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.85,
+          "away": 1.83
+        },
+        "possession": {
+          "home": 43,
+          "away": 57
+        },
+        "shots": {
+          "home": 12,
+          "away": 12
+        },
+        "shotsOnTarget": {
+          "home": 6,
+          "away": 3
+        },
+        "corners": {
+          "home": 9,
+          "away": 4
+        },
+        "yellowCards": {
+          "home": 4,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 16,
+          "away": 8
+        },
+        "offsides": {
+          "home": 7,
+          "away": 2
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-09-12-sevilla-fc-elche-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J4",
+      "homeTeamId": "sevilla-fc",
+      "awayTeamId": "elche-cf",
+      "startDate": "2025-09-12T00:00:00+02:00",
+      "localDate": "2025-09-12",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Ramón Sánchez Pizjuan",
+      "referee": "Javier Arberola Rojas",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 2
+        },
+        "xg": {
+          "home": 0.4,
+          "away": 0.95
+        },
+        "possession": {
+          "home": 53,
+          "away": 477
+        },
+        "shots": {
+          "home": 7,
+          "away": 5
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 2
+        },
+        "corners": {
+          "home": 2,
+          "away": 2
+        },
+        "yellowCards": {
+          "home": 4,
+          "away": 3
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 23,
+          "away": 19
+        },
+        "offsides": {
+          "home": 1,
+          "away": 0
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-09-13-getafe-cf-external-real-oviedo",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J4",
+      "homeTeamId": "getafe-cf",
+      "awayTeamId": "external-real-oviedo",
+      "startDate": "2025-09-13T00:00:00+02:00",
+      "localDate": "2025-09-13",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Coliseum Alfonso Pérez",
+      "referee": "Jose Luis Guzman Mansilla",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 2,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "xg": {
+          "home": 0.75,
+          "away": 0.46
+        },
+        "possession": {
+          "home": 48,
+          "away": 52
+        },
+        "shots": {
+          "home": 10,
+          "away": 5
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 1
+        },
+        "corners": {
+          "home": 4,
+          "away": 3
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 5
+        },
+        "redCards": {
+          "home": 0,
+          "away": 1
+        },
+        "fouls": {
+          "home": 12,
+          "away": 18
+        },
+        "offsides": {
+          "home": 1,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-09-13-real-sociedad-real-madrid",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J4",
+      "homeTeamId": "real-sociedad",
+      "awayTeamId": "real-madrid",
+      "startDate": "2025-09-13T00:00:00+02:00",
+      "localDate": "2025-09-13",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Reale Arena",
+      "referee": "Jesus Gil Manzano",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 1,
+        "away": 2
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 2
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 2.23,
+          "away": 2.42
+        },
+        "possession": {
+          "home": 64,
+          "away": 36
+        },
+        "shots": {
+          "home": 23,
+          "away": 16
+        },
+        "shotsOnTarget": {
+          "home": 4,
+          "away": 6
+        },
+        "corners": {
+          "home": 12,
+          "away": 4
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 1
+        },
+        "redCards": {
+          "home": 0,
+          "away": 1
+        },
+        "fouls": {
+          "home": 17,
+          "away": 7
+        },
+        "offsides": {
+          "home": 0,
+          "away": 2
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-09-13-athletic-club-deportivo-alaves",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J4",
+      "homeTeamId": "athletic-club",
+      "awayTeamId": "deportivo-alaves",
+      "startDate": "2025-09-13T00:00:00+02:00",
+      "localDate": "2025-09-13",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "San Mamés",
+      "referee": "José María Sánchez Martínez",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 0,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 0,
+          "away": 1
+        },
+        "xg": {
+          "home": 1.08,
+          "away": 0.09
+        },
+        "possession": {
+          "home": 58,
+          "away": 42
+        },
+        "shots": {
+          "home": 12,
+          "away": 4
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 2
+        },
+        "corners": {
+          "home": 6,
+          "away": 6
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 4
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 17,
+          "away": 21
+        },
+        "offsides": {
+          "home": 2,
+          "away": 1
+        }
+      },
+      "source": "Sofascore",
+      "notes": null
+    },
+    {
+      "id": "sheet-2025-09-13-atletico-de-madrid-villarreal-cf",
+      "slug": null,
+      "competitionId": "laliga",
+      "seasonId": "2025-26",
+      "roundId": "J4",
+      "homeTeamId": "atletico-de-madrid",
+      "awayTeamId": "villarreal-cf",
+      "startDate": "2025-09-13T00:00:00+02:00",
+      "localDate": "2025-09-13",
+      "localTime": null,
+      "timeStatus": "unknown",
+      "venue": "Riyadh Air Metropolitano",
+      "referee": "José Luis Munuera Montero",
+      "status": "finalizado",
+      "quality": "stats_sheet",
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "stats": {
+        "firstHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "secondHalfGoals": {
+          "home": 1,
+          "away": 0
+        },
+        "xg": {
+          "home": 1.01,
+          "away": 1.03
+        },
+        "possession": {
+          "home": 61,
+          "away": 39
+        },
+        "shots": {
+          "home": 8,
+          "away": 8
+        },
+        "shotsOnTarget": {
+          "home": 3,
+          "away": 1
+        },
+        "corners": {
+          "home": 8,
+          "away": 3
+        },
+        "yellowCards": {
+          "home": 2,
+          "away": 4
+        },
+        "redCards": {
+          "home": 0,
+          "away": 0
+        },
+        "fouls": {
+          "home": 12,
+          "away": 15
+        },
+        "offsides": {
+          "home": 1,
           "away": 0
         }
       },

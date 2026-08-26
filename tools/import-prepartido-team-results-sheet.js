@@ -120,30 +120,39 @@ const getCell = (row, headers, key) => {
   return index >= 0 ? row[index] : "";
 };
 
-const pubhtmlToCsv = async (source) => {
+const pubhtmlToCsvUrls = async (source) => {
   const response = await fetch(source, {
     cache: "no-store",
     headers: { "user-agent": "SigmaBet team results importer" },
   });
   if (!response.ok) throw new Error(`La hoja de resultados respondió ${response.status}`);
   const html = await response.text();
-  const gid = html.match(/gid=(\d+)/)?.[1];
-  if (!gid) throw new Error("No se encontró ningún gid en el enlace pubhtml de resultados.");
-  return `${source.replace(/\/pubhtml.*$/i, "/pub")}?gid=${gid}&single=true&output=csv`;
+  const gids = [...html.matchAll(/(?:[?&]|&amp;)gid=(\d+)/gi)].map((match) => match[1]);
+  const uniqueGids = [...new Set(gids)];
+  if (!uniqueGids.length) throw new Error("No se encontró ninguna pestaña publicada en el libro de resultados.");
+  const base = source.replace(/\/pubhtml.*$/i, "/pub");
+  return uniqueGids.map((gid) => `${base}?gid=${gid}&single=true&output=csv`);
 };
 
-const readSource = async (source) => {
-  if (/^https?:\/\//i.test(source) && /\/pubhtml/i.test(source)) return readSource(await pubhtmlToCsv(source));
-  if (/^https?:\/\//i.test(source)) {
-    const separator = source.includes("?") ? "&" : "?";
-    const response = await fetch(`${source}${separator}_=${Date.now()}`, {
-      cache: "no-store",
-      headers: { "user-agent": "SigmaBet team results importer" },
-    });
-    if (!response.ok) throw new Error(`La hoja de resultados respondió ${response.status}`);
-    return response.text();
+const readRemoteSource = async (source) => {
+  const separator = source.includes("?") ? "&" : "?";
+  const response = await fetch(`${source}${separator}_=${Date.now()}`, {
+    cache: "no-store",
+    headers: { "user-agent": "SigmaBet team results importer" },
+  });
+  if (!response.ok) throw new Error(`La hoja de resultados respondió ${response.status}`);
+  return response.text();
+};
+
+const readSources = async (source) => {
+  if (/^https?:\/\//i.test(source) && /\/pubhtml/i.test(source)) {
+    const urls = await pubhtmlToCsvUrls(source);
+    return Promise.all(urls.map((url) => readRemoteSource(url)));
   }
-  return fs.readFileSync(path.resolve(root, source), "utf8");
+  if (/^https?:\/\//i.test(source)) {
+    return [await readRemoteSource(source)];
+  }
+  return [fs.readFileSync(path.resolve(root, source), "utf8")];
 };
 
 const buildTeamIndex = (data) => {
@@ -202,15 +211,11 @@ const compactStats = (stats) =>
 const main = async (source) => {
   const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
   const teamIndex = buildTeamIndex(data);
-  const rows = parseCsv(await readSource(source));
-  const headerIndex = rows.findIndex((row) => row.some((cell) => normalize(cell) === "fecha") && row.some((cell) => normalize(cell) === "local"));
-
-  if (headerIndex < 0) throw new Error("No se encontró una cabecera con columnas fecha y local.");
-
-  const headers = rows[headerIndex];
+  const sheets = await readSources(source);
   const matches = [];
   const unknownTeams = new Set();
   const externalTeams = new Map();
+  let validSheets = 0;
   const resolveTeam = (value) => {
     const existing = findTeam(teamIndex, value);
     if (existing) return existing;
@@ -222,42 +227,56 @@ const main = async (source) => {
     return externalTeams.get(team.id);
   };
 
-  rows.slice(headerIndex + 1).forEach((row) => {
-    if (!row.some((cell) => String(cell).trim())) return;
-    const localDate = parseDate(getCell(row, headers, "fecha"));
-    const home = resolveTeam(getCell(row, headers, "local"));
-    const away = resolveTeam(getCell(row, headers, "visitante"));
-    const homeGoals = numberFrom(getCell(row, headers, "golesLocal"));
-    const awayGoals = numberFrom(getCell(row, headers, "golesVisitante"));
+  sheets.forEach((csv) => {
+    const rows = parseCsv(csv);
+    const headerIndex = rows.findIndex(
+      (row) => row.some((cell) => normalize(cell) === "fecha") && row.some((cell) => normalize(cell) === "local")
+    );
+    if (headerIndex < 0) return;
+    validSheets += 1;
+    const headers = rows[headerIndex];
 
-    if (!localDate || (!home && !away)) return;
-    if (!home || !away || homeGoals === null || awayGoals === null) return;
+    rows.slice(headerIndex + 1).forEach((row) => {
+      if (!row.some((cell) => String(cell).trim())) return;
+      const localDate = parseDate(getCell(row, headers, "fecha"));
+      const home = resolveTeam(getCell(row, headers, "local"));
+      const away = resolveTeam(getCell(row, headers, "visitante"));
+      const homeGoals = numberFrom(getCell(row, headers, "golesLocal"));
+      const awayGoals = numberFrom(getCell(row, headers, "golesVisitante"));
 
-    matches.push({
-      id: `sheet-${localDate}-${home.id}-${away.id}`,
-      slug: null,
-      competitionId: slugify(getCell(row, headers, "competicion") || "laliga"),
-      seasonId: text(getCell(row, headers, "temporada"), "temporada-desconocida"),
-      roundId: text(getCell(row, headers, "jornada"), "Jornada sin dato"),
-      homeTeamId: home.id,
-      awayTeamId: away.id,
-      startDate: `${localDate}T00:00:00+02:00`,
-      localDate,
-      localTime: null,
-      timeStatus: "unknown",
-      venue: text(getCell(row, headers, "estadio"), null),
-      referee: text(getCell(row, headers, "arbitro"), null),
-      status: "finalizado",
-      quality: "stats_sheet",
-      score: { home: homeGoals, away: awayGoals },
-      stats: compactStats(buildStats(row, headers)),
-      source: text(getCell(row, headers, "fuente"), null),
-      notes: text(getCell(row, headers, "notas"), null),
+      if (!localDate || (!home && !away)) return;
+      if (!home || !away || homeGoals === null || awayGoals === null) return;
+
+      matches.push({
+        id: `sheet-${localDate}-${home.id}-${away.id}`,
+        slug: null,
+        competitionId: slugify(getCell(row, headers, "competicion") || "laliga"),
+        seasonId: text(getCell(row, headers, "temporada"), "temporada-desconocida"),
+        roundId: text(getCell(row, headers, "jornada"), "Jornada sin dato"),
+        homeTeamId: home.id,
+        awayTeamId: away.id,
+        startDate: `${localDate}T00:00:00+02:00`,
+        localDate,
+        localTime: null,
+        timeStatus: "unknown",
+        venue: text(getCell(row, headers, "estadio"), null),
+        referee: text(getCell(row, headers, "arbitro"), null),
+        status: "finalizado",
+        quality: "stats_sheet",
+        score: { home: homeGoals, away: awayGoals },
+        stats: compactStats(buildStats(row, headers)),
+        source: text(getCell(row, headers, "fuente"), null),
+        notes: text(getCell(row, headers, "notas"), null),
+      });
     });
   });
 
-  fs.writeFileSync(outputPath, `${JSON.stringify({ updatedAt: new Date().toISOString(), teams: [...externalTeams.values()], matches }, null, 2)}\n`);
-  console.log(`Resultados importados: ${matches.length}`);
+  if (!validSheets) throw new Error("No se encontró una cabecera con columnas fecha y local en ninguna pestaña.");
+
+  const uniqueMatches = [...new Map(matches.map((match) => [match.id, match])).values()];
+
+  fs.writeFileSync(outputPath, `${JSON.stringify({ updatedAt: new Date().toISOString(), teams: [...externalTeams.values()], matches: uniqueMatches }, null, 2)}\n`);
+  console.log(`Pestañas importadas: ${validSheets}. Resultados únicos: ${uniqueMatches.length}`);
   if (unknownTeams.size) console.warn(`Equipos externos añadidos al historial: ${[...unknownTeams].filter(Boolean).join(", ")}`);
 };
 

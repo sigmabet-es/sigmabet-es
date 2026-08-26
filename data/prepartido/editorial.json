@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-08-21T16:39:37.458Z",
+  "updatedAt": "2026-08-26T15:42:35.829Z",
   "matches": {
     "real-betis-real-sociedad-2026-08-21": {
       "quality": "basic",
       "seoPriority": "C",
       "robots": "noindex",
-      "updatedAt": "2026-08-21T16:39:37.451Z",
+      "updatedAt": "2026-08-26T15:42:35.822Z",
       "preview": "Resumen corto de la previa.",
       "analysis": "No hay ningún análisis disponible para este encuentro.",
       "keys": [
@@ -165,6 +165,77 @@
             "(7) A. Barrenetxea",
             "(18) C. Soler",
             "(14) T. Kubo",
+            "(9) O. S. Óskarsson"
+          ],
+          "updatedAt": null
+        }
+      ],
+      "news": []
+    },
+    "real-madrid-real-sociedad-2026-08-26": {
+      "quality": "basic",
+      "seoPriority": "C",
+      "robots": "noindex",
+      "updatedAt": "2026-08-26T15:42:35.829Z",
+      "preview": "Resumen corto de la previa.",
+      "analysis": "No hay ningún análisis disponible para este encuentro.",
+      "keys": [
+        "Clave 1",
+        "Clave 2",
+        "Clave 3"
+      ],
+      "probabilities": null,
+      "mainBet": {
+        "type": "principal",
+        "market": "No Bet",
+        "selection": "Sin apuesta recomendada",
+        "bookmaker": null,
+        "odds": null,
+        "sigmaProbability": null,
+        "minimumOdds": null,
+        "stake": null,
+        "publishedAt": null,
+        "result": "no_bet"
+      },
+      "valueBets": [],
+      "injuries": [],
+      "lineups": [
+        {
+          "teamId": "real-madrid",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "alta",
+          "players": [
+            "(1) T. Courtois",
+            "(17) M. Cucurella",
+            "(4) D. Huijsen",
+            "(16) I. Konaté",
+            "(12) T. Alexander-Arnold",
+            "(8) F. Valverde",
+            "(20) B. Silva",
+            "(7) Vinícius Jr.",
+            "(5) J. Bellingham",
+            "(25) Y. Diomande",
+            "(10) K. Mbappé"
+          ],
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "type": "probable",
+          "formation": "4-4-2-0",
+          "confidence": "media",
+          "players": [
+            "(1) Á. Remiro",
+            "(17) S. Gómez",
+            "(5) I. Zubeldia",
+            "(31) J. Martínv",
+            "(2) J. Aramburu",
+            "(7) A. Barrenetxea",
+            "(24) L. Sucic",
+            "(21) Y. Herrera",
+            "(14) T. Kubo",
+            "(18) C. Soler",
             "(9) O. S. Óskarsson"
           ],
           "updatedAt": null
