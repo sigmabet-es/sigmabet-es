@@ -48,16 +48,16 @@
     {
       "id": "fd-ref-214213",
       "name": "Francisco Hernández Maeso",
-      "matches": 38,
+      "matches": 39,
       "yellowCards": {
-        "total": 148.0,
-        "matchesWithData": 38,
-        "average": 3.895
+        "total": 149.0,
+        "matchesWithData": 39,
+        "average": 3.821
       },
       "redCards": {
         "total": 5.0,
-        "matchesWithData": 38,
-        "average": 0.132
+        "matchesWithData": 39,
+        "average": 0.128
       }
     },
     {
@@ -213,16 +213,16 @@
     {
       "id": "fd-ref-80747",
       "name": "Javier Alberola Rojas",
-      "matches": 41,
+      "matches": 42,
       "yellowCards": {
-        "total": 148.0,
-        "matchesWithData": 41,
-        "average": 3.61
+        "total": 153.0,
+        "matchesWithData": 42,
+        "average": 3.643
       },
       "redCards": {
-        "total": 11.0,
-        "matchesWithData": 41,
-        "average": 0.268
+        "total": 12.0,
+        "matchesWithData": 42,
+        "average": 0.286
       }
     },
     {
@@ -243,61 +243,61 @@
     {
       "id": "fd-ref-56995",
       "name": "Víctor García Verdura",
-      "matches": 37,
+      "matches": 38,
       "yellowCards": {
-        "total": 151.0,
-        "matchesWithData": 37,
-        "average": 4.081
+        "total": 152.0,
+        "matchesWithData": 38,
+        "average": 4.0
       },
       "redCards": {
         "total": 6.0,
-        "matchesWithData": 37,
-        "average": 0.162
+        "matchesWithData": 38,
+        "average": 0.158
       }
     },
     {
       "id": "fd-ref-15628",
       "name": "Ricardo de Burgos",
-      "matches": 39,
+      "matches": 40,
       "yellowCards": {
-        "total": 145.0,
-        "matchesWithData": 39,
-        "average": 3.718
+        "total": 149.0,
+        "matchesWithData": 40,
+        "average": 3.725
       },
       "redCards": {
         "total": 7.0,
-        "matchesWithData": 39,
-        "average": 0.179
+        "matchesWithData": 40,
+        "average": 0.175
       }
     },
     {
       "id": "fd-ref-217698",
       "name": "Mateo Busquets Ferrer",
-      "matches": 35,
+      "matches": 36,
       "yellowCards": {
-        "total": 196.0,
-        "matchesWithData": 35,
-        "average": 5.6
+        "total": 199.0,
+        "matchesWithData": 36,
+        "average": 5.528
       },
       "redCards": {
         "total": 12.0,
-        "matchesWithData": 35,
-        "average": 0.343
+        "matchesWithData": 36,
+        "average": 0.333
       }
     },
     {
       "id": "fd-ref-206203",
       "name": "Juan Martínez Munuera",
-      "matches": 36,
+      "matches": 37,
       "yellowCards": {
-        "total": 178.0,
-        "matchesWithData": 36,
-        "average": 4.944
+        "total": 182.0,
+        "matchesWithData": 37,
+        "average": 4.919
       },
       "redCards": {
         "total": 10.0,
-        "matchesWithData": 36,
-        "average": 0.278
+        "matchesWithData": 37,
+        "average": 0.27
       }
     },
     {
@@ -393,60 +393,60 @@
     {
       "id": "fd-ref-215612",
       "name": "Manuel Orellana Cid",
-      "matches": 1,
+      "matches": 2,
       "yellowCards": {
-        "total": 7.0,
-        "matchesWithData": 1,
-        "average": 7.0
+        "total": 13.0,
+        "matchesWithData": 2,
+        "average": 6.5
       },
       "redCards": {
         "total": 1.0,
-        "matchesWithData": 1,
-        "average": 1.0
+        "matchesWithData": 2,
+        "average": 0.5
       }
     },
     {
       "id": "fd-ref-265471",
       "name": "Carlos Muñiz Muñoz",
-      "matches": 1,
+      "matches": 2,
       "yellowCards": {
-        "total": 3.0,
-        "matchesWithData": 1,
-        "average": 3.0
+        "total": 5.0,
+        "matchesWithData": 2,
+        "average": 2.5
       },
       "redCards": {
         "total": 0.0,
-        "matchesWithData": 1,
+        "matchesWithData": 2,
         "average": 0.0
       }
     },
     {
       "id": "fd-ref-214122",
       "name": "Jon González Esteban",
-      "matches": 1,
+      "matches": 2,
       "yellowCards": {
-        "total": 3.0,
-        "matchesWithData": 1,
-        "average": 3.0
+        "total": 5.0,
+        "matchesWithData": 2,
+        "average": 2.5
       },
       "redCards": {
         "total": 0.0,
-        "matchesWithData": 1,
+        "matchesWithData": 2,
         "average": 0.0
       }
     },
     {
       "id": "fd-ref-129443",
       "name": "Luis Bestard Servera",
-      "matches": 1,
+      "matches": 2,
       "yellowCards": {
-        "total": 6.0,
-        "matchesWithData": 1,
-        "average": 6.0
+        "total": 11.0,
+        "matchesWithData": 2,
+        "average": 5.5
       },
       "redCards": {
         "total": 0.0,
-        "matchesWithData": 1,
+        "matchesWithData": 2,
         "average": 0.0
       }
     }
@@ -2535,681 +2535,161 @@
     {
       "teamId": "deportivo-alaves",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
+          "total": 4.0,
+          "matchesWithData": 5,
+          "average": 0.8
         },
         "secondHalfGoals": {
           "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
+          "matchesWithData": 5,
+          "average": 1.4
         },
         "shots": {
-          "total": 54.0,
-          "matchesWithData": 4,
-          "average": 13.5
+          "total": 70.0,
+          "matchesWithData": 5,
+          "average": 14.0
         },
         "shotsOnTarget": {
-          "total": 20.0,
-          "matchesWithData": 4,
-          "average": 5.0
+          "total": 28.0,
+          "matchesWithData": 5,
+          "average": 5.6
         },
         "corners": {
-          "total": 21.0,
-          "matchesWithData": 4,
-          "average": 5.25
+          "total": 27.0,
+          "matchesWithData": 5,
+          "average": 5.4
         },
         "yellowCards": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
+          "total": 13.0,
+          "matchesWithData": 5,
+          "average": 2.6
         },
         "redCards": {
           "total": 0.0,
-          "matchesWithData": 4,
+          "matchesWithData": 5,
           "average": 0.0
         },
         "fouls": {
-          "total": 58.0,
-          "matchesWithData": 4,
-          "average": 14.5
+          "total": 75.0,
+          "matchesWithData": 5,
+          "average": 15.0
         },
         "goals": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
+          "total": 11.0,
+          "matchesWithData": 5,
+          "average": 2.2
         }
       }
     },
     {
       "teamId": "getafe-cf",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
           "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
+          "matchesWithData": 5,
+          "average": 0.2
         },
         "secondHalfGoals": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
+          "total": 2.0,
+          "matchesWithData": 5,
+          "average": 0.4
         },
         "shots": {
-          "total": 39.0,
-          "matchesWithData": 4,
-          "average": 9.75
+          "total": 54.0,
+          "matchesWithData": 5,
+          "average": 10.8
         },
         "shotsOnTarget": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
+          "total": 10.0,
+          "matchesWithData": 5,
+          "average": 2.0
         },
         "corners": {
-          "total": 17.0,
-          "matchesWithData": 4,
-          "average": 4.25
+          "total": 20.0,
+          "matchesWithData": 5,
+          "average": 4.0
         },
         "yellowCards": {
-          "total": 12.0,
-          "matchesWithData": 4,
+          "total": 15.0,
+          "matchesWithData": 5,
           "average": 3.0
         },
         "redCards": {
           "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
+          "matchesWithData": 5,
+          "average": 0.4
         },
         "fouls": {
-          "total": 49.0,
-          "matchesWithData": 4,
-          "average": 12.25
+          "total": 63.0,
+          "matchesWithData": 5,
+          "average": 12.6
         },
         "goals": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
+          "total": 3.0,
+          "matchesWithData": 5,
+          "average": 0.6
         }
       }
     },
     {
       "teamId": "sevilla-fc",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
           "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
+          "matchesWithData": 5,
+          "average": 0.2
         },
         "secondHalfGoals": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
         },
         "shots": {
-          "total": 46.0,
-          "matchesWithData": 4,
-          "average": 11.5
+          "total": 59.0,
+          "matchesWithData": 5,
+          "average": 11.8
         },
         "shotsOnTarget": {
-          "total": 16.0,
-          "matchesWithData": 4,
+          "total": 20.0,
+          "matchesWithData": 5,
           "average": 4.0
         },
         "corners": {
-          "total": 12.0,
-          "matchesWithData": 4,
-          "average": 3.0
+          "total": 18.0,
+          "matchesWithData": 5,
+          "average": 3.6
         },
         "yellowCards": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
+          "total": 15.0,
+          "matchesWithData": 5,
+          "average": 3.0
         },
         "redCards": {
           "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
+          "matchesWithData": 5,
+          "average": 0.4
         },
         "fouls": {
-          "total": 67.0,
-          "matchesWithData": 4,
-          "average": 16.75
+          "total": 75.0,
+          "matchesWithData": 5,
+          "average": 15.0
         },
         "goals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
         }
       }
     },
     {
       "teamId": "rayo-vallecano",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
-        },
-        "secondHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "shots": {
-          "total": 41.0,
-          "matchesWithData": 4,
-          "average": 10.25
-        },
-        "shotsOnTarget": {
-          "total": 21.0,
-          "matchesWithData": 4,
-          "average": 5.25
-        },
-        "corners": {
-          "total": 25.0,
-          "matchesWithData": 4,
-          "average": 6.25
-        },
-        "yellowCards": {
-          "total": 9.0,
-          "matchesWithData": 4,
-          "average": 2.25
-        },
-        "redCards": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
-        },
-        "fouls": {
-          "total": 58.0,
-          "matchesWithData": 4,
-          "average": 14.5
-        },
-        "goals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        }
-      }
-    },
-    {
-      "teamId": "racing-club",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        },
-        "secondHalfGoals": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "shots": {
-          "total": 45.0,
-          "matchesWithData": 4,
-          "average": 11.25
-        },
-        "shotsOnTarget": {
-          "total": 16.0,
-          "matchesWithData": 4,
-          "average": 4.0
-        },
-        "corners": {
-          "total": 23.0,
-          "matchesWithData": 4,
-          "average": 5.75
-        },
-        "yellowCards": {
-          "total": 9.0,
-          "matchesWithData": 4,
-          "average": 2.25
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 60.0,
-          "matchesWithData": 4,
-          "average": 15.0
-        },
-        "goals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        }
-      }
-    },
-    {
-      "teamId": "villarreal-cf",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "secondHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "shots": {
-          "total": 61.0,
-          "matchesWithData": 4,
-          "average": 15.25
-        },
-        "shotsOnTarget": {
-          "total": 24.0,
-          "matchesWithData": 4,
-          "average": 6.0
-        },
-        "corners": {
-          "total": 29.0,
-          "matchesWithData": 4,
-          "average": 7.25
-        },
-        "yellowCards": {
-          "total": 9.0,
-          "matchesWithData": 4,
-          "average": 2.25
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 49.0,
-          "matchesWithData": 4,
-          "average": 12.25
-        },
-        "goals": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
-        }
-      }
-    },
-    {
-      "teamId": "rcd-espanyol",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
-        },
-        "secondHalfGoals": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
-        },
-        "shots": {
-          "total": 47.0,
-          "matchesWithData": 4,
-          "average": 11.75
-        },
-        "shotsOnTarget": {
-          "total": 15.0,
-          "matchesWithData": 4,
-          "average": 3.75
-        },
-        "corners": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "yellowCards": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 67.0,
-          "matchesWithData": 4,
-          "average": 16.75
-        },
-        "goals": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
-        }
-      }
-    },
-    {
-      "teamId": "levante-ud",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
-        },
-        "secondHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "shots": {
-          "total": 45.0,
-          "matchesWithData": 4,
-          "average": 11.25
-        },
-        "shotsOnTarget": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
-        },
-        "corners": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
-        },
-        "yellowCards": {
-          "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 39.0,
-          "matchesWithData": 4,
-          "average": 9.75
-        },
-        "goals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
-        }
-      }
-    },
-    {
-      "teamId": "rc-deportivo",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
-        },
-        "secondHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "shots": {
-          "total": 33.0,
-          "matchesWithData": 4,
-          "average": 8.25
-        },
-        "shotsOnTarget": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
-        },
-        "corners": {
-          "total": 12.0,
-          "matchesWithData": 4,
-          "average": 3.0
-        },
-        "yellowCards": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
-        },
-        "redCards": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        },
-        "fouls": {
-          "total": 57.0,
-          "matchesWithData": 4,
-          "average": 14.25
-        },
-        "goals": {
-          "total": 8.0,
-          "matchesWithData": 4,
-          "average": 2.0
-        }
-      }
-    },
-    {
-      "teamId": "elche-cf",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "secondHalfGoals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
-        },
-        "shots": {
-          "total": 56.0,
-          "matchesWithData": 4,
-          "average": 14.0
-        },
-        "shotsOnTarget": {
-          "total": 25.0,
-          "matchesWithData": 4,
-          "average": 6.25
-        },
-        "corners": {
-          "total": 25.0,
-          "matchesWithData": 4,
-          "average": 6.25
-        },
-        "yellowCards": {
-          "total": 8.0,
-          "matchesWithData": 4,
-          "average": 2.0
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 53.0,
-          "matchesWithData": 4,
-          "average": 13.25
-        },
-        "goals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
-        }
-      }
-    },
-    {
-      "teamId": "atletico-de-madrid",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "secondHalfGoals": {
-          "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
-        },
-        "shots": {
-          "total": 61.0,
-          "matchesWithData": 4,
-          "average": 15.25
-        },
-        "shotsOnTarget": {
-          "total": 20.0,
-          "matchesWithData": 4,
-          "average": 5.0
-        },
-        "corners": {
-          "total": 21.0,
-          "matchesWithData": 4,
-          "average": 5.25
-        },
-        "yellowCards": {
-          "total": 8.0,
-          "matchesWithData": 4,
-          "average": 2.0
-        },
-        "redCards": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        },
-        "fouls": {
-          "total": 51.0,
-          "matchesWithData": 4,
-          "average": 12.75
-        },
-        "goals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        }
-      }
-    },
-    {
-      "teamId": "malaga-cf",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        },
-        "secondHalfGoals": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "shots": {
-          "total": 42.0,
-          "matchesWithData": 4,
-          "average": 10.5
-        },
-        "shotsOnTarget": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        },
-        "corners": {
-          "total": 20.0,
-          "matchesWithData": 4,
-          "average": 5.0
-        },
-        "yellowCards": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 47.0,
-          "matchesWithData": 4,
-          "average": 11.75
-        },
-        "goals": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        }
-      }
-    },
-    {
-      "teamId": "real-betis",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
-        },
-        "secondHalfGoals": {
-          "total": 3.0,
-          "matchesWithData": 4,
-          "average": 0.75
-        },
-        "shots": {
-          "total": 63.0,
-          "matchesWithData": 4,
-          "average": 15.75
-        },
-        "shotsOnTarget": {
-          "total": 21.0,
-          "matchesWithData": 4,
-          "average": 5.25
-        },
-        "corners": {
-          "total": 20.0,
-          "matchesWithData": 4,
-          "average": 5.0
-        },
-        "yellowCards": {
-          "total": 8.0,
-          "matchesWithData": 4,
-          "average": 2.0
-        },
-        "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
-        },
-        "fouls": {
-          "total": 38.0,
-          "matchesWithData": 4,
-          "average": 9.5
-        },
-        "goals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
-        }
-      }
-    },
-    {
-      "teamId": "real-sociedad",
       "seasonId": "laliga-2026-2027",
       "matches": 5,
       "stats": {
@@ -3219,24 +2699,76 @@
           "average": 0.8
         },
         "secondHalfGoals": {
+          "total": 4.0,
+          "matchesWithData": 5,
+          "average": 0.8
+        },
+        "shots": {
+          "total": 59.0,
+          "matchesWithData": 5,
+          "average": 11.8
+        },
+        "shotsOnTarget": {
+          "total": 28.0,
+          "matchesWithData": 5,
+          "average": 5.6
+        },
+        "corners": {
+          "total": 30.0,
+          "matchesWithData": 5,
+          "average": 6.0
+        },
+        "yellowCards": {
+          "total": 10.0,
+          "matchesWithData": 5,
+          "average": 2.0
+        },
+        "redCards": {
           "total": 2.0,
           "matchesWithData": 5,
           "average": 0.4
         },
-        "shots": {
-          "total": 65.0,
+        "fouls": {
+          "total": 71.0,
           "matchesWithData": 5,
-          "average": 13.0
+          "average": 14.2
+        },
+        "goals": {
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
+        }
+      }
+    },
+    {
+      "teamId": "racing-club",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
+        },
+        "secondHalfGoals": {
+          "total": 1.0,
+          "matchesWithData": 5,
+          "average": 0.2
+        },
+        "shots": {
+          "total": 56.0,
+          "matchesWithData": 5,
+          "average": 11.2
         },
         "shotsOnTarget": {
+          "total": 20.0,
+          "matchesWithData": 5,
+          "average": 4.0
+        },
+        "corners": {
           "total": 27.0,
           "matchesWithData": 5,
           "average": 5.4
-        },
-        "corners": {
-          "total": 37.0,
-          "matchesWithData": 5,
-          "average": 7.4
         },
         "yellowCards": {
           "total": 11.0,
@@ -3249,9 +2781,269 @@
           "average": 0.2
         },
         "fouls": {
-          "total": 62.0,
+          "total": 76.0,
           "matchesWithData": 5,
-          "average": 12.4
+          "average": 15.2
+        },
+        "goals": {
+          "total": 9.0,
+          "matchesWithData": 5,
+          "average": 1.8
+        }
+      }
+    },
+    {
+      "teamId": "villarreal-cf",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 4.0,
+          "matchesWithData": 5,
+          "average": 0.8
+        },
+        "secondHalfGoals": {
+          "total": 3.0,
+          "matchesWithData": 5,
+          "average": 0.6
+        },
+        "shots": {
+          "total": 75.0,
+          "matchesWithData": 5,
+          "average": 15.0
+        },
+        "shotsOnTarget": {
+          "total": 32.0,
+          "matchesWithData": 5,
+          "average": 6.4
+        },
+        "corners": {
+          "total": 36.0,
+          "matchesWithData": 5,
+          "average": 7.2
+        },
+        "yellowCards": {
+          "total": 10.0,
+          "matchesWithData": 5,
+          "average": 2.0
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 56.0,
+          "matchesWithData": 5,
+          "average": 11.2
+        },
+        "goals": {
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
+        }
+      }
+    },
+    {
+      "teamId": "rcd-espanyol",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 6.0,
+          "matchesWithData": 5,
+          "average": 1.2
+        },
+        "secondHalfGoals": {
+          "total": 2.0,
+          "matchesWithData": 5,
+          "average": 0.4
+        },
+        "shots": {
+          "total": 53.0,
+          "matchesWithData": 5,
+          "average": 10.6
+        },
+        "shotsOnTarget": {
+          "total": 18.0,
+          "matchesWithData": 5,
+          "average": 3.6
+        },
+        "corners": {
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
+        },
+        "yellowCards": {
+          "total": 17.0,
+          "matchesWithData": 5,
+          "average": 3.4
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 91.0,
+          "matchesWithData": 5,
+          "average": 18.2
+        },
+        "goals": {
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
+        }
+      }
+    },
+    {
+      "teamId": "levante-ud",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 2.0,
+          "matchesWithData": 5,
+          "average": 0.4
+        },
+        "secondHalfGoals": {
+          "total": 5.0,
+          "matchesWithData": 5,
+          "average": 1.0
+        },
+        "shots": {
+          "total": 58.0,
+          "matchesWithData": 5,
+          "average": 11.6
+        },
+        "shotsOnTarget": {
+          "total": 21.0,
+          "matchesWithData": 5,
+          "average": 4.2
+        },
+        "corners": {
+          "total": 17.0,
+          "matchesWithData": 5,
+          "average": 3.4
+        },
+        "yellowCards": {
+          "total": 5.0,
+          "matchesWithData": 5,
+          "average": 1.0
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 50.0,
+          "matchesWithData": 5,
+          "average": 10.0
+        },
+        "goals": {
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
+        }
+      }
+    },
+    {
+      "teamId": "rc-deportivo",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 5.0,
+          "matchesWithData": 5,
+          "average": 1.0
+        },
+        "secondHalfGoals": {
+          "total": 4.0,
+          "matchesWithData": 5,
+          "average": 0.8
+        },
+        "shots": {
+          "total": 43.0,
+          "matchesWithData": 5,
+          "average": 8.6
+        },
+        "shotsOnTarget": {
+          "total": 17.0,
+          "matchesWithData": 5,
+          "average": 3.4
+        },
+        "corners": {
+          "total": 19.0,
+          "matchesWithData": 5,
+          "average": 3.8
+        },
+        "yellowCards": {
+          "total": 11.0,
+          "matchesWithData": 5,
+          "average": 2.2
+        },
+        "redCards": {
+          "total": 1.0,
+          "matchesWithData": 5,
+          "average": 0.2
+        },
+        "fouls": {
+          "total": 66.0,
+          "matchesWithData": 5,
+          "average": 13.2
+        },
+        "goals": {
+          "total": 9.0,
+          "matchesWithData": 5,
+          "average": 1.8
+        }
+      }
+    },
+    {
+      "teamId": "elche-cf",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "secondHalfGoals": {
+          "total": 6.0,
+          "matchesWithData": 5,
+          "average": 1.2
+        },
+        "shots": {
+          "total": 59.0,
+          "matchesWithData": 5,
+          "average": 11.8
+        },
+        "shotsOnTarget": {
+          "total": 26.0,
+          "matchesWithData": 5,
+          "average": 5.2
+        },
+        "corners": {
+          "total": 26.0,
+          "matchesWithData": 5,
+          "average": 5.2
+        },
+        "yellowCards": {
+          "total": 11.0,
+          "matchesWithData": 5,
+          "average": 2.2
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 65.0,
+          "matchesWithData": 5,
+          "average": 13.0
         },
         "goals": {
           "total": 6.0,
@@ -3261,111 +3053,59 @@
       }
     },
     {
-      "teamId": "athletic-club",
+      "teamId": "atletico-de-madrid",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
-          "total": 2.0,
-          "matchesWithData": 4,
-          "average": 0.5
+          "total": 3.0,
+          "matchesWithData": 5,
+          "average": 0.6
         },
         "secondHalfGoals": {
-          "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
-        },
-        "shots": {
-          "total": 51.0,
-          "matchesWithData": 4,
-          "average": 12.75
-        },
-        "shotsOnTarget": {
-          "total": 19.0,
-          "matchesWithData": 4,
-          "average": 4.75
-        },
-        "corners": {
-          "total": 25.0,
-          "matchesWithData": 4,
-          "average": 6.25
-        },
-        "yellowCards": {
           "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
-        },
-        "redCards": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        },
-        "fouls": {
-          "total": 42.0,
-          "matchesWithData": 4,
-          "average": 10.5
-        },
-        "goals": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
-        }
-      }
-    },
-    {
-      "teamId": "valencia-cf",
-      "seasonId": "laliga-2026-2027",
-      "matches": 4,
-      "stats": {
-        "firstHalfGoals": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
-        },
-        "secondHalfGoals": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
+          "matchesWithData": 5,
+          "average": 1.4
         },
         "shots": {
-          "total": 39.0,
-          "matchesWithData": 4,
-          "average": 9.75
+          "total": 74.0,
+          "matchesWithData": 5,
+          "average": 14.8
         },
         "shotsOnTarget": {
-          "total": 11.0,
-          "matchesWithData": 4,
-          "average": 2.75
+          "total": 25.0,
+          "matchesWithData": 5,
+          "average": 5.0
         },
         "corners": {
-          "total": 15.0,
-          "matchesWithData": 4,
-          "average": 3.75
+          "total": 24.0,
+          "matchesWithData": 5,
+          "average": 4.8
         },
         "yellowCards": {
-          "total": 6.0,
-          "matchesWithData": 4,
-          "average": 1.5
+          "total": 9.0,
+          "matchesWithData": 5,
+          "average": 1.8
         },
         "redCards": {
-          "total": 0.0,
-          "matchesWithData": 4,
-          "average": 0.0
+          "total": 1.0,
+          "matchesWithData": 5,
+          "average": 0.2
         },
         "fouls": {
-          "total": 39.0,
-          "matchesWithData": 4,
-          "average": 9.75
+          "total": 60.0,
+          "matchesWithData": 5,
+          "average": 12.0
         },
         "goals": {
-          "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
+          "total": 10.0,
+          "matchesWithData": 5,
+          "average": 2.0
         }
       }
     },
     {
-      "teamId": "celta",
+      "teamId": "malaga-cf",
       "seasonId": "laliga-2026-2027",
       "matches": 5,
       "stats": {
@@ -3380,14 +3120,222 @@
           "average": 0.2
         },
         "shots": {
+          "total": 54.0,
+          "matchesWithData": 5,
+          "average": 10.8
+        },
+        "shotsOnTarget": {
+          "total": 9.0,
+          "matchesWithData": 5,
+          "average": 1.8
+        },
+        "corners": {
+          "total": 25.0,
+          "matchesWithData": 5,
+          "average": 5.0
+        },
+        "yellowCards": {
+          "total": 11.0,
+          "matchesWithData": 5,
+          "average": 2.2
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 57.0,
+          "matchesWithData": 5,
+          "average": 11.4
+        },
+        "goals": {
+          "total": 2.0,
+          "matchesWithData": 5,
+          "average": 0.4
+        }
+      }
+    },
+    {
+      "teamId": "real-betis",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 4.0,
+          "matchesWithData": 5,
+          "average": 0.8
+        },
+        "secondHalfGoals": {
+          "total": 3.0,
+          "matchesWithData": 5,
+          "average": 0.6
+        },
+        "shots": {
+          "total": 89.0,
+          "matchesWithData": 5,
+          "average": 17.8
+        },
+        "shotsOnTarget": {
+          "total": 33.0,
+          "matchesWithData": 5,
+          "average": 6.6
+        },
+        "corners": {
+          "total": 24.0,
+          "matchesWithData": 5,
+          "average": 4.8
+        },
+        "yellowCards": {
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
+        },
+        "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 46.0,
+          "matchesWithData": 5,
+          "average": 9.2
+        },
+        "goals": {
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
+        }
+      }
+    },
+    {
+      "teamId": "real-sociedad",
+      "seasonId": "laliga-2026-2027",
+      "matches": 6,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 4.0,
+          "matchesWithData": 6,
+          "average": 0.667
+        },
+        "secondHalfGoals": {
+          "total": 2.0,
+          "matchesWithData": 6,
+          "average": 0.333
+        },
+        "shots": {
+          "total": 73.0,
+          "matchesWithData": 6,
+          "average": 12.167
+        },
+        "shotsOnTarget": {
+          "total": 30.0,
+          "matchesWithData": 6,
+          "average": 5.0
+        },
+        "corners": {
+          "total": 46.0,
+          "matchesWithData": 6,
+          "average": 7.667
+        },
+        "yellowCards": {
+          "total": 14.0,
+          "matchesWithData": 6,
+          "average": 2.333
+        },
+        "redCards": {
+          "total": 1.0,
+          "matchesWithData": 6,
+          "average": 0.167
+        },
+        "fouls": {
+          "total": 75.0,
+          "matchesWithData": 6,
+          "average": 12.5
+        },
+        "goals": {
+          "total": 6.0,
+          "matchesWithData": 6,
+          "average": 1.0
+        }
+      }
+    },
+    {
+      "teamId": "athletic-club",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 2.0,
+          "matchesWithData": 5,
+          "average": 0.4
+        },
+        "secondHalfGoals": {
+          "total": 5.0,
+          "matchesWithData": 5,
+          "average": 1.0
+        },
+        "shots": {
+          "total": 70.0,
+          "matchesWithData": 5,
+          "average": 14.0
+        },
+        "shotsOnTarget": {
+          "total": 22.0,
+          "matchesWithData": 5,
+          "average": 4.4
+        },
+        "corners": {
+          "total": 32.0,
+          "matchesWithData": 5,
+          "average": 6.4
+        },
+        "yellowCards": {
+          "total": 10.0,
+          "matchesWithData": 5,
+          "average": 2.0
+        },
+        "redCards": {
+          "total": 1.0,
+          "matchesWithData": 5,
+          "average": 0.2
+        },
+        "fouls": {
+          "total": 53.0,
+          "matchesWithData": 5,
+          "average": 10.6
+        },
+        "goals": {
+          "total": 7.0,
+          "matchesWithData": 5,
+          "average": 1.4
+        }
+      }
+    },
+    {
+      "teamId": "valencia-cf",
+      "seasonId": "laliga-2026-2027",
+      "matches": 5,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 1.0,
+          "matchesWithData": 5,
+          "average": 0.2
+        },
+        "secondHalfGoals": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "shots": {
           "total": 42.0,
           "matchesWithData": 5,
           "average": 8.4
         },
         "shotsOnTarget": {
-          "total": 12.0,
+          "total": 11.0,
           "matchesWithData": 5,
-          "average": 2.4
+          "average": 2.2
         },
         "corners": {
           "total": 19.0,
@@ -3400,175 +3348,227 @@
           "average": 1.6
         },
         "redCards": {
+          "total": 0.0,
+          "matchesWithData": 5,
+          "average": 0.0
+        },
+        "fouls": {
+          "total": 51.0,
+          "matchesWithData": 5,
+          "average": 10.2
+        },
+        "goals": {
           "total": 1.0,
           "matchesWithData": 5,
           "average": 0.2
+        }
+      }
+    },
+    {
+      "teamId": "celta",
+      "seasonId": "laliga-2026-2027",
+      "matches": 6,
+      "stats": {
+        "firstHalfGoals": {
+          "total": 2.0,
+          "matchesWithData": 6,
+          "average": 0.333
+        },
+        "secondHalfGoals": {
+          "total": 1.0,
+          "matchesWithData": 6,
+          "average": 0.167
+        },
+        "shots": {
+          "total": 59.0,
+          "matchesWithData": 6,
+          "average": 9.833
+        },
+        "shotsOnTarget": {
+          "total": 17.0,
+          "matchesWithData": 6,
+          "average": 2.833
+        },
+        "corners": {
+          "total": 20.0,
+          "matchesWithData": 6,
+          "average": 3.333
+        },
+        "yellowCards": {
+          "total": 9.0,
+          "matchesWithData": 6,
+          "average": 1.5
+        },
+        "redCards": {
+          "total": 1.0,
+          "matchesWithData": 6,
+          "average": 0.167
         },
         "fouls": {
-          "total": 52.0,
-          "matchesWithData": 5,
-          "average": 10.4
+          "total": 62.0,
+          "matchesWithData": 6,
+          "average": 10.333
         },
         "goals": {
-          "total": 2.0,
-          "matchesWithData": 5,
-          "average": 0.4
+          "total": 3.0,
+          "matchesWithData": 6,
+          "average": 0.5
         }
       }
     },
     {
       "teamId": "real-madrid",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
+          "total": 8.0,
+          "matchesWithData": 5,
+          "average": 1.6
         },
         "secondHalfGoals": {
-          "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
+          "total": 6.0,
+          "matchesWithData": 5,
+          "average": 1.2
         },
         "shots": {
-          "total": 80.0,
-          "matchesWithData": 4,
-          "average": 20.0
+          "total": 104.0,
+          "matchesWithData": 5,
+          "average": 20.8
         },
         "shotsOnTarget": {
-          "total": 35.0,
-          "matchesWithData": 4,
-          "average": 8.75
+          "total": 46.0,
+          "matchesWithData": 5,
+          "average": 9.2
         },
         "corners": {
-          "total": 31.0,
-          "matchesWithData": 4,
-          "average": 7.75
+          "total": 42.0,
+          "matchesWithData": 5,
+          "average": 8.4
         },
         "yellowCards": {
           "total": 9.0,
-          "matchesWithData": 4,
-          "average": 2.25
+          "matchesWithData": 5,
+          "average": 1.8
         },
         "redCards": {
           "total": 0.0,
-          "matchesWithData": 4,
+          "matchesWithData": 5,
           "average": 0.0
         },
         "fouls": {
-          "total": 36.0,
-          "matchesWithData": 4,
+          "total": 45.0,
+          "matchesWithData": 5,
           "average": 9.0
         },
         "goals": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
+          "total": 14.0,
+          "matchesWithData": 5,
+          "average": 2.8
         }
       }
     },
     {
       "teamId": "fc-barcelona",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
-          "total": 7.0,
-          "matchesWithData": 4,
-          "average": 1.75
+          "total": 9.0,
+          "matchesWithData": 5,
+          "average": 1.8
         },
         "secondHalfGoals": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
+          "total": 12.0,
+          "matchesWithData": 5,
+          "average": 2.4
         },
         "shots": {
-          "total": 84.0,
-          "matchesWithData": 4,
-          "average": 21.0
+          "total": 96.0,
+          "matchesWithData": 5,
+          "average": 19.2
         },
         "shotsOnTarget": {
-          "total": 36.0,
-          "matchesWithData": 4,
-          "average": 9.0
+          "total": 42.0,
+          "matchesWithData": 5,
+          "average": 8.4
         },
         "corners": {
-          "total": 26.0,
-          "matchesWithData": 4,
-          "average": 6.5
+          "total": 31.0,
+          "matchesWithData": 5,
+          "average": 6.2
         },
         "yellowCards": {
-          "total": 4.0,
-          "matchesWithData": 4,
+          "total": 5.0,
+          "matchesWithData": 5,
           "average": 1.0
         },
         "redCards": {
           "total": 0.0,
-          "matchesWithData": 4,
+          "matchesWithData": 5,
           "average": 0.0
         },
         "fouls": {
-          "total": 35.0,
-          "matchesWithData": 4,
-          "average": 8.75
+          "total": 46.0,
+          "matchesWithData": 5,
+          "average": 9.2
         },
         "goals": {
-          "total": 17.0,
-          "matchesWithData": 4,
-          "average": 4.25
+          "total": 21.0,
+          "matchesWithData": 5,
+          "average": 4.2
         }
       }
     },
     {
       "teamId": "ca-osasuna",
       "seasonId": "laliga-2026-2027",
-      "matches": 4,
+      "matches": 5,
       "stats": {
         "firstHalfGoals": {
           "total": 1.0,
-          "matchesWithData": 4,
-          "average": 0.25
+          "matchesWithData": 5,
+          "average": 0.2
         },
         "secondHalfGoals": {
           "total": 4.0,
-          "matchesWithData": 4,
-          "average": 1.0
+          "matchesWithData": 5,
+          "average": 0.8
         },
         "shots": {
-          "total": 42.0,
-          "matchesWithData": 4,
-          "average": 10.5
+          "total": 53.0,
+          "matchesWithData": 5,
+          "average": 10.6
         },
         "shotsOnTarget": {
-          "total": 19.0,
-          "matchesWithData": 4,
-          "average": 4.75
+          "total": 23.0,
+          "matchesWithData": 5,
+          "average": 4.6
         },
         "corners": {
-          "total": 14.0,
-          "matchesWithData": 4,
-          "average": 3.5
+          "total": 17.0,
+          "matchesWithData": 5,
+          "average": 3.4
         },
         "yellowCards": {
-          "total": 10.0,
-          "matchesWithData": 4,
-          "average": 2.5
+          "total": 12.0,
+          "matchesWithData": 5,
+          "average": 2.4
         },
         "redCards": {
           "total": 0.0,
-          "matchesWithData": 4,
+          "matchesWithData": 5,
           "average": 0.0
         },
         "fouls": {
-          "total": 55.0,
-          "matchesWithData": 4,
-          "average": 13.75
+          "total": 65.0,
+          "matchesWithData": 5,
+          "average": 13.0
         },
         "goals": {
           "total": 5.0,
-          "matchesWithData": 4,
-          "average": 1.25
+          "matchesWithData": 5,
+          "average": 1.0
         }
       }
     }
@@ -3605,22 +3605,22 @@
       }
     },
     "laliga-2026-2027": {
-      "finished": 41,
-      "referee": 24,
-      "venue": 41,
+      "finished": 51,
+      "referee": 34,
+      "venue": 51,
       "stats": {
-        "firstHalfGoals": 41,
-        "secondHalfGoals": 41,
-        "shots": 41,
-        "shotsOnTarget": 41,
-        "corners": 41,
-        "yellowCards": 41,
-        "redCards": 41,
-        "fouls": 41
+        "firstHalfGoals": 51,
+        "secondHalfGoals": 51,
+        "shots": 51,
+        "shotsOnTarget": 51,
+        "corners": 51,
+        "yellowCards": 51,
+        "redCards": 51,
+        "fouls": 51
       }
     }
   },
-  "updatedAt": "2026-09-10T20:51:02.691168+00:00",
+  "updatedAt": "2026-09-15T13:23:24.785164+00:00",
   "sources": [
     "football-data.org",
     "football-data.co.uk"

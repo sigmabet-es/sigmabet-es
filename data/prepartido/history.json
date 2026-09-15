@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10T20:51:02.691168+00:00",
+  "updatedAt": "2026-09-15T13:23:24.785164+00:00",
   "teams": [
     {
       "id": "athletic-club",
@@ -7,28 +7,29 @@
       "name": "Athletic Club",
       "crest": "https://crests.football-data.org/77.png",
       "venueId": null,
-      "standing": 10,
+      "standing": 9,
       "form": [
         "D",
         "D",
         "V",
-        "V"
+        "V",
+        "E"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 2,
-        "draw": 0,
+        "draw": 1,
         "lost": 2,
-        "points": 6,
-        "goalsFor": 6,
-        "goalsAgainst": 5,
+        "points": 7,
+        "goalsFor": 7,
+        "goalsAgainst": 6,
         "goalDifference": 1,
         "home": {
-          "played": 2,
-          "goalsFor": 4,
-          "goalsAgainst": 3,
-          "averageGoalsFor": 2.0,
-          "averageGoalsAgainst": 1.5
+          "played": 3,
+          "goalsFor": 5,
+          "goalsAgainst": 4,
+          "averageGoalsFor": 1.67,
+          "averageGoalsAgainst": 1.33
         },
         "away": {
           "played": 2,
@@ -47,22 +48,23 @@
       "name": "Atlético de Madrid",
       "crest": "https://crests.football-data.org/78.png",
       "venueId": null,
-      "standing": 7,
+      "standing": 5,
       "form": [
         "V",
         "E",
         "V",
-        "D"
+        "D",
+        "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 2,
+        "playedGames": 5,
+        "won": 3,
         "draw": 1,
         "lost": 1,
-        "points": 7,
-        "goalsFor": 7,
+        "points": 10,
+        "goalsFor": 10,
         "goalsAgainst": 6,
-        "goalDifference": 1,
+        "goalDifference": 4,
         "home": {
           "played": 2,
           "goalsFor": 4,
@@ -71,11 +73,11 @@
           "averageGoalsAgainst": 1.0
         },
         "away": {
-          "played": 2,
-          "goalsFor": 3,
+          "played": 3,
+          "goalsFor": 6,
           "goalsAgainst": 4,
-          "averageGoalsFor": 1.5,
-          "averageGoalsAgainst": 2.0
+          "averageGoalsFor": 2.0,
+          "averageGoalsAgainst": 1.33
         }
       },
       "footballDataId": 78,
@@ -87,28 +89,29 @@
       "name": "CA Osasuna",
       "crest": "https://crests.football-data.org/79.png",
       "venueId": null,
-      "standing": 8,
+      "standing": 11,
       "form": [
         "E",
         "V",
         "V",
+        "D",
         "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 2,
         "draw": 1,
-        "lost": 1,
+        "lost": 2,
         "points": 7,
         "goalsFor": 5,
-        "goalsAgainst": 6,
-        "goalDifference": -1,
+        "goalsAgainst": 8,
+        "goalDifference": -3,
         "home": {
-          "played": 2,
+          "played": 3,
           "goalsFor": 1,
-          "goalsAgainst": 0,
-          "averageGoalsFor": 0.5,
-          "averageGoalsAgainst": 0.0
+          "goalsAgainst": 2,
+          "averageGoalsFor": 0.33,
+          "averageGoalsAgainst": 0.67
         },
         "away": {
           "played": 2,
@@ -127,22 +130,23 @@
       "name": "RCD Espanyol de Barcelona",
       "crest": "https://crests.football-data.org/80.png",
       "venueId": null,
-      "standing": 12,
+      "standing": 8,
       "form": [
         "V",
         "D",
         "D",
-        "E"
+        "E",
+        "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 1,
+        "playedGames": 5,
+        "won": 2,
         "draw": 1,
         "lost": 2,
-        "points": 4,
-        "goalsFor": 6,
+        "points": 7,
+        "goalsFor": 8,
         "goalsAgainst": 5,
-        "goalDifference": 1,
+        "goalDifference": 3,
         "home": {
           "played": 3,
           "goalsFor": 5,
@@ -151,11 +155,11 @@
           "averageGoalsAgainst": 1.0
         },
         "away": {
-          "played": 1,
-          "goalsFor": 1,
+          "played": 2,
+          "goalsFor": 3,
           "goalsAgainst": 2,
-          "averageGoalsFor": 1.0,
-          "averageGoalsAgainst": 2.0
+          "averageGoalsFor": 1.5,
+          "averageGoalsAgainst": 1.0
         }
       },
       "footballDataId": 80,
@@ -172,17 +176,18 @@
         "V",
         "V",
         "V",
+        "V",
         "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 4,
+        "playedGames": 5,
+        "won": 5,
         "draw": 0,
         "lost": 0,
-        "points": 12,
-        "goalsFor": 17,
-        "goalsAgainst": 2,
-        "goalDifference": 15,
+        "points": 15,
+        "goalsFor": 21,
+        "goalsAgainst": 4,
+        "goalDifference": 17,
         "home": {
           "played": 2,
           "goalsFor": 7,
@@ -191,11 +196,11 @@
           "averageGoalsAgainst": 1.0
         },
         "away": {
-          "played": 2,
-          "goalsFor": 10,
-          "goalsAgainst": 0,
-          "averageGoalsFor": 5.0,
-          "averageGoalsAgainst": 0.0
+          "played": 3,
+          "goalsFor": 14,
+          "goalsAgainst": 2,
+          "averageGoalsFor": 4.67,
+          "averageGoalsAgainst": 0.67
         }
       },
       "footballDataId": 81,
@@ -207,28 +212,29 @@
       "name": "Getafe CF",
       "crest": "https://crests.football-data.org/82.png",
       "venueId": null,
-      "standing": 15,
+      "standing": 14,
       "form": [
         "D",
         "V",
         "D",
+        "E",
         "E"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 1,
-        "draw": 1,
+        "draw": 2,
         "lost": 2,
-        "points": 4,
-        "goalsFor": 2,
-        "goalsAgainst": 5,
+        "points": 5,
+        "goalsFor": 3,
+        "goalsAgainst": 6,
         "goalDifference": -3,
         "home": {
-          "played": 2,
-          "goalsFor": 2,
-          "goalsAgainst": 1,
+          "played": 3,
+          "goalsFor": 3,
+          "goalsAgainst": 2,
           "averageGoalsFor": 1.0,
-          "averageGoalsAgainst": 0.5
+          "averageGoalsAgainst": 0.67
         },
         "away": {
           "played": 2,
@@ -247,21 +253,22 @@
       "name": "Málaga CF",
       "crest": "https://crests.football-data.org/84.png",
       "venueId": null,
-      "standing": 18,
+      "standing": 17,
       "form": [
         "D",
         "E",
         "D",
+        "E",
         "E"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 0,
-        "draw": 2,
+        "draw": 3,
         "lost": 2,
-        "points": 2,
-        "goalsFor": 1,
-        "goalsAgainst": 7,
+        "points": 3,
+        "goalsFor": 2,
+        "goalsAgainst": 8,
         "goalDifference": -6,
         "home": {
           "played": 2,
@@ -271,11 +278,11 @@
           "averageGoalsAgainst": 0.5
         },
         "away": {
-          "played": 2,
-          "goalsFor": 0,
-          "goalsAgainst": 6,
-          "averageGoalsFor": 0.0,
-          "averageGoalsAgainst": 3.0
+          "played": 3,
+          "goalsFor": 1,
+          "goalsAgainst": 7,
+          "averageGoalsFor": 0.33,
+          "averageGoalsAgainst": 2.33
         }
       },
       "footballDataId": 84,
@@ -287,28 +294,29 @@
       "name": "Real Madrid",
       "crest": "https://crests.football-data.org/86.png",
       "venueId": null,
-      "standing": 3,
+      "standing": 2,
       "form": [
         "V",
         "V",
         "V",
-        "D"
+        "D",
+        "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 3,
+        "playedGames": 5,
+        "won": 4,
         "draw": 0,
         "lost": 1,
-        "points": 9,
-        "goalsFor": 10,
-        "goalsAgainst": 3,
-        "goalDifference": 7,
+        "points": 12,
+        "goalsFor": 14,
+        "goalsAgainst": 4,
+        "goalDifference": 10,
         "home": {
-          "played": 2,
-          "goalsFor": 8,
-          "goalsAgainst": 1,
+          "played": 3,
+          "goalsFor": 12,
+          "goalsAgainst": 2,
           "averageGoalsFor": 4.0,
-          "averageGoalsAgainst": 0.5
+          "averageGoalsAgainst": 0.67
         },
         "away": {
           "played": 2,
@@ -327,22 +335,23 @@
       "name": "Rayo Vallecano",
       "crest": "https://crests.football-data.org/87.png",
       "venueId": null,
-      "standing": 14,
+      "standing": 16,
       "form": [
         "D",
         "E",
         "D",
-        "V"
+        "V",
+        "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 1,
         "draw": 1,
-        "lost": 2,
+        "lost": 3,
         "points": 4,
-        "goalsFor": 7,
-        "goalsAgainst": 10,
-        "goalDifference": -3,
+        "goalsFor": 8,
+        "goalsAgainst": 14,
+        "goalDifference": -6,
         "home": {
           "played": 2,
           "goalsFor": 4,
@@ -351,11 +360,11 @@
           "averageGoalsAgainst": 1.5
         },
         "away": {
-          "played": 2,
-          "goalsFor": 3,
-          "goalsAgainst": 7,
-          "averageGoalsFor": 1.5,
-          "averageGoalsAgainst": 3.5
+          "played": 3,
+          "goalsFor": 4,
+          "goalsAgainst": 11,
+          "averageGoalsFor": 1.33,
+          "averageGoalsAgainst": 3.67
         }
       },
       "footballDataId": 87,
@@ -367,28 +376,29 @@
       "name": "Levante UD",
       "crest": "https://crests.football-data.org/88.png",
       "venueId": null,
-      "standing": 11,
+      "standing": 13,
       "form": [
         "D",
         "E",
         "V",
-        "E"
+        "E",
+        "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 1,
         "draw": 2,
-        "lost": 1,
+        "lost": 2,
         "points": 5,
-        "goalsFor": 5,
-        "goalsAgainst": 5,
-        "goalDifference": 0,
+        "goalsFor": 7,
+        "goalsAgainst": 9,
+        "goalDifference": -2,
         "home": {
-          "played": 1,
-          "goalsFor": 5,
-          "goalsAgainst": 2,
-          "averageGoalsFor": 5.0,
-          "averageGoalsAgainst": 2.0
+          "played": 2,
+          "goalsFor": 7,
+          "goalsAgainst": 6,
+          "averageGoalsFor": 3.5,
+          "averageGoalsAgainst": 3.0
         },
         "away": {
           "played": 3,
@@ -407,22 +417,23 @@
       "name": "Real Betis",
       "crest": "https://crests.football-data.org/90.png",
       "venueId": null,
-      "standing": 4,
+      "standing": 3,
       "form": [
         "V",
         "V",
         "D",
+        "V",
         "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 3,
+        "playedGames": 5,
+        "won": 4,
         "draw": 0,
         "lost": 1,
-        "points": 9,
-        "goalsFor": 5,
-        "goalsAgainst": 5,
-        "goalDifference": 0,
+        "points": 12,
+        "goalsFor": 7,
+        "goalsAgainst": 6,
+        "goalDifference": 1,
         "home": {
           "played": 2,
           "goalsFor": 2,
@@ -431,11 +442,11 @@
           "averageGoalsAgainst": 0.0
         },
         "away": {
-          "played": 2,
-          "goalsFor": 3,
-          "goalsAgainst": 5,
-          "averageGoalsFor": 1.5,
-          "averageGoalsAgainst": 2.5
+          "played": 3,
+          "goalsFor": 5,
+          "goalsAgainst": 6,
+          "averageGoalsFor": 1.67,
+          "averageGoalsAgainst": 2.0
         }
       },
       "footballDataId": 90,
@@ -447,29 +458,29 @@
       "name": "Real Sociedad",
       "crest": "https://crests.football-data.org/92.png",
       "venueId": null,
-      "standing": 9,
+      "standing": 12,
       "form": [
-        "D",
         "D",
         "V",
         "E",
-        "V"
+        "V",
+        "D"
       ],
       "stats": {
-        "playedGames": 5,
+        "playedGames": 6,
         "won": 2,
         "draw": 1,
-        "lost": 2,
+        "lost": 3,
         "points": 7,
         "goalsFor": 6,
-        "goalsAgainst": 8,
-        "goalDifference": -2,
+        "goalsAgainst": 11,
+        "goalDifference": -5,
         "home": {
-          "played": 2,
+          "played": 3,
           "goalsFor": 2,
-          "goalsAgainst": 1,
-          "averageGoalsFor": 1.0,
-          "averageGoalsAgainst": 0.5
+          "goalsAgainst": 4,
+          "averageGoalsFor": 0.67,
+          "averageGoalsAgainst": 1.33
         },
         "away": {
           "played": 3,
@@ -488,28 +499,29 @@
       "name": "Villarreal CF",
       "crest": "https://crests.football-data.org/94.png",
       "venueId": null,
-      "standing": 17,
+      "standing": 18,
       "form": [
         "E",
         "E",
         "D",
+        "D",
         "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 0,
         "draw": 2,
-        "lost": 2,
+        "lost": 3,
         "points": 2,
-        "goalsFor": 6,
-        "goalsAgainst": 8,
-        "goalDifference": -2,
+        "goalsFor": 7,
+        "goalsAgainst": 10,
+        "goalDifference": -3,
         "home": {
-          "played": 1,
-          "goalsFor": 2,
-          "goalsAgainst": 3,
-          "averageGoalsFor": 2.0,
-          "averageGoalsAgainst": 3.0
+          "played": 2,
+          "goalsFor": 3,
+          "goalsAgainst": 5,
+          "averageGoalsFor": 1.5,
+          "averageGoalsAgainst": 2.5
         },
         "away": {
           "played": 3,
@@ -533,17 +545,18 @@
         "E",
         "D",
         "D",
+        "D",
         "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 0,
         "draw": 1,
-        "lost": 3,
+        "lost": 4,
         "points": 1,
         "goalsFor": 1,
-        "goalsAgainst": 9,
-        "goalDifference": -8,
+        "goalsAgainst": 10,
+        "goalDifference": -9,
         "home": {
           "played": 3,
           "goalsFor": 0,
@@ -552,11 +565,11 @@
           "averageGoalsAgainst": 2.0
         },
         "away": {
-          "played": 1,
+          "played": 2,
           "goalsFor": 1,
-          "goalsAgainst": 3,
-          "averageGoalsFor": 1.0,
-          "averageGoalsAgainst": 3.0
+          "goalsAgainst": 4,
+          "averageGoalsFor": 0.5,
+          "averageGoalsAgainst": 2.0
         }
       },
       "footballDataId": 95,
@@ -568,22 +581,23 @@
       "name": "Deportivo Alavés",
       "crest": "https://crests.football-data.org/263.png",
       "venueId": null,
-      "standing": 2,
+      "standing": 4,
       "form": [
         "V",
         "E",
         "V",
-        "V"
+        "V",
+        "D"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 3,
         "draw": 1,
-        "lost": 0,
+        "lost": 1,
         "points": 10,
-        "goalsFor": 10,
-        "goalsAgainst": 3,
-        "goalDifference": 7,
+        "goalsFor": 11,
+        "goalsAgainst": 5,
+        "goalDifference": 6,
         "home": {
           "played": 3,
           "goalsFor": 9,
@@ -592,11 +606,11 @@
           "averageGoalsAgainst": 0.67
         },
         "away": {
-          "played": 1,
-          "goalsFor": 1,
-          "goalsAgainst": 1,
+          "played": 2,
+          "goalsFor": 2,
+          "goalsAgainst": 3,
           "averageGoalsFor": 1.0,
-          "averageGoalsAgainst": 1.0
+          "averageGoalsAgainst": 1.5
         }
       },
       "footballDataId": 263,
@@ -613,16 +627,17 @@
         "E",
         "D",
         "D",
-        "D"
+        "D",
+        "E"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 0,
-        "draw": 1,
+        "draw": 2,
         "lost": 3,
-        "points": 1,
-        "goalsFor": 5,
-        "goalsAgainst": 12,
+        "points": 2,
+        "goalsFor": 6,
+        "goalsAgainst": 13,
         "goalDifference": -7,
         "home": {
           "played": 2,
@@ -632,11 +647,11 @@
           "averageGoalsAgainst": 4.0
         },
         "away": {
-          "played": 2,
-          "goalsFor": 3,
-          "goalsAgainst": 4,
-          "averageGoalsFor": 1.5,
-          "averageGoalsAgainst": 2.0
+          "played": 3,
+          "goalsFor": 4,
+          "goalsAgainst": 5,
+          "averageGoalsFor": 1.33,
+          "averageGoalsAgainst": 1.67
         }
       },
       "footballDataId": 285,
@@ -648,29 +663,29 @@
       "name": "Celta",
       "crest": "https://crests.football-data.org/558.png",
       "venueId": null,
-      "standing": 16,
+      "standing": 15,
       "form": [
+        "D",
+        "D",
         "E",
-        "D",
-        "D",
         "E",
         "E"
       ],
       "stats": {
-        "playedGames": 5,
+        "playedGames": 6,
         "won": 0,
-        "draw": 3,
+        "draw": 4,
         "lost": 2,
-        "points": 3,
-        "goalsFor": 2,
-        "goalsAgainst": 5,
+        "points": 4,
+        "goalsFor": 3,
+        "goalsAgainst": 6,
         "goalDifference": -3,
         "home": {
-          "played": 2,
-          "goalsFor": 1,
-          "goalsAgainst": 4,
-          "averageGoalsFor": 0.5,
-          "averageGoalsAgainst": 2.0
+          "played": 3,
+          "goalsFor": 2,
+          "goalsAgainst": 5,
+          "averageGoalsFor": 0.67,
+          "averageGoalsAgainst": 1.67
         },
         "away": {
           "played": 3,
@@ -694,23 +709,24 @@
         "V",
         "V",
         "D",
-        "E"
+        "E",
+        "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 2,
+        "playedGames": 5,
+        "won": 3,
         "draw": 1,
         "lost": 1,
-        "points": 7,
-        "goalsFor": 7,
+        "points": 10,
+        "goalsFor": 8,
         "goalsAgainst": 6,
-        "goalDifference": 1,
+        "goalDifference": 2,
         "home": {
-          "played": 2,
-          "goalsFor": 3,
+          "played": 3,
+          "goalsFor": 4,
           "goalsAgainst": 4,
-          "averageGoalsFor": 1.5,
-          "averageGoalsAgainst": 2.0
+          "averageGoalsFor": 1.33,
+          "averageGoalsAgainst": 1.33
         },
         "away": {
           "played": 2,
@@ -729,21 +745,22 @@
       "name": "RC Deportivo",
       "crest": "https://crests.football-data.org/560.png",
       "venueId": null,
-      "standing": 5,
+      "standing": 7,
       "form": [
         "E",
         "E",
         "V",
-        "V"
+        "V",
+        "E"
       ],
       "stats": {
-        "playedGames": 4,
+        "playedGames": 5,
         "won": 2,
-        "draw": 2,
+        "draw": 3,
         "lost": 0,
-        "points": 8,
-        "goalsFor": 8,
-        "goalsAgainst": 5,
+        "points": 9,
+        "goalsFor": 9,
+        "goalsAgainst": 6,
         "goalDifference": 3,
         "home": {
           "played": 2,
@@ -753,11 +770,11 @@
           "averageGoalsAgainst": 1.0
         },
         "away": {
-          "played": 2,
-          "goalsFor": 4,
-          "goalsAgainst": 3,
-          "averageGoalsFor": 2.0,
-          "averageGoalsAgainst": 1.5
+          "played": 3,
+          "goalsFor": 5,
+          "goalsAgainst": 4,
+          "averageGoalsFor": 1.67,
+          "averageGoalsAgainst": 1.33
         }
       },
       "footballDataId": 560,
@@ -769,28 +786,29 @@
       "name": "R. Racing Club",
       "crest": "https://crests.football-data.org/5335.png",
       "venueId": null,
-      "standing": 13,
+      "standing": 10,
       "form": [
         "E",
         "D",
         "V",
-        "D"
+        "D",
+        "V"
       ],
       "stats": {
-        "playedGames": 4,
-        "won": 1,
+        "playedGames": 5,
+        "won": 2,
         "draw": 1,
         "lost": 2,
-        "points": 4,
-        "goalsFor": 7,
-        "goalsAgainst": 8,
-        "goalDifference": -1,
+        "points": 7,
+        "goalsFor": 9,
+        "goalsAgainst": 9,
+        "goalDifference": 0,
         "home": {
-          "played": 2,
-          "goalsFor": 5,
-          "goalsAgainst": 4,
-          "averageGoalsFor": 2.5,
-          "averageGoalsAgainst": 2.0
+          "played": 3,
+          "goalsFor": 7,
+          "goalsAgainst": 5,
+          "averageGoalsFor": 2.33,
+          "averageGoalsAgainst": 1.67
         },
         "away": {
           "played": 2,
