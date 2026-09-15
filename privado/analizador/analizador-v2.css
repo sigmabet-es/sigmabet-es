@@ -1,0 +1,74 @@
+.mode-switch[hidden],
+[hidden] {
+  display: none !important;
+}
+
+.mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  border: 1px solid #29313d;
+  border-radius: 13px;
+  background: #0a0e14;
+}
+
+.mode-switch button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mode-switch button.active {
+  background: #202830;
+  color: white;
+  box-shadow: 0 2px 12px #0005;
+}
+
+.mode-switch button.active:last-child {
+  background: var(--lime);
+  color: #101507;
+}
+
+select:disabled { opacity: .45; }
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: -8px 0 22px;
+}
+
+.comparison button {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #303945;
+  border-radius: 12px;
+  background: #11171e;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.comparison button.active {
+  border-color: #84aa2e;
+  background: #b9f33d0c;
+  color: white;
+}
+
+.comparison img { width: 28px; height: 28px; object-fit: contain; }
+.comparison b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.comparison strong { color: var(--lime); font-size: 17px; }
+
+@media (max-width: 560px) {
+  .comparison { grid-template-columns: 1fr; }
+}

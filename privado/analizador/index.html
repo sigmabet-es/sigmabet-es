@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>Analizador privado | SigmaBet</title>
+    <link rel="icon" href="../../assets/img/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="analizador.css?v=1" />
+    <link rel="stylesheet" href="analizador-v2.css?v=1" />
+    <script src="analizador-v2.js?v=1" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"><img src="../../assets/img/logo.svg" alt="" /><strong>SigmaBet</strong><span>Privado</span></a>
+      <a class="logout" href="?logout=1">Cerrar sesión</a>
+    </header>
+    <main>
+      <section class="intro">
+        <div><p class="eyebrow">LABORATORIO DE DATOS</p><h1>Analiza una tendencia.<br><em>Comprueba cada partido.</em></h1></div>
+        <p class="lead">Elige un equipo, el mercado y el contexto. El resultado se calcula sobre los encuentros terminados que tienen esa estadística disponible.</p>
+      </section>
+
+      <section class="workspace" aria-labelledby="filters-title">
+        <div class="filters">
+          <div class="section-head"><span>01</span><div><p>CONFIGURACIÓN</p><h2 id="filters-title">Define la muestra</h2></div></div>
+          <div class="mode-switch" aria-label="Tipo de análisis">
+            <button type="button" class="active" data-mode="team">Un equipo</button>
+            <button type="button" data-mode="match">Un encuentro</button>
+          </div>
+          <label id="team-field">Equipo<select id="team"></select></label>
+          <label id="fixture-field" hidden>Encuentro<select id="fixture"></select></label>
+          <div class="row">
+            <label>Mercado<select id="market"></select></label>
+            <label>Condición<select id="condition"><option value="over">Más de</option><option value="under">Menos de</option><option value="atleast">Al menos</option><option value="atmost">Como máximo</option></select></label>
+          </div>
+          <div class="row">
+            <label>Línea<input id="line" type="number" value="2.5" min="0" step="0.5" /></label>
+            <label id="direction-field">Lectura<select id="direction"><option value="for">A favor · realizadas</option><option value="against">En contra · recibidas</option></select></label>
+          </div>
+          <label id="venue-field">Condición del equipo<select id="venue"><option value="all">Local y visitante</option><option value="home">Solo como local</option><option value="away">Solo como visitante</option></select></label>
+          <fieldset><legend>Temporadas</legend><div id="seasons" class="chips"></div></fieldset>
+          <div class="sample-row"><label>Partidos a mostrar<select id="limit"><option value="10">Últimos 10</option><option value="20" selected>Últimos 20</option><option value="50">Últimos 50</option><option value="all">Todos</option></select></label><button id="analyze" type="button">Actualizar análisis</button></div>
+        </div>
+
+        <aside class="summary" aria-live="polite">
+          <p class="eyebrow">RESULTADO</p><div class="rate"><strong id="rate">—</strong><span>%</span></div>
+          <p id="summary-text">Cargando datos…</p><div class="meter"><i id="meter"></i></div>
+          <div id="comparison" class="comparison" hidden></div>
+          <dl><div><dt>Aciertos</dt><dd id="hits">—</dd></div><div><dt>Fallos</dt><dd id="misses">—</dd></div><div><dt>Muestra</dt><dd id="sample">—</dd></div><div><dt>Media</dt><dd id="average">—</dd></div></dl>
+        </aside>
+      </section>
+
+      <section class="results">
+        <div class="section-head"><span>02</span><div><p>EVIDENCIA</p><h2>Partido a partido</h2></div></div>
+        <div class="legend"><span><i class="green"></i>Supera el filtro</span><span><i class="red"></i>No lo supera</span></div>
+        <div id="matches" class="match-list"><p class="empty">Preparando la muestra…</p></div>
+      </section>
+    </main>
+  </body>
+</html>
