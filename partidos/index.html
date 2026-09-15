@@ -4,20 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Partidos de fútbol analizados | SigmaBet</title>
-    <meta name="description" content="Calendario de partidos de fútbol analizados por SigmaBet con datos, contexto, probabilidades, cuotas justas y apuestas con valor." />
+    <meta name="description" content="Calendario y resultados de fútbol con pronósticos explicados, forma reciente, enfrentamientos directos y estadísticas de cada partido." />
     <meta name="robots" content="index,follow" />
     <meta property="og:title" content="Partidos de fútbol analizados | SigmaBet" />
-    <meta property="og:description" content="Calendario de partidos con análisis prepartido, value betting y registro transparente de SigmaBet." />
+    <meta property="og:description" content="Calendario de partidos con pronóstico, análisis, forma reciente, H2H y estadísticas." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sigmabet.es/partidos/" />
     <meta property="og:image" content="https://sigmabet.es/assets/img/banner.webp" />
     <link rel="canonical" href="https://sigmabet.es/partidos/" />
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260821-02" />
+    <link rel="stylesheet" href="/assets/css/partidos.css?v=20260911-02" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
-    <script src="/assets/js/partidos.js?v=20260821-01" defer></script>
+    <script src="/assets/js/partidos.js?v=20260911-01" defer></script>
   </head>
-  <body>
+  <body class="matches-page">
     <header class="site-header">
       <a class="brand" href="/index.html" aria-label="SigmaBet inicio"><img src="/assets/img/logo.svg?v=20260709-05" alt="" /><span>SigmaBet</span></a>
       <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle><span></span><span></span><span></span></button>
@@ -26,37 +27,60 @@
     </header>
     <main>
       <section class="matches-today-shell" data-matches-app data-source="/data/prepartido/laliga.json">
-        <div class="matches-today-head">
-          <p class="kicker" data-competition-label>Inteligencia prepartido</p>
-          <h1>Partidos de hoy</h1>
-          <p data-matches-status>Actualizando calendario…</p>
-        </div>
+        <header class="matches-today-head">
+          <div>
+            <p class="kicker">PARTIDOS DE FÚTBOL</p>
+            <h1>Calendario, resultados y análisis.</h1>
+          </div>
+          <p>Consulta cada jornada, encuentra un encuentro y accede a su pronóstico, forma reciente, H2H y estadísticas.</p>
+        </header>
 
-        <div class="match-day-nav" aria-label="Navegación por fecha">
+        <section class="matches-control-panel" aria-label="Filtros del calendario">
+          <div class="matches-toolbar">
+            <div class="matches-competition"><span class="competition-icon" aria-hidden="true">◎</span><div><strong data-competition-label>LaLiga</strong><small data-season-label>Calendario de partidos</small></div></div>
+            <label class="matches-search"><span>Buscar equipo</span><input type="search" data-team-search placeholder="Buscar por equipo…" autocomplete="off" /></label>
+            <div class="matches-status-filter" role="group" aria-label="Filtrar por estado">
+              <button type="button" class="is-active" data-status-filter="all">Todos</button>
+              <button type="button" data-status-filter="upcoming">Próximos</button>
+              <button type="button" data-status-filter="finished">Resultados</button>
+            </div>
+          </div>
+          <div class="match-day-nav" aria-label="Navegación por fecha">
           <button type="button" aria-label="Día anterior" data-date-prev>&lt;</button>
-          <button class="match-day-current" type="button" data-date-label>Hoy</button>
+          <button class="match-day-current" type="button" data-date-label aria-controls="match-calendar">Hoy</button>
           <button type="button" aria-label="Día siguiente" data-date-next>&gt;</button>
-          <div class="match-calendar-popover" data-calendar-popover hidden>
+          <div class="match-calendar-popover" id="match-calendar" data-calendar-popover hidden aria-label="Elegir fecha">
             <div class="match-calendar-head">
               <button type="button" aria-label="Mes anterior" data-calendar-prev>&lt;</button>
-              <strong data-calendar-month>Agosto 2026</strong>
+              <strong data-calendar-month></strong>
               <button type="button" aria-label="Mes siguiente" data-calendar-next>&gt;</button>
             </div>
             <div class="match-calendar-weekdays" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
             <div class="match-calendar-grid" data-calendar-grid></div>
           </div>
-        </div>
+          </div>
+          <div class="matches-week" data-week aria-label="Días de la semana"></div>
+        </section>
 
-        <section class="daily-match-list" aria-label="Partidos del día" data-matches-list>
+        <div class="matches-results-head"><div><h2 data-matches-status>Actualizando calendario…</h2><span data-match-count role="status" aria-live="polite"></span></div><button type="button" data-today>Volver a hoy</button></div>
+        <section class="daily-match-list" aria-label="Partidos del día" data-matches-list aria-busy="true">
           <div class="daily-empty-state">
             <strong>Cargando partidos…</strong>
           </div>
         </section>
 
+        <p class="matches-data-source">Datos: <a href="https://www.football-data.org" target="_blank" rel="noreferrer">football-data.org</a> <span data-data-updated></span></p>
+        <noscript><p>Activa JavaScript para consultar el calendario. También puedes <a href="/competiciones/laliga/">ver los partidos de LaLiga</a>.</p></noscript>
         <div class="matches-today-foot">
           <a class="text-link" href="/competiciones/laliga/">Ver LaLiga</a>
-          <a class="text-link" href="/partidos/plantilla/">Ver plantilla técnica</a>
+          <span>Horarios en tu zona local · Fechas sujetas a cambios</span>
         </div>
+      </section>
+
+      <section class="matches-seo-section">
+        <div><span>Antes de cada jornada</span><h2>Información útil para entender cada partido</h2></div>
+        <p>Las fichas reúnen resultados recientes, enfrentamientos directos, goles por periodo, remates, córners, tarjetas, faltas, estadio y árbitro. Los datos se actualizan en nuestra base interna para ofrecer una consulta rápida y consistente.</p>
+        <div class="matches-seo-points"><article><strong>Pronóstico explicado</strong><span>Una lectura breve del escenario más probable.</span></article><article><strong>Forma y H2H</strong><span>Contexto reciente de ambos equipos.</span></article><article><strong>Datos verificables</strong><span>Estadísticas mostradas con su muestra disponible.</span></article></div>
       </section>
     </main>
     <footer class="site-footer">

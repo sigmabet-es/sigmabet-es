@@ -3,6 +3,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const dataPath = path.join(root, "data", "prepartido", "laliga.json");
+const historyPath = path.join(root, "data", "prepartido", "history.json");
 const editorialPath = path.join(root, "data", "prepartido", "editorial.json");
 const teamResultsPath = path.join(root, "data", "prepartido", "team-results.json");
 const outputRoot = root;
@@ -65,6 +66,20 @@ const writeFile = (file, content) => {
   fs.writeFileSync(file, `${String(content).replace(/[ \t]+$/gm, "").trimEnd()}\n`);
 };
 
+const CORE_STAT_KEYS = [
+  "firstHalfGoals",
+  "secondHalfGoals",
+  "shots",
+  "shotsOnTarget",
+  "corners",
+  "yellowCards",
+  "redCards",
+  "fouls",
+];
+
+const coreStats = (stats) =>
+  Object.fromEntries(CORE_STAT_KEYS.filter((key) => stats?.[key]).map((key) => [key, stats[key]]));
+
 const mergeDefined = (base, override) => {
   if (!override || typeof override !== "object" || Array.isArray(override)) return base;
   return Object.entries(override).reduce(
@@ -108,6 +123,14 @@ const mergeEditorial = (data, editorial) => {
   };
 };
 
+const mergeHistory = (data, history) => {
+  const teams = new Map((history.teams || []).map(team => [team.id, team]));
+  (data.teams || []).forEach(team => teams.set(team.id, team));
+  const matches = new Map((history.matches || []).map(match => [match.footballDataId || match.id, match]));
+  (data.matches || []).forEach(match => matches.set(match.footballDataId || match.id, match));
+  return { ...data, teams: [...teams.values()], matches: [...matches.values()] };
+};
+
 const matchMergeKey = (match) =>
   [match.localDate || String(match.startDate || "").slice(0, 10), match.homeTeamId, match.awayTeamId].join("|");
 
@@ -127,12 +150,12 @@ const mergeTeamResults = (data, teamResults) => {
     if (!result) return match;
     usedKeys.add(key);
     return mergeDefined(match, {
-      score: result.score || match.score,
-      status: result.score ? "finalizado" : match.status,
-      stats: result.stats || match.stats,
+      score: match.footballDataId ? match.score : result.score || match.score,
+      status: match.footballDataId ? match.status : result.score ? "finalizado" : match.status,
+      stats: mergeDefined(coreStats(match.stats), coreStats(result.stats)),
       venue: match.venue || result.venue,
       referee: match.referee || result.referee,
-      source: result.source || match.source,
+      source: match.footballDataId ? match.source : result.source || match.source,
       notes: result.notes || match.notes,
     });
   });
@@ -170,11 +193,12 @@ const pageShell = ({ title, description, canonical, robots = "index,follow", bod
     <link rel="canonical" href="${escapeHtml(canonical)}" />
     <link rel="icon" href="/assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260826-04" />
+    <link rel="stylesheet" href="/assets/css/partido.css?v=20260914-04" />
     <script src="/assets/js/main.js?v=20260709-05" defer></script>
-    <script src="/assets/js/prepartido-match.js?v=20260821-01" defer></script>
+    <script src="/assets/js/prepartido-match.js?v=20260914-01" defer></script>
     ${structuredData ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>` : ""}
   </head>
-  <body>
+  <body class="match-detail-page">
     <header class="site-header">
       <a class="brand" href="/index.html" aria-label="SigmaBet inicio"><img src="/assets/img/logo.svg?v=20260709-05" alt="" /><span>SigmaBet</span></a>
       <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle><span></span><span></span><span></span></button>
@@ -388,6 +412,19 @@ const renderLineupCard = (match, team, typeLabel) => {
 
 const renderLineupsSection = (match, home, away) => {
   const lineups = Array.isArray(match.lineups) ? match.lineups : [];
+  if (!lineups.some((lineup) => Array.isArray(lineup.players) && lineup.players.length)) {
+    return `<div id="alineaciones" class="match-squad-lineups match-lineups-empty">
+      <div class="match-section-copy">
+        <span>Alineaciones</span>
+        <h2>Alineaciones probables</h2>
+        <p>Publicaremos los onces cuando exista información contrastada.</p>
+      </div>
+      <div class="lineup-empty-grid">
+        <article>${renderCrest(home)}<div><strong>${escapeHtml(home.name)}</strong><span>Alineación pendiente</span></div></article>
+        <article>${renderCrest(away)}<div><strong>${escapeHtml(away.name)}</strong><span>Alineación pendiente</span></div></article>
+      </div>
+    </div>`;
+  }
   return `<div id="alineaciones" class="match-squad-lineups">
     <div class="match-section-copy">
       <span>Alineaciones</span>
@@ -440,8 +477,8 @@ const renderInjuriesSection = (match, home, away) => {
     );
     if (!items.length) {
       return `<div class="availability-empty">
-        <span class="availability-ok">OK</span>
-        <p>Sin bajas confirmadas en la ficha.</p>
+        <span class="availability-ok">—</span>
+        <p>Sin información confirmada.</p>
       </div>`;
     }
     return `<div class="availability-summary">
@@ -491,8 +528,8 @@ const matchTimestamp = (match) => new Date(match.startDate || "9999-12-31T00:00:
 const isFinished = (match) =>
   match.status === "finalizado" &&
   match.score &&
-  Number.isFinite(Number(match.score.home)) &&
-  Number.isFinite(Number(match.score.away));
+  typeof match.score.home === "number" && Number.isFinite(match.score.home) &&
+  typeof match.score.away === "number" && Number.isFinite(match.score.away);
 
 const scoreText = (match) => (isFinished(match) ? `${match.score.home} - ${match.score.away}` : "VS");
 
@@ -516,7 +553,7 @@ const teamMatches = (data, match, teamId, scope = "all", limit = 5) =>
     .filter((item) => scope === "all" || (scope === "home" ? item.homeTeamId === teamId : item.awayTeamId === teamId))
     .slice(0, limit);
 
-const h2hMatches = (data, match, scope = "all") =>
+const h2hMatches = (data, match, scope = "all", limit = 10) =>
   completedBefore(data, match)
     .filter(
       (item) =>
@@ -524,38 +561,27 @@ const h2hMatches = (data, match, scope = "all") =>
         (item.homeTeamId === match.awayTeamId && item.awayTeamId === match.homeTeamId)
     )
     .filter((item) => scope === "all" || (scope === "home" ? item.homeTeamId === match.homeTeamId : item.awayTeamId === match.homeTeamId))
-    .slice(0, 10);
+    .slice(0, limit);
 
-const refereeCardAverages = (data, referee) => {
+const refereeCardAverages = (data, referee, beforeMatch) => {
   const clean = normalize(referee);
   if (!clean) return null;
-  const rows = (data.matches || []).filter((item) => {
-    const stats = item.stats || {};
-    return (
-      isFinished(item) &&
-      normalize(item.referee) === clean &&
-      stats.yellowCards &&
-      stats.redCards &&
-      Number.isFinite(Number(stats.yellowCards.home)) &&
-      Number.isFinite(Number(stats.yellowCards.away)) &&
-      Number.isFinite(Number(stats.redCards.home)) &&
-      Number.isFinite(Number(stats.redCards.away))
-    );
-  });
-  if (!rows.length) return null;
-  const totals = rows.reduce(
-    (acc, item) => {
-      acc.yellow += Number(item.stats.yellowCards.home) + Number(item.stats.yellowCards.away);
-      acc.red += Number(item.stats.redCards.home) + Number(item.stats.redCards.away);
-      return acc;
-    },
-    { yellow: 0, red: 0 }
+  const rows = (data.matches || []).filter(item =>
+    isFinished(item) &&
+    (beforeMatch?.refereeId && item.refereeId ? item.refereeId === beforeMatch.refereeId : normalize(item.referee) === clean) &&
+    (!beforeMatch || (item.id !== beforeMatch.id && matchTimestamp(item) < matchTimestamp(beforeMatch))) &&
+    matchTimestamp(item) >= Date.parse("2024-07-01T00:00:00Z")
   );
-  return {
-    matches: rows.length,
-    yellow: totals.yellow / rows.length,
-    red: totals.red / rows.length,
+  const average = key => {
+    const valid = rows.filter(item => ["home", "away"].every(side =>
+      typeof item.stats?.[key]?.[side] === "number" && Number.isFinite(item.stats[key][side])));
+    return { count: valid.length, value: valid.length ? valid.reduce((sum, item) =>
+      sum + item.stats[key].home + item.stats[key].away, 0) / valid.length : null };
   };
+  const yellow = average("yellowCards");
+  const red = average("redCards");
+  return yellow.count || red.count ? { yellow: yellow.value, red: red.value,
+    yellowMatches: yellow.count, redMatches: red.count } : null;
 };
 
 const renderFormPills = (data, match, teamId) => {
@@ -586,12 +612,113 @@ const formatDayMonth = (date) => {
 
 const sideStat = (stats, key, side) => {
   const value = stats?.[key]?.[side];
-  return Number.isFinite(Number(value)) ? Number(value) : null;
+  return value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value)) ? Number(value) : null;
 };
 
 const formatStat = (value, decimals = 0) => {
   if (value === null || value === undefined || value === "") return "—";
   return Number.isFinite(Number(value)) ? Number(value).toFixed(decimals) : "—";
+};
+
+const formatDecimalEs = (value, decimals = 1) =>
+  Number.isFinite(Number(value)) ? Number(value).toFixed(decimals).replace(".", ",") : "—";
+
+const matchMetricTotal = (match, key) => {
+  if (key === "goals") return isFinished(match) ? Number(match.score.home) + Number(match.score.away) : null;
+  if (key === "firstHalfGoals") {
+    const home = periodGoals(match, 1, "home");
+    const away = periodGoals(match, 1, "away");
+    return home === null || away === null ? null : home + away;
+  }
+  const home = sideStat(match.stats, key, "home");
+  const away = sideStat(match.stats, key, "away");
+  return home === null || away === null ? null : home + away;
+};
+
+const uniqueMatches = (rows) => [...new Map(rows.map((item) => [item.footballDataId || item.id, item])).values()];
+
+const average = (values) => {
+  const valid = values.filter((value) => Number.isFinite(Number(value))).map(Number);
+  return valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : null;
+};
+
+const teamRecord = (rows, teamId) =>
+  rows.reduce(
+    (record, item) => {
+      const result = resultForTeam(item, teamId);
+      if (result === "V") record.wins += 1;
+      if (result === "E") record.draws += 1;
+      if (result === "D") record.losses += 1;
+      return record;
+    },
+    { wins: 0, draws: 0, losses: 0 }
+  );
+
+const countLabel = (count, singular, plural) => `${count} ${count === 1 ? singular : plural}`;
+
+const substantiveEditorialText = (value) => {
+  const clean = text(value, "");
+  if (!clean) return "";
+  const normalized = normalize(clean);
+  return normalized.includes("no hay ningun analisis") || normalized.includes("resumen corto") ? "" : clean;
+};
+
+const buildAutomaticAnalysis = (data, match, home, away) => {
+  const homeRows = teamMatches(data, match, home.id, "all", 10);
+  const awayRows = teamMatches(data, match, away.id, "all", 10);
+  const h2hRows = h2hMatches(data, match, "all", 20);
+  const sample = uniqueMatches([...homeRows, ...awayRows]);
+  const homeRecord = teamRecord(homeRows, home.id);
+  const awayRecord = teamRecord(awayRows, away.id);
+  const goalsAverage = average(sample.map((item) => matchMetricTotal(item, "goals")));
+  const cornersAverage = average(sample.map((item) => matchMetricTotal(item, "corners")));
+  const shotsAverage = average(sample.map((item) => matchMetricTotal(item, "shots")));
+  const sampleLabel = `${sample.length} partido${sample.length === 1 ? "" : "s"}`;
+  const h2hCopy = h2hRows.length
+    ? `El cara a cara aporta ${h2hRows.length} encuentro${h2hRows.length === 1 ? "" : "s"} desde 2024/25.`
+    : "No hay enfrentamientos directos disponibles desde 2024/25.";
+  const generated = `${home.name} presenta un balance de ${countLabel(homeRecord.wins, "victoria", "victorias")}, ${countLabel(homeRecord.draws, "empate", "empates")} y ${countLabel(homeRecord.losses, "derrota", "derrotas")} en su muestra reciente; ${away.name}, ${countLabel(awayRecord.wins, "victoria", "victorias")}, ${countLabel(awayRecord.draws, "empate", "empates")} y ${countLabel(awayRecord.losses, "derrota", "derrotas")}. En ${sampleLabel} únicos, el promedio es de ${formatDecimalEs(goalsAverage, 2)} goles y ${formatDecimalEs(cornersAverage, 2)} córners por encuentro. ${h2hCopy}`;
+  const manualKeys = (Array.isArray(match.keys) ? match.keys : [])
+    .map((key) => text(key, ""))
+    .filter((key) => key && !/^clave\s+\d+$/i.test(key));
+  const autoKeys = [
+    `${home.name}: ${homeRecord.wins}V · ${homeRecord.draws}E · ${homeRecord.losses}D en ${homeRows.length} partidos.`,
+    `${away.name}: ${awayRecord.wins}V · ${awayRecord.draws}E · ${awayRecord.losses}D en ${awayRows.length} partidos.`,
+    `Muestra conjunta: ${formatDecimalEs(cornersAverage, 2)} córners y ${formatDecimalEs(shotsAverage, 2)} remates de media.`,
+  ];
+  return {
+    copy: substantiveEditorialText(match.analysis) || generated,
+    keys: manualKeys.length ? manualKeys.slice(0, 5) : autoKeys,
+    homeRows,
+    awayRows,
+    h2hRows,
+    sample,
+  };
+};
+
+const buildForecast = (data, match, home, away) => {
+  const analysis = buildAutomaticAnalysis(data, match, home, away);
+  const score = (rows, teamId) => {
+    const record = teamRecord(rows, teamId);
+    const possible = rows.length * 3;
+    return {
+      ...record,
+      matches: rows.length,
+      points: record.wins * 3 + record.draws,
+      rate: possible ? Math.round(((record.wins * 3 + record.draws) / possible) * 100) : null,
+    };
+  };
+  const homeForm = score(analysis.homeRows, home.id);
+  const awayForm = score(analysis.awayRows, away.id);
+  const difference = homeForm.rate === null || awayForm.rate === null ? null : homeForm.rate + 5 - awayForm.rate;
+  const tendency = difference === null
+    ? { label: "Pronóstico pendiente", tone: "neutral", confidence: null }
+    : difference >= 12
+      ? { label: `Ligera ventaja de ${home.name}`, tone: "home", confidence: Math.min(72, 55 + Math.round(Math.abs(difference) / 3)) }
+      : difference <= -12
+        ? { label: `Ligera ventaja de ${away.name}`, tone: "away", confidence: Math.min(72, 55 + Math.round(Math.abs(difference) / 3)) }
+        : { label: "Encuentro equilibrado", tone: "neutral", confidence: Math.max(50, 60 - Math.round(Math.abs(difference) / 2)) };
+  return { tendency, homeForm, awayForm, h2hCount: analysis.h2hRows.length, sampleCount: analysis.sample.length };
 };
 
 const periodGoals = (match, period, side) => {
@@ -612,11 +739,50 @@ const renderMatchStatCell = (match, key, label, decimals = 0, extraClass = "") =
     decimals
   )}</td>`;
 
+const renderComparisonMetric = (match, key, label) => {
+  const home = sideStat(match.stats, key, "home");
+  const away = sideStat(match.stats, key, "away");
+  if (home === null && away === null) return "";
+  const homeValue = home ?? 0;
+  const awayValue = away ?? 0;
+  const maximum = Math.max(homeValue, awayValue, 1);
+  const homeWidth = Math.max(homeValue > 0 ? 8 : 0, Math.round((homeValue / maximum) * 100));
+  const awayWidth = Math.max(awayValue > 0 ? 8 : 0, Math.round((awayValue / maximum) * 100));
+  return `<div class="match-comparison-row">
+    <div class="match-comparison-values"><strong>${escapeHtml(formatStat(home))}</strong><span>${escapeHtml(label)}</span><strong>${escapeHtml(formatStat(away))}</strong></div>
+    <div class="match-comparison-bars" aria-hidden="true"><i style="width:${homeWidth}%"></i><i style="width:${awayWidth}%"></i></div>
+  </div>`;
+};
+
+const renderExpandedResult = (item, home, away, scope, open = false) => `<tr class="match-expanded-row" data-scope-row="${escapeHtml(scope)}">
+  <td class="match-expanded-cell" colspan="12">
+    <details class="match-expanded-details"${open ? " open" : ""}>
+      <summary><span>Ver estadísticas del partido</span><b aria-hidden="true">+</b></summary>
+      <div class="match-expanded-body">
+        <div class="match-expanded-team-labels"><span>${renderCrest(home)}<strong>${escapeHtml(home?.name || "Local")}</strong></span><span>${renderCrest(away)}<strong>${escapeHtml(away?.name || "Visitante")}</strong></span></div>
+        <div class="match-period-score">
+          <span><small>1ª parte</small><strong>${escapeHtml(formatStat(periodGoals(item, 1, "home")))} – ${escapeHtml(formatStat(periodGoals(item, 1, "away")))}</strong></span>
+          <span><small>2ª parte</small><strong>${escapeHtml(formatStat(periodGoals(item, 2, "home")))} – ${escapeHtml(formatStat(periodGoals(item, 2, "away")))}</strong></span>
+        </div>
+        <div class="match-comparison-grid">
+          ${renderComparisonMetric(item, "shots", "Remates")}
+          ${renderComparisonMetric(item, "shotsOnTarget", "A puerta")}
+          ${renderComparisonMetric(item, "corners", "Córners")}
+          ${renderComparisonMetric(item, "fouls", "Faltas")}
+          ${renderComparisonMetric(item, "yellowCards", "Amarillas")}
+          ${renderComparisonMetric(item, "redCards", "Rojas")}
+        </div>
+      </div>
+    </details>
+  </td>
+</tr>`;
+
 const renderResultTable = (data, rows, focusTeamId, mode = "team") => {
   if (!rows.length) return "";
   const teams = new Map(data.teams.map((team) => [team.id, team]));
   return `<div class="match-table-wrap">
-    <table class="match-result-table">
+    <table class="match-result-table ${mode === "h2h" ? "is-comparison-table" : "is-data-table"}">
+      <caption>${escapeHtml(teamName(teams, focusTeamId))}: últimos partidos disponibles</caption>
       <thead>
         <tr>
           <th>Fecha / competición</th>
@@ -624,12 +790,12 @@ const renderResultTable = (data, rows, focusTeamId, mode = "team") => {
           <th>Marcador</th>
           <th>1ª parte</th>
           <th>2ª parte</th>
-          <th>xG</th>
-          <th>Tiros</th>
-          <th>Tiros a puerta</th>
+          <th>Remates</th>
+          <th>A puerta</th>
           <th>Córners</th>
-          <th title="Tarjetas amarillas"><span class="card-dot card-yellow"></span></th>
-          <th title="Tarjetas rojas"><span class="card-dot card-red"></span></th>
+          <th>Faltas</th>
+          <th title="Tarjetas amarillas"><span class="card-dot card-yellow"></span><span class="card-label">TA</span></th>
+          <th title="Tarjetas rojas"><span class="card-dot card-red"></span><span class="card-label">TR</span></th>
           <th>Resultado</th>
         </tr>
       </thead>
@@ -650,10 +816,10 @@ const renderResultTable = (data, rows, focusTeamId, mode = "team") => {
               <td class="result-score" data-label="Marcador">${renderStackedValues(item.score?.home, item.score?.away)}</td>
               <td class="result-stat" data-label="1ª parte">${renderStackedValues(periodGoals(item, 1, "home"), periodGoals(item, 1, "away"))}</td>
               <td class="result-stat" data-label="2ª parte">${renderStackedValues(periodGoals(item, 2, "home"), periodGoals(item, 2, "away"))}</td>
-              ${renderMatchStatCell(item, "xg", "xG", 2)}
-              ${renderMatchStatCell(item, "shots", "Tiros")}
+              ${renderMatchStatCell(item, "shots", "Remates")}
               ${renderMatchStatCell(item, "shotsOnTarget", "A puerta")}
               ${renderMatchStatCell(item, "corners", "Córners")}
+              ${renderMatchStatCell(item, "fouls", "Faltas")}
               ${renderMatchStatCell(item, "yellowCards", "Amarillas", 0, "result-yellow")}
               ${renderMatchStatCell(item, "redCards", "Rojas", 0, "result-red")}
               <td class="result-outcome"><span class="form-${escapeHtml(normalize(result))}" data-short="${escapeHtml(result || "—")}">${escapeHtml(resultLabel)}</span></td>
@@ -686,6 +852,24 @@ const averageMatchGoals = (rows) => {
     .filter((value) => value !== null);
   if (!values.length) return null;
   return values.reduce((sum, value) => sum + value, 0) / values.length;
+};
+
+const averageTeamGoals = (rows, teamId, direction = "for") => {
+  const values = rows
+    .map((item) => {
+      if (!isFinished(item)) return null;
+      const isHome = item.homeTeamId === teamId;
+      const own = Number(item.score?.[isHome ? "home" : "away"]);
+      const rival = Number(item.score?.[isHome ? "away" : "home"]);
+      return Number.isFinite(own) && Number.isFinite(rival) ? (direction === "against" ? rival : own) : null;
+    })
+    .filter((value) => value !== null);
+  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+};
+
+const sampleRate = (rows, test) => {
+  const values = rows.map(test).filter((value) => value !== null);
+  return values.length ? Math.round((values.filter(Boolean).length / values.length) * 100) : null;
 };
 
 const averageTeamStat = (rows, teamId, key) => {
@@ -722,6 +906,37 @@ const renderScopeControls = () => `<div class="match-scope-controls" role="group
   <button type="button" data-scope-filter="away">Visitante</button>
 </div>`;
 
+const renderCompactMatch = (data, item, focusTeamId, open = false, collapsed = false) => {
+  const teams = new Map(data.teams.map((team) => [team.id, team]));
+  const home = teams.get(item.homeTeamId);
+  const away = teams.get(item.awayTeamId);
+  const result = resultForTeam(item, focusTeamId);
+  const scope = item.homeTeamId === focusTeamId ? "home" : "away";
+  const resultLabel = result === "V" ? "Victoria" : result === "D" ? "Derrota" : "Empate";
+  return `<li class="compact-match result-${escapeHtml(normalize(result))}" data-scope-row="${escapeHtml(scope)}"${collapsed ? " hidden data-extra-match" : ""}>
+    <div class="compact-match-main">
+      <time datetime="${escapeHtml(String(item.localDate || item.startDate || "").slice(0, 10))}"><strong>${escapeHtml(formatShortDate(item.localDate || item.startDate))}</strong><span>${escapeHtml(competitionLabel(item))}</span></time>
+      <div class="compact-match-teams">
+        <span>${renderCrest(home)}<b>${escapeHtml(teamName(teams, item.homeTeamId))}</b><strong>${escapeHtml(formatStat(item.score?.home))}</strong></span>
+        <span>${renderCrest(away)}<b>${escapeHtml(teamName(teams, item.awayTeamId))}</b><strong>${escapeHtml(formatStat(item.score?.away))}</strong></span>
+      </div>
+      <span class="compact-match-outcome form-${escapeHtml(normalize(result))}" data-short="${escapeHtml(result || "—")}">${escapeHtml(resultLabel)}</span>
+    </div>
+    <div class="compact-match-stats" aria-label="Estadísticas del partido">
+      <span><small>1.ª mitad</small><strong>${escapeHtml(formatStat(periodGoals(item, 1, "home")))} – ${escapeHtml(formatStat(periodGoals(item, 1, "away")))}</strong></span>
+      <span><small>2.ª mitad</small><strong>${escapeHtml(formatStat(periodGoals(item, 2, "home")))} – ${escapeHtml(formatStat(periodGoals(item, 2, "away")))}</strong></span>
+      <span><small>Remates</small><strong>${escapeHtml(formatStat(matchMetricTotal(item, "shots")))}</strong></span>
+      <span><small>A puerta</small><strong>${escapeHtml(formatStat(matchMetricTotal(item, "shotsOnTarget")))}</strong></span>
+      <span><small>Córners</small><strong>${escapeHtml(formatStat(matchMetricTotal(item, "corners")))}</strong></span>
+      <span><small>Faltas</small><strong>${escapeHtml(formatStat(matchMetricTotal(item, "fouls")))}</strong></span>
+      <span><small>TA / TR</small><strong>${escapeHtml(formatStat(matchMetricTotal(item, "yellowCards")))} / ${escapeHtml(formatStat(matchMetricTotal(item, "redCards")))}</strong></span>
+    </div>
+  </li>`;
+};
+
+const renderCompactMatches = (data, rows, focusTeamId, firstOpen = false, visible = rows.length) =>
+  `<ol class="compact-match-list">${rows.map((item, index) => renderCompactMatch(data, item, focusTeamId, firstOpen && index === 0, index >= visible)).join("")}</ol>`;
+
 const renderRecentTeamResults = (data, match, team) => {
   const rows = teamMatches(data, match, team.id, "all", 10);
   return `<article class="match-results-card" data-filter-section>
@@ -731,7 +946,7 @@ const renderRecentTeamResults = (data, match, team) => {
     </div>
     ${
       rows.length
-        ? renderResultTable(data, rows, team.id)
+        ? `${renderCompactMatches(data, rows, team.id, false, 5)}${rows.length > 5 ? `<button class="match-show-more" type="button" data-show-more>Ver los ${rows.length} partidos <span>↓</span></button>` : ""}`
         : '<p class="match-empty-copy">No hay resultados de liga suficientes en temporada actual o anterior para este equipo.</p>'
     }
   </article>`;
@@ -740,10 +955,23 @@ const renderRecentTeamResults = (data, match, team) => {
 const renderRecentResultsSection = (data, match, home, away) => `<section id="resultados" class="match-panel match-recent-panel">
   <div class="match-panel-heading">
     <div><span>Forma reciente</span><h2>Últimos partidos</h2></div>
-    <p>Temporada actual y anterior.</p>
+    <p>Histórico disponible desde 2024/25. Las celdas «—» indican datos no disponibles.</p>
   </div>
   <div class="match-results-grid">${renderRecentTeamResults(data, match, home)}${renderRecentTeamResults(data, match, away)}</div>
 </section>`;
+
+const renderTeamHistorySection = (data, match, team, id, role) => {
+  const rows = teamMatches(data, match, team.id, "all", 10);
+  return `<section id="${escapeHtml(id)}" class="match-panel match-team-history" data-filter-section>
+    <div class="match-section-head match-team-history-head">
+      <div class="match-card-title">${renderCrest(team)}<div><span>${escapeHtml(role)}</span><h2>Últimos encuentros del ${escapeHtml(team.name)}</h2><p>Resultados y estadísticas anteriores a este partido.</p></div></div>
+      ${renderScopeControls()}
+    </div>
+    ${rows.length
+      ? renderResultTable(data, rows, team.id)
+      : '<p class="match-empty-copy">No hay resultados suficientes desde la temporada 2024/25.</p>'}
+  </section>`;
+};
 
 const renderH2h = (data, match, home, away) => {
   const rows = h2hMatches(data, match, "all");
@@ -757,28 +985,39 @@ const renderH2h = (data, match, home, away) => {
     },
     { home: 0, draw: 0, away: 0 }
   );
+  const total = rows.length;
+  const homeRate = total ? Math.round((summary.home / total) * 100) : 0;
+  const drawRate = total ? Math.round((summary.draw / total) * 100) : 0;
+  const awayRate = total ? Math.max(0, 100 - homeRate - drawRate) : 0;
+  const bothScoreRate = sampleRate(rows, (item) => {
+    if (!isFinished(item)) return null;
+    return Number(item.score?.home) > 0 && Number(item.score?.away) > 0;
+  });
 
   return `<section id="h2h" class="match-panel match-h2h-panel" data-filter-section>
     <div class="match-section-head">
-      <div><span>Resumen</span><h2>Enfrentamientos directos</h2></div>
+      <div><span>H2H reciente</span><h2>Últimos enfrentamientos entre ambos</h2><p>Historial directo anterior a este encuentro.</p></div>
       ${renderScopeControls()}
     </div>
     ${
       rows.length
-        ? `<div class="match-h2h-summary">
-            <div><small>${escapeHtml(home.name)}</small><strong>${summary.home}</strong></div>
-            <div><small>Empates</small><strong>${summary.draw}</strong></div>
-            <div><small>${escapeHtml(away.name)}</small><strong>${summary.away}</strong></div>
+        ? `<div class="match-h2h-balance">
+            <div class="match-h2h-outcomes">
+              <article>${renderCrest(home)}<div><strong>${homeRate}%</strong><span>${summary.home} victorias</span></div></article>
+              <article><div><strong>${drawRate}%</strong><span>${summary.draw} empates</span></div></article>
+              <article><div><strong>${awayRate}%</strong><span>${summary.away} victorias</span></div>${renderCrest(away)}</article>
+            </div>
+            <div class="match-h2h-bar" aria-label="Reparto de resultados"><i style="width:${homeRate}%"></i><i style="width:${drawRate}%"></i><i style="width:${awayRate}%"></i></div>
           </div>
           <div class="match-insight-strip">
+            <div><small>Total partidos</small><strong>${total}</strong></div>
             <div><small>Promedio goles</small><strong>${escapeHtml(formatStat(averageMatchGoals(rows), 2))}</strong></div>
-            <div><small>Tarjetas amarillas</small><strong>${escapeHtml(formatStat(averageMatchStat(rows, "yellowCards"), 2))}</strong></div>
-            <div><small>Córners</small><strong>${escapeHtml(formatStat(averageMatchStat(rows, "corners"), 2))}</strong></div>
-            <div><small>xG ${escapeHtml(home.name)}</small><strong>${escapeHtml(formatStat(averageTeamStat(rows, home.id, "xg"), 2))}</strong></div>
-            <div><small>xG ${escapeHtml(away.name)}</small><strong>${escapeHtml(formatStat(averageTeamStat(rows, away.id, "xg"), 2))}</strong></div>
+            <div><small>Ambos marcaron</small><strong>${bothScoreRate === null ? "—" : `${bothScoreRate}%`}</strong></div>
+            <div><small>Media ${escapeHtml(home.name)}</small><strong>${escapeHtml(formatStat(averageTeamGoals(rows, home.id), 2))}</strong></div>
+            <div><small>Media ${escapeHtml(away.name)}</small><strong>${escapeHtml(formatStat(averageTeamGoals(rows, away.id), 2))}</strong></div>
           </div>
           ${renderResultTable(data, rows, home.id, "h2h")}`
-        : '<div class="match-section-empty"><strong>Sin enfrentamientos recientes</strong><span>No hay H2H en la temporada actual o anterior.</span></div>'
+        : '<div class="match-section-empty"><strong>Sin enfrentamientos recientes</strong><span>No hay enfrentamientos previos disponibles desde 2024/25.</span></div>'
     }
   </section>`;
 };
@@ -803,36 +1042,189 @@ const renderProbabilities = (match) => {
   </dl>`;
 };
 
-const renderAnalysisSection = (match) => {
-  const keys = Array.isArray(match.keys) ? match.keys.filter(Boolean).slice(0, 5) : [];
-  const hasAnalysis = Boolean(text(match.analysis, "") || keys.length || match.probabilities);
+const renderAnalysisSection = (data, match, home, away) => {
+  const analysis = buildAutomaticAnalysis(data, match, home, away);
+  const keys = analysis.keys;
   return `<section id="analisis" class="match-panel match-analysis-panel">
     <div class="match-section-copy">
       <span>Análisis SigmaBet</span>
-      <h2>Lectura del partido</h2>
-      <p>${escapeHtml(text(match.analysis, "No hay ningún análisis disponible para este encuentro."))}</p>
+      <h2>Análisis del ${escapeHtml(home.name)} vs ${escapeHtml(away.name)}</h2>
+      <p>${escapeHtml(analysis.copy)}</p>
     </div>
     ${renderProbabilities(match)}
-    ${
-      keys.length
-        ? `<div class="match-analysis-grid">${keys
-            .map((key, index) => `<article><span>Clave ${index + 1}</span><strong>${escapeHtml(key)}</strong></article>`)
-            .join("")}</div>`
-        : hasAnalysis
-          ? ""
-          : '<div class="match-section-empty"><strong>Análisis pendiente</strong><span>Publicaremos la lectura cuando exista información suficiente.</span></div>'
-    }
+    <div class="match-analysis-grid">${keys
+      .map((key, index) => `<article><span>Dato ${index + 1}</span><strong>${escapeHtml(key)}</strong></article>`)
+      .join("")}</div>
+    <p class="match-analysis-source">La lectura usa únicamente partidos anteriores a la fecha del encuentro y separa el análisis editorial de cualquier apuesta publicada.</p>
   </section>`;
 };
 
-const renderBetSection = (match) => `<section id="apuestas" class="match-panel match-bet-section">
-  <div class="match-section-copy">
-    <span>Apuestas</span>
-    <h2>Apuesta con valor</h2>
-    <p>Predicción no significa apuesta. Si no existe valor claro, no se publica entrada.</p>
-  </div>
-  ${renderBet(match.mainBet)}
-</section>`;
+const renderBetSection = (data, match, home, away) => {
+  const forecast = buildForecast(data, match, home, away);
+  return `<section id="apuestas" class="match-panel match-bet-section match-forecast-panel">
+    <div class="match-section-copy">
+      <span>Pronóstico del encuentro</span>
+      <h2>${escapeHtml(forecast.tendency.label)}</h2>
+      <p>Lectura orientativa construida a partir del rendimiento reciente de ambos equipos y del contexto de localía.</p>
+    </div>
+    <div class="match-forecast-layout">
+      <article class="match-forecast-primary ${forecast.tendency.tone !== "neutral" ? "has-signal" : "is-neutral"}">
+        <span>Escenario principal</span>
+        <strong>${escapeHtml(forecast.tendency.label)}</strong>
+        <b>${forecast.tendency.confidence === null ? "—" : `${forecast.tendency.confidence}%`}</b>
+        <small>${forecast.sampleCount} partidos únicos anteriores al encuentro</small>
+      </article>
+      <div class="match-forecast-markets">
+        <article><span>Forma de ${escapeHtml(home.name)}</span><strong>${forecast.homeForm.rate === null ? "—" : `${forecast.homeForm.rate}%`}</strong><small>${forecast.homeForm.points} de ${forecast.homeForm.matches * 3} puntos posibles</small><i><b style="width:${forecast.homeForm.rate || 0}%"></b></i></article>
+        <article><span>Forma de ${escapeHtml(away.name)}</span><strong>${forecast.awayForm.rate === null ? "—" : `${forecast.awayForm.rate}%`}</strong><small>${forecast.awayForm.points} de ${forecast.awayForm.matches * 3} puntos posibles</small><i><b style="width:${forecast.awayForm.rate || 0}%"></b></i></article>
+        <article><span>Muestra H2H</span><strong>${forecast.h2hCount}</strong><small>enfrentamientos desde 2024/25</small><i><b style="width:${Math.min(100, forecast.h2hCount * 10)}%"></b></i></article>
+      </div>
+    </div>
+    <p class="match-forecast-note">El porcentaje expresa la fuerza de la tendencia estimada y no garantiza el resultado final.</p>
+    ${renderBet(match.mainBet)}
+  </section>`;
+};
+
+const renderSummaryMetric = (label, value, suffix = "") => `<article class="match-summary-metric">
+  <span>${escapeHtml(label)}</span>
+  <strong>${escapeHtml(value)}${suffix ? `<small>${escapeHtml(suffix)}</small>` : ""}</strong>
+</article>`;
+
+const buildEditorialPick = (data, match, home, away, analysis) => {
+  const scoreCandidate = (label, rows, test, reason) => {
+    const values = rows.map(test).filter((value) => value !== null);
+    const hits = values.filter(Boolean).length;
+    return { label, hits, total: values.length, rate: values.length ? Math.round((hits / values.length) * 100) : 0, reason };
+  };
+  const totals = analysis.sample;
+  const homeAtHome = teamMatches(data, match, home.id, "home", 10);
+  const awayAway = teamMatches(data, match, away.id, "away", 10);
+  const totalTest = (key, compare) => (item) => {
+    const value = matchMetricTotal(item, key);
+    return value === null ? null : compare(value);
+  };
+  const resultTest = (teamId) => (item) => {
+    const result = resultForTeam(item, teamId);
+    return result ? result !== "D" : null;
+  };
+  const candidates = [
+    scoreCandidate("Más de 1,5 goles", totals, totalTest("goals", (value) => value > 1.5), "La muestra reciente favorece un partido con al menos dos goles."),
+    scoreCandidate("Menos de 3,5 goles", totals, totalTest("goals", (value) => value < 3.5), "La mayoría de los encuentros recientes terminó por debajo de cuatro goles."),
+    scoreCandidate("Más de 7,5 córners", totals, totalTest("corners", (value) => value > 7.5), "El volumen reciente de córners respalda esta línea."),
+    scoreCandidate(`${home.name} o empate`, homeAtHome, resultTest(home.id), `El ${home.name} ha protegido el resultado jugando como local.`),
+    scoreCandidate(`${away.name} o empate`, awayAway, resultTest(away.id), `El ${away.name} ha protegido el resultado jugando como visitante.`),
+  ].filter((candidate) => candidate.total >= 4);
+  return candidates.sort((a, b) => b.rate - a.rate || b.total - a.total)[0] || {
+    label: "Esperar / sin apuesta", hits: 0, total: 0, rate: null, reason: "Todavía no hay una muestra suficiente para justificar una entrada.",
+  };
+};
+
+const renderMatchOverview = (data, match, home, away) => {
+  const analysis = buildAutomaticAnalysis(data, match, home, away);
+  const forecast = buildForecast(data, match, home, away);
+  const homeRecord = teamRecord(analysis.homeRows, home.id);
+  const awayRecord = teamRecord(analysis.awayRows, away.id);
+  const goals = average(analysis.sample.map((item) => matchMetricTotal(item, "goals")));
+  const corners = average(analysis.sample.map((item) => matchMetricTotal(item, "corners")));
+  const shots = average(analysis.sample.map((item) => matchMetricTotal(item, "shots")));
+  const onTarget = average(analysis.sample.map((item) => matchMetricTotal(item, "shotsOnTarget")));
+  const yellows = average(analysis.sample.map((item) => matchMetricTotal(item, "yellowCards")));
+  const actualBet = match.mainBet && match.mainBet.result !== "no_bet" ? renderBet(match.mainBet) : "";
+  const editorialPick = buildEditorialPick(data, match, home, away, analysis);
+  const lineWidth = (rate) => Math.max(0, Math.min(100, rate || 0));
+  const overOneFive = sampleRate(analysis.sample, (item) => {
+    const value = matchMetricTotal(item, "goals");
+    return value === null ? null : value > 1.5;
+  });
+  const bothScore = sampleRate(analysis.sample, (item) => {
+    if (!isFinished(item)) return null;
+    return Number(item.score?.home) > 0 && Number(item.score?.away) > 0;
+  });
+  const homeGoalsFor = averageTeamGoals(analysis.homeRows, home.id);
+  const homeGoalsAgainst = averageTeamGoals(analysis.homeRows, home.id, "against");
+  const awayGoalsFor = averageTeamGoals(analysis.awayRows, away.id);
+  const awayGoalsAgainst = averageTeamGoals(analysis.awayRows, away.id, "against");
+  const fouls = average(analysis.sample.map((item) => matchMetricTotal(item, "fouls")));
+  const percentageCopy = (value) => value === null ? "sin una muestra completa" : `en el ${value}% de la muestra`;
+  return `<section id="pronostico" class="match-panel match-summary-panel">
+    <header class="match-summary-heading">
+      <div><span>Nuestra lectura del encuentro</span><h2>${escapeHtml(forecast.tendency.label)}</h2><p>Rendimiento anterior al encuentro · ${analysis.sample.length} partidos únicos analizados</p></div>
+      <div class="match-confidence"><strong>${forecast.tendency.confidence === null ? "—" : `${forecast.tendency.confidence}%`}</strong><span>fuerza de la tendencia</span></div>
+    </header>
+    <div class="match-form-comparison">
+      <article>
+        <div>${renderCrest(home)}<div><span>${escapeHtml(home.name)}</span><strong>${homeRecord.wins}V · ${homeRecord.draws}E · ${homeRecord.losses}D</strong></div></div>
+        <b>${forecast.homeForm.rate === null ? "—" : `${forecast.homeForm.rate}%`}</b>
+        <i><span style="width:${lineWidth(forecast.homeForm.rate)}%"></span></i>
+      </article>
+      <div class="match-form-divider"><span>FORMA</span><b>VS</b></div>
+      <article>
+        <div>${renderCrest(away)}<div><span>${escapeHtml(away.name)}</span><strong>${awayRecord.wins}V · ${awayRecord.draws}E · ${awayRecord.losses}D</strong></div></div>
+        <b>${forecast.awayForm.rate === null ? "—" : `${forecast.awayForm.rate}%`}</b>
+        <i><span style="width:${lineWidth(forecast.awayForm.rate)}%"></span></i>
+      </article>
+    </div>
+    <div class="match-summary-metrics">
+      ${renderSummaryMetric("Goles", formatDecimalEs(goals, 1), "media")}
+      ${renderSummaryMetric("Córners", formatDecimalEs(corners, 1), "media")}
+      ${renderSummaryMetric("Remates", formatDecimalEs(shots, 1), "media")}
+      ${renderSummaryMetric("A puerta", formatDecimalEs(onTarget, 1), "media")}
+      ${renderSummaryMetric("Amarillas", formatDecimalEs(yellows, 1), "media")}
+      ${renderSummaryMetric("H2H", String(analysis.h2hRows.length), "partidos")}
+    </div>
+    <div class="match-key-readings">${analysis.keys.slice(0, 3).map((key) => `<p><i aria-hidden="true"></i><span>${escapeHtml(key)}</span></p>`).join("")}</div>
+    <div class="match-editorial-analysis">
+      <article>
+        <span class="match-editorial-icon" aria-hidden="true">⚽</span>
+        <div><h3>Predicción de goles</h3><p>${escapeHtml(home.name)} marca ${formatDecimalEs(homeGoalsFor, 2)} y recibe ${formatDecimalEs(homeGoalsAgainst, 2)} goles de media; ${escapeHtml(away.name)} marca ${formatDecimalEs(awayGoalsFor, 2)} y recibe ${formatDecimalEs(awayGoalsAgainst, 2)}. La línea de 1,5 goles se superó ${percentageCopy(overOneFive)} y ambos equipos marcaron ${percentageCopy(bothScore)}.</p></div>
+      </article>
+      <article>
+        <span class="match-editorial-icon" aria-hidden="true">⚑</span>
+        <div><h3>Predicción de córners</h3><p>Los encuentros recientes de ambos equipos promedian ${formatDecimalEs(corners, 2)} córners. Este dato se calcula con ${analysis.sample.length} partidos únicos anteriores al encuentro y sirve para situar el posible volumen ofensivo.</p></div>
+      </article>
+      <article>
+        <span class="match-editorial-icon match-card-icon" aria-hidden="true"></span>
+        <div><h3>Predicción de tarjetas</h3><p>La muestra registra ${formatDecimalEs(yellows, 2)} tarjetas amarillas y ${formatDecimalEs(fouls, 2)} faltas por partido. El árbitro y las alineaciones confirmadas pueden cambiar esta lectura antes del inicio.</p></div>
+      </article>
+      <article class="match-editorial-conclusion">
+        <span class="match-editorial-icon" aria-hidden="true">★</span>
+        <div><h3>Pronóstico editorial</h3><p>${escapeHtml(analysis.copy)}</p></div>
+      </article>
+    </div>
+    <article class="match-editorial-pick match-editorial-pick-final">
+      <span>Apuesta que haríamos</span>
+      <strong>${escapeHtml(editorialPick.label)}</strong>
+      <div><b>${editorialPick.rate === null ? "—" : `${editorialPick.rate}%`}</b><small>${editorialPick.total ? `${editorialPick.hits} de ${editorialPick.total} partidos de la muestra` : "Sin muestra suficiente"}</small></div>
+      <p>${escapeHtml(editorialPick.reason)}</p>
+    </article>
+    ${renderProbabilities(match)}
+    ${actualBet}
+    <aside class="match-telegram-method"><div><span>La apuesta oficial del día</span><strong>Cuota mínima, stake y seguimiento en Telegram</strong><p>Únete gratis para seguir el método SigmaBet y recibir cada publicación.</p></div><a href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Ver apuesta en Telegram →</a></aside>
+    <p class="match-summary-note">Los porcentajes describen la muestra histórica y no garantizan el resultado.</p>
+  </section>`;
+};
+
+const renderFinishedMatchStats = (match, home, away) => {
+  if (!isFinished(match)) return "";
+  const rows = [
+    renderComparisonMetric(match, "shots", "Remates"),
+    renderComparisonMetric(match, "shotsOnTarget", "A puerta"),
+    renderComparisonMetric(match, "corners", "Córners"),
+    renderComparisonMetric(match, "fouls", "Faltas"),
+    renderComparisonMetric(match, "yellowCards", "Amarillas"),
+    renderComparisonMetric(match, "redCards", "Rojas"),
+  ].filter(Boolean).join("");
+  if (!rows) return "";
+  return `<section id="estadisticas" class="match-panel match-current-stats">
+    <div class="match-section-head"><div><span>Datos del partido</span><h2>Estadísticas del encuentro</h2></div><small>Resultado final</small></div>
+    <div class="match-current-team-labels"><span>${renderCrest(home)}<strong>${escapeHtml(home.name)}</strong></span><b>${escapeHtml(scoreText(match))}</b><span><strong>${escapeHtml(away.name)}</strong>${renderCrest(away)}</span></div>
+    <div class="match-period-score">
+      <span><small>1.ª mitad</small><strong>${escapeHtml(formatStat(periodGoals(match, 1, "home")))} – ${escapeHtml(formatStat(periodGoals(match, 1, "away")))}</strong></span>
+      <span><small>2.ª mitad</small><strong>${escapeHtml(formatStat(periodGoals(match, 2, "home")))} – ${escapeHtml(formatStat(periodGoals(match, 2, "away")))}</strong></span>
+    </div>
+    <div class="match-comparison-grid">${rows}</div>
+  </section>`;
+};
 
 const renderCrest = (team) =>
   team?.crest
@@ -889,9 +1281,9 @@ const renderMatch = (data, match) => {
   const away = teams.get(match.awayTeamId) || { name: "Equipo visitante", slug: "" };
   const round = data.rounds.find((item) => item.id === match.roundId) || { name: "Jornada pendiente", slug: "" };
   const title = `${home.name} vs ${away.name}: análisis y pronóstico | SigmaBet`;
-  const description = `Análisis del ${home.name} vs ${away.name} con estadísticas, H2H, bajas, posibles alineaciones, probabilidades y apuestas con valor de SigmaBet.`;
+  const description = `Pronóstico y análisis del ${home.name} vs ${away.name}: últimos partidos, H2H, goles, remates, córners, tarjetas, alineaciones y bajas desde 2024/25.`;
   const canonical = `https://sigmabet.es/partidos/${match.slug}/`;
-  const refereeCards = refereeCardAverages(data, match.referee);
+  const refereeCards = refereeCardAverages(data, match.referee, match);
   const body = `
     <nav class="match-breadcrumb" aria-label="Migas de pan"><a href="/index.html">Inicio</a><span>/</span><a href="/competiciones/laliga/">LaLiga</a><span>/</span><span>${escapeHtml(round.name)}</span></nav>
     <article class="match-page">
@@ -915,19 +1307,21 @@ const renderMatch = (data, match) => {
             icon: "card",
             label: "Media tarjetas",
             value: refereeCards
-              ? `<span class="ref-card-stats"><b class="card-yellow">${refereeCards.yellow.toFixed(2)}</b><b class="card-red">${refereeCards.red.toFixed(2)}</b></span>`
+              ? `<span class="ref-card-stats"><b class="card-yellow">${formatStat(refereeCards.yellow, 2)}</b><b class="card-red">${formatStat(refereeCards.red, 2)}</b></span>`
               : '<span class="ref-card-empty">Sin datos</span>',
-            extra: refereeCards ? `<small>${refereeCards.matches} partidos con datos</small>` : "",
+            extra: refereeCards ? `<small>Muestra: TA ${refereeCards.yellowMatches} · TR ${refereeCards.redMatches} · desde 2024/25</small>` : "",
           })}
         </div>
         ${renderScoreHero(data, match, home, away)}
       </header>
-      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a class="is-active" href="#h2h">Resumen</a><a href="#h2h">H2H</a><a href="#alineaciones">Alineaciones</a><a href="#bajas">Bajas</a><a href="#resultados">Resultados</a><a href="#analisis">Análisis</a><a href="#apuestas">Pronóstico</a></nav>
+      <nav class="match-anchor-nav" aria-label="Navegación del partido"><a class="is-active" href="#local">Equipo local</a><a href="#visitante">Equipo visitante</a><a href="#h2h">H2H</a>${isFinished(match) ? '<a href="#estadisticas">Estadísticas</a>' : ""}<a href="#alineaciones">Alineaciones</a><a href="#bajas">Bajas</a><a href="#pronostico">Pronóstico</a><a class="match-telegram-link" href="https://t.me/SigmaBetES" target="_blank" rel="noreferrer" data-telegram-link>Seguir apuestas</a></nav>
+      ${renderTeamHistorySection(data, match, home, "local", "Equipo local")}
+      ${renderTeamHistorySection(data, match, away, "visitante", "Equipo visitante")}
       ${renderH2h(data, match, home, away)}
+      ${renderFinishedMatchStats(match, home, away)}
       ${renderSquadSection(match, home, away)}
-      ${renderRecentResultsSection(data, match, home, away)}
-      ${renderAnalysisSection(match)}
-      ${renderBetSection(match)}
+      ${renderMatchOverview(data, match, home, away)}
+      ${match.footballDataId ? `<p class="match-source-note">Calendario, resultados y árbitros: <a href="https://www.football-data.org">football-data.org</a>. Estadísticas del encuentro: <a href="https://www.football-data.co.uk">football-data.co.uk</a>. Actualizado ${escapeHtml(formatShortDate(data.lastUpdated))}; los datos gratuitos pueden publicarse con retraso.</p>` : ""}
     </article>`;
 
   const structuredData = {
@@ -947,7 +1341,7 @@ const renderMatch = (data, match) => {
 };
 
 const build = () => {
-  const data = mergeEditorial(mergeTeamResults(readData(), readTeamResults()), readEditorial());
+  const data = mergeEditorial(mergeTeamResults(mergeHistory(readData(), readJson(historyPath, {})), readTeamResults()), readEditorial());
   const publicMatches = data.matches.filter((match) => match.slug);
 
   publicMatches.forEach((match) => {
@@ -957,4 +1351,16 @@ const build = () => {
   console.log(`SigmaBet prepartido: ${publicMatches.length} páginas de partido generadas.`);
 };
 
-build();
+if (require.main === module) build();
+module.exports = {
+  mergeHistory,
+  mergeTeamResults,
+  refereeCardAverages,
+  sideStat,
+  periodGoals,
+  isFinished,
+  matchMetricTotal,
+  buildAutomaticAnalysis,
+  buildForecast,
+  buildEditorialPick,
+};

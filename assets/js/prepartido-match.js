@@ -31,8 +31,44 @@ document.querySelectorAll("[data-filter-section]").forEach((section) => {
       const scope = button.dataset.scopeFilter || "all";
       buttons.forEach((item) => item.classList.toggle("is-active", item === button));
       rows.forEach((row) => {
-        row.hidden = scope !== "all" && row.dataset.scopeRow !== scope;
+        const outsideScope = scope !== "all" && row.dataset.scopeRow !== scope;
+        const collapsed = row.hasAttribute("data-extra-match") && section.dataset.resultsExpanded !== "true";
+        row.hidden = outsideScope || collapsed;
       });
     });
   });
+});
+
+document.querySelectorAll("[data-show-more]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const section = button.closest("[data-filter-section]");
+    if (!section) return;
+    section.dataset.resultsExpanded = "true";
+    const scope = section.querySelector("[data-scope-filter].is-active")?.dataset.scopeFilter || "all";
+    section.querySelectorAll("[data-extra-match]").forEach((row) => {
+      row.hidden = scope !== "all" && row.dataset.scopeRow !== scope;
+    });
+    button.remove();
+  });
+});
+
+const anchorLinks = [...document.querySelectorAll('.match-anchor-nav a[href^="#"]')];
+anchorLinks.forEach((link) => link.addEventListener("click", () => {
+  anchorLinks.forEach((item) => item.classList.toggle("is-active", item === link));
+}));
+
+if ("IntersectionObserver" in window && anchorLinks.length) {
+  const sections = anchorLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible) return;
+    anchorLinks.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === `#${visible.target.id}`));
+  }, { rootMargin: "-25% 0px -60%", threshold: [0.05, 0.3] });
+  sections.forEach((section) => observer.observe(section));
+}
+
+window.addEventListener("load", () => {
+  if (!window.location.hash) return;
+  const target = document.getElementById(window.location.hash.slice(1));
+  if (target) window.requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
 });
