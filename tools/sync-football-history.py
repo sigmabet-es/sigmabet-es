@@ -33,6 +33,7 @@ CSV_STATS = {'firstHalfGoals':('HTHG','HTAG'),'shots':('HS','AS'),'shotsOnTarget
     'corners':('HC','AC'),'yellowCards':('HY','AY'),'redCards':('HR','AR'),'fouls':('HF','AF')}
 REQUIRED = ['firstHalfGoals','secondHalfGoals','shots','shotsOnTarget','corners',
             'yellowCards','redCards','fouls']
+CACHE_TTL_SECONDS = 5 * 60 * 60
 
 
 def number(value):
@@ -82,7 +83,7 @@ def download(url, token=None, provider='org', csv_file=False):
 def load_source(db, key, url, token, offline, current=False, csv_file=False):
     saved = read_cache(db,key)
     stamp = db.execute('SELECT updated FROM history_sources WHERE key=?',(key,)).fetchone()
-    fresh = stamp and (dt.datetime.now(dt.timezone.utc)-dt.datetime.fromisoformat(stamp[0])).total_seconds()<21600
+    fresh = stamp and (dt.datetime.now(dt.timezone.utc)-dt.datetime.fromisoformat(stamp[0])).total_seconds()<CACHE_TTL_SECONDS
     if saved is not None and (not current or fresh or offline): return saved
     if offline: raise ValueError('No hay copia local de '+key)
     if not token and not csv_file: raise ValueError('Falta el token para '+key)

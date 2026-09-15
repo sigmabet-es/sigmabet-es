@@ -10,7 +10,7 @@ La web publica una copia JSON de LaLiga. Las visitas nunca consultan el proveedo
 - Datos ausentes se mantienen como `null`; no se inventan estadísticas avanzadas.
 - Los resultados y horarios del plan gratuito pueden llegar con retraso.
 
-Son tres consultas por sincronización: partidos, equipos y clasificación. Se separan por 6,1 segundos. Las respuestas válidas de menos de seis horas se reutilizan sin consultar la API; no hay reintentos automáticos. Un bloqueo impide sincronizaciones locales simultáneas. Con cuatro ejecuciones diarias se utilizan normalmente 12 consultas/día, independientemente del tráfico web.
+Son tres consultas por sincronización: partidos, equipos y clasificación. Se separan por 6,1 segundos. Las respuestas válidas de menos de cinco horas se reutilizan sin consultar la API; no hay reintentos automáticos. Un bloqueo impide sincronizaciones locales simultáneas. El workflow programado fuerza una descarga cada seis horas, por lo que utiliza normalmente 12 consultas/día, independientemente del tráfico web.
 
 ## Uso local
 

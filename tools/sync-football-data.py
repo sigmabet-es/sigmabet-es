@@ -17,6 +17,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://api.football-data.org/v4/competitions/PD'
+CACHE_TTL_SECONDS = 5 * 60 * 60
 STATUS = {'SCHEDULED': 'proximo', 'TIMED': 'proximo', 'IN_PLAY': 'en_directo',
           'PAUSED': 'en_directo', 'FINISHED': 'finalizado', 'POSTPONED': 'aplazado',
           'SUSPENDED': 'suspendido', 'CANCELLED': 'cancelado', 'AWARDED': 'finalizado'}
@@ -184,7 +185,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--db', required=True, type=Path, help='Private SQLite path OUTSIDE the public repository')
     parser.add_argument('--output', type=Path, default=ROOT / 'data/prepartido/laliga.json')
-    parser.add_argument('--force', action='store_true', help='Ignore the six-hour freshness check')
+    parser.add_argument('--force', action='store_true', help='Ignore the five-hour freshness check')
     args = parser.parse_args()
     if args.db.resolve().is_relative_to(ROOT):
         parser.error('La base SQLite debe estar fuera del repositorio público.')
@@ -200,7 +201,7 @@ def main():
             db.execute('CREATE TABLE IF NOT EXISTS snapshots (id INTEGER PRIMARY KEY CHECK(id=1), updated TEXT, payload TEXT)')
             cached = db.execute('SELECT updated, payload FROM snapshots WHERE id=1').fetchone()
             now = dt.datetime.now(dt.timezone.utc)
-            if cached and not args.force and (now - dt.datetime.fromisoformat(cached[0])).total_seconds() < 21600:
+            if cached and not args.force and (now - dt.datetime.fromisoformat(cached[0])).total_seconds() < CACHE_TTL_SECONDS:
                 export(json.loads(cached[1]), args.output)
                 print('Copia vigente: 0 consultas a la API.')
                 return

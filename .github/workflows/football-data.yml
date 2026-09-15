@@ -34,7 +34,7 @@ jobs:
         env:
           FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
         run: |
-          python3 tools/sync-football-data.py --db "$RUNNER_TEMP/sigmabet-private/football.sqlite"
+          python3 tools/sync-football-data.py --force --db "$RUNNER_TEMP/sigmabet-private/football.sqlite"
           python3 tools/sync-football-history.py --db "$RUNNER_TEMP/sigmabet-private/football.sqlite"
           node tools/build-prepartido.js
       - name: Guardar cambios públicos

@@ -87,6 +87,9 @@ class FootballDataTests(unittest.TestCase):
                 request.assert_not_called()
             self.assertEqual(json.loads(output.read_text()), snapshot)
 
+    def test_cache_expires_before_the_six_hour_schedule(self):
+        self.assertLess(sync.CACHE_TTL_SECONDS, 6 * 60 * 60)
+
     def test_failed_download_keeps_existing_public_data(self):
         with tempfile.TemporaryDirectory() as directory:
             db_path = Path(directory) / 'private.sqlite'
