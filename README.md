@@ -47,3 +47,7 @@ La URL del CSV puede configurarse con `SIGMABET_REGISTRY_CSV_URL`. Si el hosting
 ## Publicacion
 
 Repositorio preparado para publicar desde la cuenta `sigmabet-es`.
+
+## Calendario automático gratuito
+
+LaLiga se sincroniza desde football-data.org con una base SQLite privada y una copia pública sin claves. Consulta [configuración y activación](docs/football-data.md). El workflow requiere el secreto `FOOTBALL_DATA_TOKEN`; la actualización de la web publicada depende del despliegue del proyecto.
