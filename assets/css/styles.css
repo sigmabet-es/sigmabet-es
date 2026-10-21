@@ -14892,3 +14892,69 @@ nav[aria-label="Footer"] a[href="/partidos/"] {
 .registry-ledger-meta { flex-wrap: wrap; }
 
 .chart-callout-card .chart-bet-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Registro: resumen primero y herramientas discretas para consultar el historial. */
+.registry-only .registry-overview > .registry-summary-first { order: -1; }
+.registry-only .registry-summary-first article:nth-child(-n+4) > span { color: #b5b5b5; }
+.registry-only .registry-summary-first article:nth-child(n+5) strong { color: #b5b5b5; }
+.registry-pending-section { margin: 24px 0 30px; }
+.registry-pending-section[hidden],
+.registry-load-more[hidden] { display: none; }
+.registry-load-more:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.registry-load-more {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.registry-load-more:hover { background: rgba(255,255,255,.04); }
+
+
+/* Valor Sigma: misma señal visual que en Telegram. */
+.registry-ledger-meta .registry-sigma,
+.registry-pending-metrics .registry-sigma {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  cursor: help;
+}
+.registry-sigma .sigma-diamond {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke: #dce7f0;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.registry-ledger-meta .registry-sigma b,
+.registry-pending-metrics .registry-sigma b { margin: 0; color: #fff; font-variant-numeric: tabular-nums; }
+.sigma-value-tooltip {
+  position: fixed;
+  z-index: 10000;
+  box-sizing: border-box;
+  width: 250px;
+  max-width: calc(100vw - 24px);
+  padding: 12px 14px;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  background: #181818;
+  color: #dedede;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.55;
+  white-space: normal;
+  box-shadow: 0 8px 24px #0007;
+  pointer-events: none;
+}
+.sigma-value-tooltip[hidden] { display: none; }
+.registry-sigma:focus-visible { outline: 1px solid #fff; outline-offset: 4px; border-radius: 3px; }

@@ -623,8 +623,49 @@ if (registry) {
     const raw = String(row.valorSigma ?? "").trim();
     // Conservar la escala de la hoja: no convertir valores sin unidad a porcentajes.
     const label = raw ? raw.replace(/(\d)\.(?=\d)/g, "$1,") : "—";
-    return `<span class="registry-sigma" title="Valor Sigma · EV estimado de la apuesta">Valor Sigma <b>${escapeHtml(label)}</b></span>`;
+    return `<span class="registry-sigma" tabindex="0" aria-label="Valor Sigma ${escapeHtml(label)}" aria-describedby="sigma-value-tooltip"><svg class="sigma-diamond" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10l5 6-10 11L2 10 7 4Z"/><path d="m7 4 5 17 5-17M2 10h20M7 4l5 6 5-6"/></svg><b>${escapeHtml(label)}</b></span>`;
   };
+
+  // Fuera de las tarjetas para evitar recortes por overflow o contain.
+  const sigmaTooltip = document.createElement("div");
+  sigmaTooltip.id = "sigma-value-tooltip";
+  sigmaTooltip.className = "sigma-value-tooltip";
+  sigmaTooltip.setAttribute("role", "tooltip");
+  sigmaTooltip.textContent = "Valor Sigma: ventaja estimada de la apuesta según nuestro análisis. No garantiza el resultado.";
+  sigmaTooltip.hidden = true;
+  document.body.append(sigmaTooltip);
+  let sigmaAnchor = null;
+  const hideSigmaTooltip = () => { sigmaTooltip.hidden = true; sigmaAnchor = null; };
+  const showSigmaTooltip = (anchor) => {
+    sigmaAnchor = anchor;
+    sigmaTooltip.hidden = false;
+    const bounds = anchor.getBoundingClientRect();
+    const box = sigmaTooltip.getBoundingClientRect();
+    const margin = 12;
+    const left = Math.max(margin, Math.min(bounds.left + bounds.width / 2 - box.width / 2, window.innerWidth - box.width - margin));
+    const below = bounds.bottom + 10;
+    const top = below + box.height <= window.innerHeight - margin ? below : Math.max(margin, bounds.top - box.height - 10);
+    sigmaTooltip.style.left = `${left}px`;
+    sigmaTooltip.style.top = `${top}px`;
+  };
+  registry.addEventListener("pointerover", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor && anchor !== sigmaAnchor) showSigmaTooltip(anchor);
+  });
+  registry.addEventListener("pointerout", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor && !anchor.contains(event.relatedTarget)) hideSigmaTooltip();
+  });
+  registry.addEventListener("focusin", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor) showSigmaTooltip(anchor);
+  });
+  registry.addEventListener("focusout", (event) => {
+    if (event.target.closest?.(".registry-sigma")) hideSigmaTooltip();
+  });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") hideSigmaTooltip(); });
+  window.addEventListener("scroll", hideSigmaTooltip, { passive: true, capture: true });
+  window.addEventListener("resize", hideSigmaTooltip, { passive: true });
 
   const formatPercent = (value) => `${(value * 100).toFixed(2)}%`;
 
@@ -1248,18 +1289,18 @@ if (registry) {
     plotTarget?.addEventListener("mouseleave", hideDetail);
   };
 
-  const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.") => {
-    if (!rowsTarget) return;
-    if (countTarget) {
+  const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.", target = rowsTarget, updateCount = true) => {
+    if (!target) return;
+    if (countTarget && updateCount) {
       countTarget.textContent = `${visibleRows.length} ${visibleRows.length === 1 ? "apuesta" : "apuestas"}`;
     }
 
     if (!visibleRows.length) {
-      rowsTarget.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(emptyMessage)}</div>`;
+      target.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(emptyMessage)}</div>`;
       return;
     }
 
-    rowsTarget.innerHTML = visibleRows
+    target.innerHTML = visibleRows
       .map((row) => {
         const profit = numberFrom(row.profit);
         const profitClass = profit > 0 ? "profit-positive" : profit < 0 ? "profit-negative" : "";
@@ -1387,13 +1428,31 @@ if (registry) {
     filters.month.disabled = filters.year.disabled = !months.size;
   };
 
+  const historyMore = registry.querySelector("[data-history-more]");
+  let historyLimit = 20;
+  const renderHistory = () => {
+    hideSigmaTooltip();
+    const periodRows = registryRows.filter(rowMatchesFilters);
+    const pending = periodRows.filter((row) => !isSettled(row)).reverse();
+    const pendingSection = registry.querySelector("[data-pending-section]");
+    if (pendingSection) {
+      pendingSection.hidden = !pending.length;
+      registry.querySelector("[data-pending-count]").textContent = `${pending.length} abiertas`;
+      renderRows(pending, "", registry.querySelector("[data-pending-rows]"), false);
+    }
+    const rows = periodRows.filter(isSettled).reverse();
+    renderRows(rows.slice(0, historyLimit), "No hay apuestas cerradas en el periodo seleccionado.", rowsTarget, false);
+    if (countTarget) countTarget.textContent = `${Math.min(historyLimit, rows.length)} de ${rows.length} apuestas`;
+    if (historyMore) historyMore.hidden = rows.length <= historyLimit;
+  };
+  historyMore?.addEventListener("click", () => { historyLimit += 20; renderHistory(); });
+
   const renderRegistryView = ({ source = "fresh" } = {}) => {
     const filteredRows = registryRows.filter(rowMatchesFilters);
-    const displayRows = [...filteredRows].reverse();
     const settledRows = filteredRows.filter(isSettled);
     renderSummary(filteredRows);
     renderRegistryChart(filteredRows);
-    renderRows(displayRows, "Todavía no existen apuestas cerradas en este periodo.");
+    renderHistory();
 
     if (source === "stale") {
       updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
@@ -1480,6 +1539,7 @@ if (registry) {
   Object.values(filters).forEach((filter) => {
     filter?.addEventListener("change", () => {
       if (registryHasTerminalError) return;
+      historyLimit = 20;
       if (filter === filters.year) updateMonthOptions();
       updateCustomRangeVisibility();
       renderRegistryView();
