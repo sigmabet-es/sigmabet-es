@@ -14878,7 +14878,7 @@ nav[aria-label="Footer"] a[href="/partidos/"] {
 
 .registry-ledger-meta .registry-sigma b,
 .registry-pending-metrics .registry-sigma b,
-.chart-sigma-metric dd { color: #d6c399; }
+.chart-sigma-metric dd { color: #ffffff; }
 .registry-pending-metrics {
   display: flex;
   align-items: center;
