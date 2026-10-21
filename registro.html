@@ -6,8 +6,8 @@
     <title>Registro público | SigmaBet</title>
     <meta name="description" content="Historial público de apuestas de SigmaBet: cuota, stake, resultado, unidades, balance y Yield." />
     <link rel="icon" href="assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260709-05" />
-    <script src="assets/js/main.js?v=20260709-05" defer></script>
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261021-chart-static-1" />
+    <script src="assets/js/main.js?v=20261021-chart-static-1" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -48,13 +48,20 @@
                       <span>Rango</span>
                       <select aria-label="Filtrar gráfico por tiempo" data-filter="time">
                         <option value="Todos" selected>Histórico</option>
-                        <option value="7d">7 días</option>
-                        <option value="30d">30 días</option>
-                        <option value="90d">90 días</option>
-                        <option value="365d">1 año</option>
+                        <option value="month">Mes</option>
                         <option value="custom">Personalizado</option>
                       </select>
                     </label>
+                    <div class="registry-month-picker" data-month-range hidden>
+                      <label>
+                        <span>Año</span>
+                        <select aria-label="Seleccionar año" data-filter="year"></select>
+                      </label>
+                      <label>
+                        <span>Mes</span>
+                        <select aria-label="Seleccionar mes" data-filter="month"></select>
+                      </label>
+                    </div>
                     <div class="registry-custom-range" id="registry-date-panel" data-custom-range hidden>
                       <label>
                         <span>Desde</span>

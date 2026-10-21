@@ -190,6 +190,7 @@ if (signalNavLink || signalFeed) {
     partido: ["partido", "evento", "encuentro", "match"],
     apuesta: ["apuesta", "pick", "seleccion", "selección", "mercado"],
     cuota: ["cuota", "odd"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado", "estado", "resultado pick"],
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades", "uds", "beneficio", "lucro"],
@@ -252,6 +253,7 @@ if (signalNavLink || signalFeed) {
           partido: signalCell(row, headers, "partido"),
           apuesta,
           cuota: signalCell(row, headers, "cuota"),
+          valorSigma: signalCell(row, headers, "valorSigma"),
           resultado: signalCell(row, headers, "resultado"),
           stake: signalCell(row, headers, "stake"),
           profit: signalCell(row, headers, "profit"),
@@ -551,6 +553,8 @@ if (registry) {
   const registryOverview = registry.querySelector(".registry-overview");
   const filters = {
     time: registry.querySelector('[data-filter="time"]'),
+    year: registry.querySelector('[data-filter="year"]'),
+    month: registry.querySelector('[data-filter="month"]'),
     from: registry.querySelector('[data-filter="from"]'),
     to: registry.querySelector('[data-filter="to"]'),
   };
@@ -612,7 +616,14 @@ if (registry) {
   const formatUnits = (value) => {
     const number = numberFrom(value);
     const sign = number > 0 ? "+" : "";
-    return `${sign}${number.toFixed(2)} u`;
+    return `${sign}${number.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} u`;
+  };
+
+  const sigmaMarkup = (row) => {
+    const raw = String(row.valorSigma ?? "").trim();
+    // Conservar la escala de la hoja: no convertir valores sin unidad a porcentajes.
+    const label = raw ? raw.replace(/(\d)\.(?=\d)/g, "$1,") : "—";
+    return `<span class="registry-sigma" title="Valor Sigma · EV estimado de la apuesta">Valor Sigma <b>${escapeHtml(label)}</b></span>`;
   };
 
   const formatPercent = (value) => `${(value * 100).toFixed(2)}%`;
@@ -720,6 +731,7 @@ if (registry) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades"],
@@ -795,6 +807,7 @@ if (registry) {
           apuesta,
           casa: getCell(row, headers, "casa"),
           cuota: getCell(row, headers, "cuota"),
+          valorSigma: getCell(row, headers, "valorSigma"),
           resultado: getCell(row, headers, "resultado"),
           stake: getCell(row, headers, "stake"),
           profit: getCell(row, headers, "profit"),
@@ -911,8 +924,9 @@ if (registry) {
 
   const updateCustomRangeVisibility = () => {
     const isCustom = filters.time?.value === "custom";
-    if (!customRange) return;
-    customRange.hidden = !isCustom;
+    if (customRange) customRange.hidden = !isCustom;
+    const monthRange = registry.querySelector("[data-month-range]");
+    if (monthRange) monthRange.hidden = filters.time?.value !== "month";
   };
 
   const rowMatchesTime = (row) => {
@@ -922,36 +936,15 @@ if (registry) {
     const date = parseDate(row.fecha);
     if (!date) return false;
 
-    const now = new Date();
-    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (value === "month") {
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      return filters.month?.value === key;
+    }
+
     if (value === "custom") {
       const from = filters.from?.value ? new Date(`${filters.from.value}T00:00:00`) : null;
       const to = filters.to?.value ? new Date(`${filters.to.value}T23:59:59`) : null;
       return (!from || date >= from) && (!to || date <= to);
-    }
-
-    if (value === "7d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 6);
-      return date >= start && date <= now;
-    }
-
-    if (value === "30d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 29);
-      return date >= start && date <= now;
-    }
-
-    if (value === "90d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 89);
-      return date >= start && date <= now;
-    }
-
-    if (value === "365d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 364);
-      return date >= start && date <= now;
     }
 
     return true;
@@ -1036,20 +1029,27 @@ if (registry) {
       return balance;
     });
     const values = points.length ? [0, ...points] : [0, 0];
-    const min = Math.min(...values, 0);
-    const max = Math.max(...values, 0);
-    const range = max - min || 1;
+    const dataMin = Math.min(...values, 0);
+    const dataMax = Math.max(...values, 0);
+    const roughStep = Math.max(1, (dataMax - dataMin) / 4);
+    const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+    const step = [1, 2, 5, 10].map((factor) => factor * magnitude).find((value) => value >= roughStep);
+    const min = Math.floor(dataMin / step) * step;
+    const max = Math.max(min + step, Math.ceil(dataMax / step) * step);
+    const range = max - min;
+    const scaleTicks = Array.from({ length: Math.round(range / step) + 1 }, (_, index) => max - index * step);
     const width = 640;
     const height = 240;
     const padX = 28;
     const padY = 30;
     const innerW = width - padX * 2;
     const innerH = height - padY * 2;
-    const coords = values.map((value, index) => {
-      const x = padX + (innerW * index) / Math.max(values.length - 1, 1);
-      const y = padY + innerH - ((value - min) / range) * innerH;
-      return { value, x, y };
-    });
+    // Una distancia uniforme por apuesta; el zoom cambia la ventana visible.
+    const coords = values.map((value, index) => ({
+      value,
+      x: padX + innerW * index / Math.max(1, values.length - 1),
+      y: padY + innerH - ((value - min) / range) * innerH,
+    }));
     const betSegments = settled.map((row, index) => {
       const from = coords[index];
       const to = coords[index + 1];
@@ -1063,6 +1063,29 @@ if (registry) {
         cumulative,
       };
     });
+    // El eje avanza por apuesta: cada mes ocupa el tramo de sus operaciones.
+    const monthBands = [];
+    settled.forEach((row, index) => {
+      const date = parseDate(row.fecha);
+      const key = date ? `${date.getFullYear()}-${date.getMonth()}` : "unknown";
+      const previous = monthBands[monthBands.length - 1];
+      if (previous?.key === key) {
+        previous.end = coords[index + 1].x;
+        previous.profit += numberFrom(row.profit);
+      } else {
+        monthBands.push({ key, date, start: coords[index].x, end: coords[index + 1].x, profit: numberFrom(row.profit) });
+      }
+    });
+    const monthMarkup = monthBands.map((band, index) =>
+      `<rect class="chart-month-band${index % 2 ? ' chart-month-band-alt' : ''}" x="${band.start}" y="${padY}" width="${band.end - band.start}" height="${innerH}" />${index ? `<line class="chart-month-divider" x1="${band.start}" x2="${band.start}" y1="${padY}" y2="${height - padY}" />` : ""}`
+    ).join("");
+    const monthAxisMarkup = monthBands.map((band) => {
+      if (!band.date) return "";
+      const fullLabel = band.date.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+      const label = band.date.toLocaleDateString("es-ES", { month: "short", year: "numeric" }).replace(".", "");
+      const tone = band.profit > 0 ? "is-positive" : band.profit < 0 ? "is-negative" : "";
+      return `<span class="chart-month-label" style="left:${band.start / width * 100}%;width:${(band.end - band.start) / width * 100}%" title="${escapeHtml(fullLabel)}"><span>${escapeHtml(label)}</span><strong class="${tone}">(${escapeHtml(formatUnits(band.profit))})</strong></span>`;
+    }).join("");
     const zeroY = padY + innerH - ((0 - min) / range) * innerH;
     const segments = [];
     const areas = [];
@@ -1112,6 +1135,7 @@ if (registry) {
         <dl class="chart-bet-metrics">
           <div><dt>Cuota</dt><dd>${escapeHtml(formatOdd(segment.row.cuota))}</dd></div>
           <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
+          <div class="chart-sigma-metric"><dt>Valor Sigma</dt><dd>${escapeHtml(String(segment.row.valorSigma ?? "").trim().replace(/(\d)\.(?=\d)/g, "$1,") || "—")}</dd></div>
           <div><dt>Balance</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
         </dl>
         <ul class="chart-selection-list">
@@ -1148,16 +1172,13 @@ if (registry) {
     const enableChartCallout = window.matchMedia("(min-width: 761px)").matches;
     chartTarget.innerHTML = `
       <div class="registry-chart-layout">
-        <div class="registry-chart-plot" data-chart-plot>
-          <div class="chart-unit-axis" aria-hidden="true">
-            <span>+u</span>
-            <span>0u</span>
-            <span>-u</span>
-          </div>
+        <div class="registry-chart-plot" data-chart-plot style="min-width:${Math.max(320, monthBands.length * 112)}px">
           <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
-            <path class="chart-grid-line" d="M24 56 H616"></path>
-            <path class="chart-grid-line" d="M24 120 H616"></path>
-            <path class="chart-grid-line" d="M24 184 H616"></path>
+            ${scaleTicks.map((value) => {
+              const y = padY + innerH * (max - value) / range;
+              return `<path class="chart-grid-line" d="M${padX} ${y} H${width - padX}"></path><text class="chart-scale-label" x="${width - padX + 5}" y="${y}" dominant-baseline="middle">${escapeHtml(value.toLocaleString("es-ES", { maximumFractionDigits: 0 }))} u</text>`;
+            }).join("")}
+            <g class="chart-months">${monthMarkup}</g>
             <path class="chart-zero-line" d="M${padX} ${zeroY.toFixed(1)} H${width - padX}"></path>
             ${areas.map((area) => `<path class="chart-area chart-area-${area.type}" d="${area.d}"></path>`).join("")}
             ${segments.map((segment) => `<path class="chart-line chart-line-${segment.type}" d="${segment.d}"></path>`).join("")}
@@ -1184,6 +1205,8 @@ if (registry) {
                 : ""
             }
           </svg>
+          <div class="chart-month-axis" aria-label="Meses del registro">${monthAxisMarkup}</div>
+          <p class="chart-month-caption">Resultado mensual · unidades (u)</p>
           <aside class="chart-bet-card chart-bet-card-side chart-callout-card is-hidden" data-chart-bet-detail aria-hidden="true">
           </aside>
         </div>
@@ -1278,7 +1301,7 @@ if (registry) {
                   <strong class="registry-event">${escapeHtml(row.partido)}</strong>
                   <span class="registry-competition">${escapeHtml(row.competition)}</span>
                 </div>
-                <span class="pending-status-pill">Pendiente</span>
+                <div class="registry-pending-metrics">${sigmaMarkup(row)}<span class="pending-status-pill">Pendiente</span></div>
               </div>
             </article>
           `;
@@ -1296,6 +1319,7 @@ if (registry) {
                 <div class="registry-ledger-meta">
                   <span>Cuota <b>${escapeHtml(formatOdd(row.cuota))}</b></span>
                   <span>Stake <b>${escapeHtml(row.stake)}</b></span>
+                  ${sigmaMarkup(row)}
                 </div>
               </div>
               <div class="registry-ledger-result">
@@ -1340,6 +1364,27 @@ if (registry) {
         `;
       })
       .join("");
+  };
+
+  const updateMonthOptions = () => {
+    if (!filters.month || !filters.year) return;
+    const selected = filters.month.value;
+    const selectedYear = filters.year.value;
+    const months = new Map();
+    registryRows.forEach((row) => {
+      const date = parseDate(row.fecha);
+      if (!date) return;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      months.set(key, date.toLocaleDateString("es-ES", { month: "long" }));
+    });
+    const years = [...new Set([...months.keys()].map((key) => key.slice(0, 4)))].sort().reverse();
+    filters.year.replaceChildren(...years.map((year) => new Option(year, year)));
+    if (years.includes(selectedYear)) filters.year.value = selectedYear;
+    const options = [...months].filter(([key]) => key.startsWith(`${filters.year.value}-`)).sort(([a], [b]) => b.localeCompare(a));
+    filters.month.replaceChildren(...options.map(([key, label]) => new Option(label.charAt(0).toUpperCase() + label.slice(1), key)));
+    if (options.some(([key]) => key === selected)) filters.month.value = selected;
+    if (!months.size) filters.month.append(new Option("Sin datos", ""));
+    filters.month.disabled = filters.year.disabled = !months.size;
   };
 
   const renderRegistryView = ({ source = "fresh" } = {}) => {
@@ -1408,6 +1453,7 @@ if (registry) {
       if (registryWarningTarget) registryWarningTarget.hidden = true;
       const dataset = await loadRegistryDataset();
       registryRows = dataset.rows;
+      updateMonthOptions();
       registryUpdatedAt = dataset.updatedAt;
       localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
       updateCustomRangeVisibility();
@@ -1419,6 +1465,7 @@ if (registry) {
       const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
       if (cached?.rows?.length) {
         registryRows = cached.rows;
+        updateMonthOptions();
         registryUpdatedAt = cached.updatedAt;
         registryHasRenderedData = true;
         registryHasTerminalError = false;
@@ -1433,6 +1480,7 @@ if (registry) {
   Object.values(filters).forEach((filter) => {
     filter?.addEventListener("change", () => {
       if (registryHasTerminalError) return;
+      if (filter === filters.year) updateMonthOptions();
       updateCustomRangeVisibility();
       renderRegistryView();
     });
@@ -1612,6 +1660,7 @@ if (homeFeed) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     resultadoSelecciones: [
       "resultado selecciones",
@@ -1653,6 +1702,7 @@ if (homeFeed) {
         apuesta: homeCell(row, headers, "apuesta"),
         casa: homeCell(row, headers, "casa"),
         cuota: homeCell(row, headers, "cuota"),
+          valorSigma: homeCell(row, headers, "valorSigma"),
         resultado: homeCell(row, headers, "resultado"),
         resultadoSelecciones: homeCell(row, headers, "resultadoSelecciones"),
         stake: homeCell(row, headers, "stake"),
