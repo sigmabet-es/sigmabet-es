@@ -14,11 +14,11 @@
     busy = true; status.textContent = 'Comprobando acceso…';
     try {
       const token = await user.jwt();
-      const response = await fetch('/privado/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({token})});
+      const response = await fetch('/admin/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({token})});
       if (!response.ok) throw new Error(response.status === 403 ? 'Tu cuenta necesita el rol admin. Solicita que lo activen en Netlify Identity.' : 'No se ha podido iniciar la sesión.');
       widget.close(); tools.hidden = false; login.hidden = true; logout.hidden = false;
       status.textContent = `Sesión iniciada · ${user.email}`;
-      if (destination && /^\/privado\/(apuestas|analizador)\/$/.test(destination)) location.assign(destination);
+      if (destination && /^\/admin\/(apuestas|analizador)\/$/.test(destination)) location.assign(destination);
     } catch (error) { clear(); status.textContent = error.message; logout.hidden = false; }
     finally { busy = false; }
   };
@@ -27,7 +27,7 @@
   widget.on('login', enter);
   widget.on('logout', async () => {
     clear();
-    try { await fetch('/privado/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'logout'})}); status.textContent = 'Sesión cerrada.'; }
+    try { await fetch('/admin/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'logout'})}); status.textContent = 'Sesión cerrada.'; }
     catch { status.textContent = 'No se pudo cerrar la sesión del servidor. Reintenta antes de salir.'; logout.hidden = false; }
   });
   widget.on('error', () => { status.textContent = 'No se pudo conectar con Netlify Identity. Comprueba que esté activado en este sitio.'; });

@@ -1,6 +1,6 @@
 const COOKIE = 'sigmabet_admin_session';
 const noStore = {'cache-control': 'private, no-store, max-age=0', 'x-robots-tag': 'noindex, nofollow, noarchive'};
-const sessionCookie = (token, age = 3600) => `${COOKIE}=${token}; Path=/privado/; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
+const sessionCookie = (token, age = 3600) => `${COOKIE}=${token}; Path=/admin/; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
 
 // Identity valida el JWT en el servidor; los roles nunca proceden de user_metadata.
 async function authorizedUser(origin, token) {
@@ -17,7 +17,7 @@ async function authorizedUser(origin, token) {
 
 export default async (request, context) => {
   const url = new URL(request.url);
-  const home = url.pathname === '/privado/' || url.pathname === '/privado/index.html';
+  const home = url.pathname === '/admin/' || url.pathname === '/admin/index.html';
   const sameOrigin = request.headers.get('origin') === url.origin;
   if (home && request.method === 'POST') {
     if (!sameOrigin) return new Response('Origen no permitido.', {status: 403, headers: noStore});
@@ -30,8 +30,8 @@ export default async (request, context) => {
   if (home && ['GET', 'HEAD'].includes(request.method)) return context.next();
   const token = (request.headers.get('cookie') || '').split(';').map(s => s.trim()).find(s => s.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1);
   if (!await authorizedUser(url.origin, token)) {
-    return new Response(null, {status: 303, headers: {...noStore, location: `/privado/?next=${encodeURIComponent(url.pathname)}`, 'set-cookie': sessionCookie('', 0)}});
+    return new Response(null, {status: 303, headers: {...noStore, location: `/admin/?next=${encodeURIComponent(url.pathname)}`, 'set-cookie': sessionCookie('', 0)}});
   }
-  if (url.searchParams.get('logout') === '1') return new Response(null, {status: 303, headers: {...noStore, location: '/privado/?logout=1', 'set-cookie': sessionCookie('', 0)}});
+  if (url.searchParams.get('logout') === '1') return new Response(null, {status: 303, headers: {...noStore, location: '/admin/?logout=1', 'set-cookie': sessionCookie('', 0)}});
   return context.next();
 };

@@ -1,16 +1,8 @@
 # Analizador privado
 
-El analizador se publica en `/privado/analizador/` y toda la ruta `/privado/*` está protegida por una Netlify Edge Function.
+El analizador se publica en `/admin/analizador/`, protegido por Netlify Identity y rol admin. La entrada es `/admin/`.
 
-## Configuración en Netlify
-
-1. Crear la variable de entorno `PROTECTED_ANALYZER_PASSWORD` con una contraseña larga y exclusiva.
-2. Desplegar la rama que contiene `netlify.toml` y `netlify/edge-functions/private-analyzer.js`.
-3. Abrir `https://sigmabet.es/privado/analizador/` y comprobar que aparece el formulario de acceso.
-
-La sesión dura 12 horas. El enlace «Cerrar sesión» elimina la cookie inmediatamente. Si la variable no existe, la función devuelve un error 503 y no sirve el analizador.
-
-La ruta envía `noindex`, `nofollow`, `noarchive`, `no-store` y no aparece en la navegación ni en los sitemaps públicos.
+Consultar [Configuración del acceso](admin-acceso.md). La contraseña compartida anterior ya no se utiliza. Las rutas /privado/ redirigen a /admin/.
 
 ## Modos de análisis
 
