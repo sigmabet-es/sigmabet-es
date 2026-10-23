@@ -559,6 +559,7 @@ if (registry) {
     to: registry.querySelector('[data-filter="to"]'),
   };
   const customRange = registry.querySelector("[data-custom-range]");
+  const historyReset = registry.querySelector("[data-chart-history]");
   const summaryTargets = {
     total: registry.querySelector('[data-summary="total"]'),
     hit: registry.querySelector('[data-summary="hit"]'),
@@ -664,7 +665,10 @@ if (registry) {
     if (event.target.closest?.(".registry-sigma")) hideSigmaTooltip();
   });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") hideSigmaTooltip(); });
-  window.addEventListener("scroll", hideSigmaTooltip, { passive: true, capture: true });
+  window.addEventListener("scroll", () => {
+    if (sigmaAnchor && document.activeElement === sigmaAnchor) showSigmaTooltip(sigmaAnchor);
+    else hideSigmaTooltip();
+  }, { passive: true, capture: true });
   window.addEventListener("resize", hideSigmaTooltip, { passive: true });
 
   const formatPercent = (value) => `${(value * 100).toFixed(2)}%`;
@@ -968,6 +972,7 @@ if (registry) {
     if (customRange) customRange.hidden = !isCustom;
     const monthRange = registry.querySelector("[data-month-range]");
     if (monthRange) monthRange.hidden = filters.time?.value !== "month";
+    if (historyReset) historyReset.hidden = (filters.time?.value || "Todos") === "Todos";
   };
 
   const rowMatchesTime = (row) => {
@@ -1125,7 +1130,9 @@ if (registry) {
       const fullLabel = band.date.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
       const label = band.date.toLocaleDateString("es-ES", { month: "short", year: "numeric" }).replace(".", "");
       const tone = band.profit > 0 ? "is-positive" : band.profit < 0 ? "is-negative" : "";
-      return `<span class="chart-month-label" style="left:${band.start / width * 100}%;width:${(band.end - band.start) / width * 100}%" title="${escapeHtml(fullLabel)}"><span>${escapeHtml(label)}</span><strong class="${tone}">(${escapeHtml(formatUnits(band.profit))})</strong></span>`;
+      const monthKey = `${band.date.getFullYear()}-${String(band.date.getMonth() + 1).padStart(2, "0")}`;
+      const selected = filters.time?.value === "month" && filters.month?.value === monthKey;
+      return `<button type="button" class="chart-month-label" data-chart-month="${monthKey}" aria-pressed="${selected}" aria-label="${escapeHtml(`Ver ${fullLabel}, resultado mensual ${formatUnits(band.profit)}`)}" style="left:${band.start / width * 100}%;width:${(band.end - band.start) / width * 100}%" title="${escapeHtml(`Ver ${fullLabel}`)}"><span>${escapeHtml(label)}</span><strong class="${tone}">(${escapeHtml(formatUnits(band.profit))})</strong></button>`;
     }).join("");
     const zeroY = padY + innerH - ((0 - min) / range) * innerH;
     const segments = [];
@@ -1307,6 +1314,9 @@ if (registry) {
         const statusLabel = resultLabel(row.resultado);
         const isPendingRow = ["", "pendiente"].includes(normalize(row.resultado));
         const rowClass = `registry-row-${normalize(statusLabel).replace(/\s+/g, "-")}`;
+        const statusIconPath = rowClass === "registry-row-ganado"
+          ? "m5 12 4 4L19 6"
+          : rowClass === "registry-row-perdido" ? "m6 6 12 12M18 6 6 18" : "M5 12h14";
         const timeline = isPendingRow ? [] : selectionParts(row.apuesta, row.resultadoSelecciones);
         const sharePayload = {
           type: "apuesta",
@@ -1316,6 +1326,7 @@ if (registry) {
           pick: isPendingRow ? "Disponible en el Telegram gratuito" : row.apuesta,
           odd: formatOdd(row.cuota),
           stake: row.stake,
+          valorSigma: row.valorSigma,
           result: statusLabel,
           profit: formatUnits(row.profit),
           selections: isPendingRow
@@ -1342,14 +1353,14 @@ if (registry) {
                   <strong class="registry-event">${escapeHtml(row.partido)}</strong>
                   <span class="registry-competition">${escapeHtml(row.competition)}</span>
                 </div>
-                <div class="registry-pending-metrics">${sigmaMarkup(row)}<span class="pending-status-pill">Pendiente</span></div>
+                <div class="registry-pending-metrics"><span class="pending-status-pill">Pendiente</span></div>
               </div>
             </article>
           `;
         }
 
         return `
-          <details class="registry-ledger-item ${rowClass}">
+          <details class="registry-ledger-item bet-card ${rowClass}">
             <summary>
               <div class="registry-ledger-content">
                 <div class="registry-ledger-main">
@@ -1360,11 +1371,11 @@ if (registry) {
                 <div class="registry-ledger-meta">
                   <span>Cuota <b>${escapeHtml(formatOdd(row.cuota))}</b></span>
                   <span>Stake <b>${escapeHtml(row.stake)}</b></span>
-                  ${sigmaMarkup(row)}
+                  <span class="bet-card-sigma"><span class="bet-metric-label">Valor Sigma</span>${sigmaMarkup(row)}</span>
                 </div>
               </div>
               <div class="registry-ledger-result">
-                <span class="pill ${resultClass(row.resultado)}">${escapeHtml(statusLabel)}</span>
+                <span class="pill ${resultClass(row.resultado)}"><svg class="bet-status-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${statusIconPath}"></path></svg>${escapeHtml(statusLabel)}</span>
                 <strong class="registry-profit ${profitClass}">${formatUnits(row.profit)}</strong>
                 <span class="pending-toggle"></span>
                 <button class="share-button" type="button" aria-label="Compartir apuesta" title="Compartir apuesta" data-share-card="${escapeHtml(JSON.stringify(sharePayload))}">
@@ -1535,6 +1546,34 @@ if (registry) {
       }
     }
   };
+
+  const selectChartMonth = (monthKey) => {
+    if (registryHasTerminalError || !/^\d{4}-(0[1-9]|1[0-2])$/.test(monthKey)) return;
+    if (!filters.time || !filters.year || !filters.month) return;
+    // Reconstruir primero los meses del año pulsado, incluso si cambia el año.
+    filters.year.value = monthKey.slice(0, 4);
+    updateMonthOptions();
+    filters.month.value = monthKey;
+    filters.time.value = "month";
+    historyLimit = 20;
+    updateCustomRangeVisibility();
+    renderRegistryView();
+    chartTarget.querySelector(`[data-chart-month="${monthKey}"]`)?.focus({ preventScroll: true });
+  };
+
+  // Delegación: los botones se regeneran al actualizar o filtrar la gráfica.
+  chartTarget?.addEventListener("click", (event) => {
+    const monthButton = event.target.closest("[data-chart-month]");
+    if (monthButton) selectChartMonth(monthButton.dataset.chartMonth);
+  });
+  historyReset?.addEventListener("click", () => {
+    if (registryHasTerminalError || !filters.time) return;
+    filters.time.value = "Todos";
+    historyLimit = 20;
+    updateCustomRangeVisibility();
+    renderRegistryView();
+    filters.time.focus({ preventScroll: true });
+  });
 
   Object.values(filters).forEach((filter) => {
     filter?.addEventListener("change", () => {
@@ -2263,120 +2302,179 @@ const shareCanvasHelpers = (() => {
     await document.fonts?.ready;
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
-    canvas.height = 1080;
     const ctx = canvas.getContext("2d");
-    const state = resultColors(payload.result, payload.profit);
+    const isPending = String(payload.result || "").trim().toLowerCase() === "pendiente";
+    const state = resultColors(payload.result, isPending ? "" : payload.profit);
     const selections = Array.isArray(payload.selections) && payload.selections.length
       ? payload.selections
       : [{ text: payload.pick || "Apuesta registrada", status: payload.result || "" }];
 
-    drawGrid(ctx);
-    drawBrand(ctx);
-
-    ctx.strokeStyle = "rgba(245,245,245,0.1)";
-    ctx.fillStyle = "rgba(245,245,245,0.028)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    roundedRect(ctx, 86, 178, 908, 806, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = green;
-    ctx.font = `850 20px ${mono}`;
-    ctx.fillText("> PICK REGISTRADO", 116, 246);
-
-    ctx.fillStyle = muted;
-    ctx.font = `750 18px ${mono}`;
-    ctx.fillText(String(payload.date || "--").toUpperCase(), 116, 292);
-    ctx.fillText(String(payload.competition || "SigmaBet").toUpperCase(), 116, 322);
-
-    ctx.fillStyle = text;
-    ctx.font = `900 70px ${sans}`;
-    wrapText(ctx, payload.match || "Partido", 116, 414, 710, 78, 2);
-
-    ctx.strokeStyle = `${state.color}66`;
-    ctx.fillStyle = `${state.color}12`;
-    ctx.beginPath();
-    roundedRect(ctx, 770, 272, 164, 46, 999);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = state.color;
-    ctx.font = `850 18px ${mono}`;
-    ctx.textAlign = "center";
-    ctx.fillText(state.label, 852, 302);
-    ctx.textAlign = "left";
-
-    ctx.fillStyle = state.color;
-    ctx.font = `900 56px ${mono}`;
-    ctx.textAlign = "right";
-    ctx.fillText(payload.profit || "0.00u", 934, 398);
-    ctx.textAlign = "left";
-
-    const metric = (label, value, x, y, width) => {
-      ctx.strokeStyle = "rgba(245,245,245,0.1)";
-      ctx.fillStyle = "rgba(0,0,0,0.2)";
-      ctx.beginPath();
-      roundedRect(ctx, x, y, width, 82, 10);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = text;
-      ctx.font = `850 30px ${mono}`;
-      ctx.fillText(value || "--", x + 22, y + 39);
-      ctx.fillStyle = muted;
-      ctx.font = `800 15px ${mono}`;
-      ctx.fillText(label, x + 22, y + 62);
+    // Medir antes de dibujar para conservar encuentros y selecciones completos.
+    const linesFor = (value, maxWidth) => {
+      const words = String(value || "").trim().split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = "";
+      for (const word of words) {
+        if (ctx.measureText(word).width > maxWidth) {
+          if (line) { lines.push(line); line = ""; }
+          for (const character of word) {
+            if (line && ctx.measureText(line + character).width > maxWidth) {
+              lines.push(line);
+              line = "";
+            }
+            line += character;
+          }
+        } else if (line && ctx.measureText(`${line} ${word}`).width > maxWidth) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = line ? `${line} ${word}` : word;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
     };
-
-    metric("CUOTA", payload.odd || "--", 116, 484, 252);
-    metric("STAKE", payload.stake || "--", 386, 484, 252);
-    metric("UDS.", payload.profit || "--", 656, 484, 278);
-
-    ctx.fillStyle = muted;
-    ctx.font = `850 18px ${mono}`;
-    ctx.fillText("SELECCIONES", 116, 638);
-
-    ctx.strokeStyle = "rgba(245,245,245,0.11)";
-    ctx.lineWidth = 2;
-    const circleX = 136;
-    const textX = 174;
-    const rowHeight = 74;
-    const visibleSelections = selections.slice(0, 3);
-    const centers = visibleSelections.map((_, index) => 674 + index * rowHeight);
-
-    if (centers.length > 1) {
-      ctx.strokeStyle = "rgba(245,245,245,0.18)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(circleX, centers[0]);
-      ctx.lineTo(circleX, centers[centers.length - 1]);
-      ctx.stroke();
-    }
-
-    visibleSelections.forEach((selection, index) => {
-      const centerY = centers[index];
-      drawSelectionStatus(ctx, circleX, centerY, selection.status || payload.result || "");
-      ctx.fillStyle = text;
-      ctx.font = `850 27px ${sans}`;
-      wrapText(ctx, selection.text || "Selección", textX, centerY - 8, 720, 30, 2);
+    let titleSize = 54;
+    let titleLines;
+    do {
+      ctx.font = `750 ${titleSize}px ${sans}`;
+      titleLines = linesFor(payload.match || "Partido", 872);
+      if (titleLines.length <= 3 || titleSize <= 34) break;
+      titleSize -= 2;
+    } while (true);
+    const titleLineHeight = Math.ceil(titleSize * 1.16);
+    const titleTop = 278;
+    const selectionsTop = Math.max(388, titleTop + titleLines.length * titleLineHeight + 30);
+    ctx.font = `650 26px ${sans}`;
+    const selectionRows = selections.map((selection) => {
+      const lines = linesFor(selection.text || "Selección", 772);
+      return { ...selection, lines, height: Math.max(82, lines.length * 32 + 32) };
     });
+    const rowsBottom = selectionsTop + 36 + selectionRows.reduce((sum, row) => sum + row.height + 12, 0);
+    const resultTop = Math.max(738, rowsBottom + 40);
+    const footerTop = Math.max(962, resultTop + 208);
+    canvas.height = Math.max(1080, footerTop + 102);
 
-    if (selections.length > visibleSelections.length) {
-      ctx.fillStyle = muted;
-      ctx.font = `750 22px ${mono}`;
-      ctx.fillText(`+${selections.length - visibleSelections.length} selecciones más`, textX, 674 + visibleSelections.length * rowHeight + 4);
-    }
-
-    ctx.strokeStyle = "rgba(245,245,245,0.08)";
+    const box = (x, y, width, height, radius, fill, stroke, borderWidth = 1) => {
+      ctx.beginPath();
+      roundedRect(ctx, x, y, width, height, radius);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = borderWidth; ctx.stroke(); }
+    };
+    const write = (value, x, y, size, weight = 600, color = text, align = "left") => {
+      ctx.font = `${weight} ${size}px ${sans}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = "top";
+      ctx.fillText(String(value), x, y);
+    };
+    const fit = (value, x, y, width, size, weight = 650, color = text, align = "left") => {
+      let fitted = size;
+      do {
+        ctx.font = `${weight} ${fitted}px ${sans}`;
+        if (ctx.measureText(String(value)).width <= width) break;
+        fitted -= 1;
+      } while (fitted > 12);
+      write(value, x, y, fitted, weight, color, align);
+    };
+    ctx.fillStyle = "#080909";
+    ctx.fillRect(0, 0, 1080, canvas.height);
+    ctx.strokeStyle = "rgba(0,255,127,0.055)";
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(116, 958);
-    ctx.lineTo(934, 958);
+    for (let x = 64; x < 1080; x += 64) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
+    for (let y = 64; y < canvas.height; y += 64) { ctx.moveTo(0, y); ctx.lineTo(1080, y); }
     ctx.stroke();
-    ctx.fillStyle = muted;
-    ctx.font = `750 18px ${mono}`;
-    ctx.fillText("+18 · Juego responsable · No hay apuestas seguras", 116, 1000);
-    ctx.fillStyle = green;
-    ctx.font = `850 22px ${mono}`;
-    ctx.fillText("@SigmaBetES", 732, 1000);
+    const glow = ctx.createRadialGradient(950, 180, 0, 950, 180, 720);
+    glow.addColorStop(0, "#FFFFFF04");
+    glow.addColorStop(1, "#FFFFFF00");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 1080, canvas.height);
+    drawBrand(ctx);
+    write(payload.date || "Registro público", 976, 100, 19, 500, "#ADADAD", "right");
+    box(64, 178, 952, footerTop - 178, 26, "#111313");
+    const cardGlow = ctx.createRadialGradient(1016, footerTop, 0, 1016, footerTop, 760);
+    cardGlow.addColorStop(0, `${state.color}38`);
+    cardGlow.addColorStop(0.5, `${state.color}12`);
+    cardGlow.addColorStop(1, `${state.color}00`);
+    box(64, 178, 952, footerTop - 178, 26, cardGlow, state.color, 3);
+    // La liga actúa como antetítulo, sin duplicar etiquetas ni añadir otro contenedor.
+    fit(String(payload.competition || "Registro SigmaBet"), 104, 231, 580, 20, 550, "#AEBBB4");
+    const ticketStatus = state.label === "GANADO" ? "GANADOR" : state.label;
+    ctx.font = `800 22px ${sans}`;
+    const tabWidth = Math.max(184, ctx.measureText(ticketStatus).width + 100);
+    const tabRight = 990;
+    const tabLeft = tabRight - tabWidth;
+    // Dos curvas tangentes por lado forman una unión continua con el borde.
+    ctx.beginPath();
+    ctx.moveTo(tabLeft, 178);
+    ctx.arc(tabLeft, 204, 26, -Math.PI / 2, 0);
+    ctx.arc(tabLeft + 52, 204, 26, Math.PI, Math.PI / 2, true);
+    ctx.lineTo(tabRight - 52, 230);
+    ctx.arc(tabRight - 52, 204, 26, Math.PI / 2, 0, true);
+    ctx.arc(tabRight, 204, 26, Math.PI, Math.PI * 1.5);
+    ctx.lineTo(tabLeft, 178);
+    ctx.fillStyle = state.color;
+    ctx.fill();
+    write(ticketStatus, (tabLeft + tabRight) / 2, 192, 22, 800, "#08120D", "center");
+    titleLines.forEach((line, index) => write(line, 104, titleTop + index * titleLineHeight, titleSize, 750));
+
+    write("SELECCIONES", 104, selectionsTop, 15, 650, "#9BA3A0");
+    let rowTop = selectionsTop + 36;
+    for (const selection of selectionRows) {
+      box(104, rowTop, 872, selection.height, 12, "#FFFFFF03", "#FFFFFF0C");
+      const selectionState = resultColors(selection.status || "", "");
+      const centerY = rowTop + selection.height / 2;
+      box(122, centerY - 17, 34, 34, 17, "#FFFFFF08");
+      ctx.beginPath();
+      ctx.strokeStyle = selectionState.color;
+      ctx.lineWidth = 2.5;
+      if (selectionState.label === "GANADO") { ctx.moveTo(131, centerY); ctx.lineTo(137, centerY + 6); ctx.lineTo(147, centerY - 6); }
+      else if (selectionState.label === "PERDIDO") { ctx.moveTo(133, centerY - 6); ctx.lineTo(145, centerY + 6); ctx.moveTo(145, centerY - 6); ctx.lineTo(133, centerY + 6); }
+      else { ctx.moveTo(133, centerY); ctx.lineTo(145, centerY); }
+      ctx.stroke();
+      const textTop = rowTop + (selection.height - selection.lines.length * 32) / 2;
+      selection.lines.forEach((line, index) => write(line, 176, textTop + index * 32, 26, 650));
+      rowTop += selection.height + 12;
+    }
+    if (!isPending) {
+      write("RESULTADO EN UNIDADES", 976, resultTop + 26, 13, 650, "#ADB4B1", "right");
+      fit(payload.profit || "—", 976, resultTop + 62, 296, 52, 750, state.color, "right");
+    }
+    // Valor Sigma conserva el distintivo utilizado en la web.
+    write("VALOR SIGMA", 266, resultTop + 26, 13, 600, "#ADB4B1");
+    {
+      const x = 266;
+      const sigmaValue = (String(payload.valorSigma ?? "").trim() || "—").replace(/(\d)\.(?=\d)/g, "$1,");
+        const badgeY = resultTop + 61;
+        ctx.font = `650 26px ${sans}`;
+        const badgeWidth = Math.min(196, Math.max(130, ctx.measureText(sigmaValue).width + 64));
+        const badgeFill = ctx.createLinearGradient(x, badgeY, x + badgeWidth, badgeY + 48);
+        badgeFill.addColorStop(0, "#56CAFF1C");
+        badgeFill.addColorStop(1, "#56CAFF08");
+        box(x, badgeY, badgeWidth, 48, 9, badgeFill, "#83D9FF40");
+        const dx = x + 13, dy = badgeY + 10, scale = 1.1;
+        const path = (points) => {
+          ctx.moveTo(dx + points[0][0] * scale, dy + points[0][1] * scale);
+          points.slice(1).forEach(([px, py]) => ctx.lineTo(dx + px * scale, dy + py * scale));
+        };
+        ctx.beginPath();
+        path([[7,4],[17,4],[22,10],[12,21],[2,10],[7,4]]);
+        path([[7,4],[12,21],[17,4]]);
+        path([[2,10],[22,10]]);
+        path([[7,4],[12,10],[17,4]]);
+        ctx.strokeStyle = "#9CE2FF"; ctx.lineWidth = 1.65; ctx.lineJoin = "round"; ctx.stroke();
+        fit(sigmaValue, x + 49, badgeY + 10, badgeWidth - 61, 26, 650, "#9CE2FF");
+    }
+    write("STAKE", 490, resultTop + 26, 13, 600, "#ADB4B1");
+    fit(payload.stake || "—", 490, resultTop + 68, 132, 30);
+    write("CUOTA", 104, resultTop + 26, 13, 600, "#ADB4B1");
+    fit(payload.odd || "—", 104, resultTop + 68, 140, 30);
+
+    write("REGISTRO PÚBLICO · sigmabet.es", 104, footerTop - 42, 14, 550, "#7D8983");
+    write("Más datos. Menos fe.", 104, footerTop + 26, 19, 650, "#CBCFCB");
+    write("@SigmaBetES", 976, footerTop + 24, 22, 700, green, "right");
+    write("+18 · Juego responsable · No hay apuestas seguras", 104, footerTop + 59, 13, 500, "#858B87");
     return canvas;
   };
 

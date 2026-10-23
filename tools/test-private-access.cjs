@@ -1,0 +1,35 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const source = fs.readFileSync('netlify/edge-functions/private-analyzer.js', 'utf8').replace('export default async', 'globalThis.handler = async');
+let calls = 0;
+const scope = {Response, URL, AbortSignal, fetch: async (_url, options) => {
+  calls++;
+  const token = options.headers.Authorization;
+  if (token === 'Bearer admin.jwt') return Response.json({app_metadata: {roles: ['admin']}});
+  if (token === 'Bearer fake.admin') return Response.json({user_metadata: {roles: ['admin']}});
+  return new Response(null, {status: 401});
+}};
+vm.createContext(scope); vm.runInContext(source, scope);
+const context = {next: () => new Response('protected content')};
+const request = (path, options = {}) => new Request(`https://sigmabet.es${path}`, options);
+(async () => {
+  let response = await scope.handler(request('/privado/apuestas/'), context);
+  assert.equal(response.status, 303); assert.match(response.headers.get('location'), /^\/privado\/\?next=/);
+  response = await scope.handler(request('/privado/'), context); assert.equal(response.status, 200);
+  const post = token => request('/privado/', {method: 'POST', headers: {origin: 'https://sigmabet.es', 'content-type': 'application/json'}, body: JSON.stringify({token})});
+  assert.equal((await scope.handler(post('fake.admin'), context)).status, 403);
+  assert.equal((await scope.handler(post('expired.jwt'), context)).status, 403);
+  response = await scope.handler(post('admin.jwt'), context);
+  assert.equal(response.status, 204); assert.match(response.headers.get('set-cookie'), /HttpOnly; Secure; SameSite=Strict/);
+  response = await scope.handler(request('/privado/apuestas/', {headers: {cookie: 'sigmabet_admin_session=admin.jwt'}}), context);
+  assert.equal(await response.text(), 'protected content');
+  response = await scope.handler(request('/privado/', {method: 'POST', headers: {origin: 'https://other.example'}, body: JSON.stringify({token: 'admin.jwt'})}), context);
+  assert.equal(response.status, 403);
+  response = await scope.handler(request('/privado/', {method: 'POST', headers: {origin: 'https://sigmabet.es'}, body: JSON.stringify({action: 'logout'})}), context);
+  assert.match(response.headers.get('set-cookie'), /Max-Age=0/);
+  response = await scope.handler(request('/privado/analizador/?logout=1', {headers: {cookie: 'sigmabet_admin_session=admin.jwt'}}), context);
+  assert.equal(response.headers.get('location'), '/privado/?logout=1');
+  assert(calls >= 4);
+  console.log('Acceso privado: portal público, rutas protegidas, rol admin validado, tokens rechazados, origen y cierre de sesión correctos.');
+})().catch(error => {console.error(error); process.exitCode = 1;});

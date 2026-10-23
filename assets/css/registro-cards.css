@@ -1,0 +1,252 @@
+/* Tarjetas del historial. Ámbito aislado para conservar el resto del registro. */
+.registry-only .bet-card {
+  --bet-accent: #909090;
+  position: relative;
+  border: 1px solid #292929;
+  border-radius: 10px;
+  background: #101010;
+  box-shadow: none;
+  overflow: visible;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+.registry-only .bet-card.registry-row-ganado { --bet-accent: #4ad995; }
+.registry-only .bet-card.registry-row-perdido { --bet-accent: #f08085; }
+.registry-only .bet-card::before { content: none; }
+.registry-only .bet-card:hover, .registry-only .bet-card[open] { border-color: #454545; background: #141414; }
+.registry-only .bet-card > summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 136px;
+  align-items: center;
+  min-height: 0;
+  gap: 24px;
+  padding: 22px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.registry-only .bet-card > summary::-webkit-details-marker { display: none; }
+.registry-only .bet-card > summary::before { content: ''; position: absolute; left: -1px; top: 24px; bottom: 24px; width: 2px; border-radius: 2px; background: var(--bet-accent); opacity: .65; }
+.registry-only .bet-card > summary::after { content: none; }
+.registry-only .bet-card > summary:focus-visible { outline: 2px solid #dedede; outline-offset: 4px; }
+.registry-only .bet-card .registry-ledger-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  align-content: center;
+  gap: 20px;
+  min-height: 0;
+  padding: 0;
+}
+.registry-only .bet-card .registry-ledger-main { display: grid; gap: 6px; min-width: 0; padding: 0; }
+.registry-only .bet-card .registry-date { grid-column: auto; grid-row: auto; color: #777; font-size: 10px; font-weight: 400; letter-spacing: .04em; }
+.registry-only .bet-card .registry-event { grid-column: auto; color: #f2f2f2; font-family: var(--font-sans); font-size: 18px; font-weight: 600; letter-spacing: -.02em; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; overflow: visible; text-overflow: clip; }
+.registry-only .bet-card .registry-competition { grid-column: auto; color: #929292; font-size: 10px; font-weight: 400; text-transform: none; }
+.registry-only .bet-card .registry-ledger-meta {
+  display: grid;
+  grid-template-columns: 64px 64px 100px;
+  align-items: center;
+  justify-self: end;
+  align-self: center;
+  gap: 12px;
+  width: auto;
+  max-width: none;
+  min-height: 0;
+  padding: 0 22px 0 0;
+  border: 0;
+  border-right: 1px solid #2c2c2c;
+  border-radius: 0;
+  background: none;
+}
+.registry-only .bet-card .registry-ledger-meta > span {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 8px;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #808080;
+  font-size: 9px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: .02em;
+}
+.registry-only .bet-card .registry-ledger-meta b { margin: 0; font-size: 13px; line-height: 1.2; font-weight: 500; color: #dedede; font-variant-numeric: tabular-nums; }
+.registry-only .bet-card .bet-card-sigma .bet-metric-label { display: block; margin: 0; padding: 0; border: 0; color: #808080; font-size: 9px; line-height: 1; text-transform: none; letter-spacing: .02em; }
+.registry-only .bet-card .bet-card-sigma .registry-sigma { display: inline-flex; align-items: center; flex-direction: row; gap: 5px; padding: 0; margin: 0; border: 0; }
+.registry-only .bet-card .registry-sigma b { color: #fff; font-weight: 600; }
+.registry-only .bet-card .sigma-diamond { width: 13px; height: 13px; stroke: #cad7e2; }
+.registry-only .bet-card .registry-ledger-result {
+  position: static;
+  inset: auto;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 24px;
+  grid-template-rows: auto auto;
+  align-items: center;
+  justify-content: initial;
+  justify-items: end;
+  gap: 10px 12px;
+  width: auto;
+  min-width: 0;
+  padding: 0;
+}
+.registry-only .bet-card .registry-ledger-result > * { position: static; inset: auto; margin: 0; }
+.registry-only .bet-card .registry-ledger-result .registry-profit { grid-column: 1; grid-row: 1; align-self: center; font-size: 21px; font-family: var(--font-sans); font-weight: 600; font-style: normal; line-height: 1.2; letter-spacing: -.04em; white-space: nowrap; color: var(--bet-accent) !important; }
+.registry-only .bet-card .registry-ledger-result .pill { grid-column: 1; grid-row: 2; display: inline-flex; align-items: center; gap: 5px; min-width: 0; padding: 0; border: 0; border-radius: 0; background: none; color: #aaa; font-size: 10px; font-weight: 400; line-height: 1.2; }
+.registry-only .bet-card .registry-ledger-result .pill::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--bet-accent); }
+.registry-only .bet-card .registry-ledger-result .pending-toggle { grid-column: 2; grid-row: 1; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 0; background: none; color: #aaa; }
+.registry-only .bet-card .registry-ledger-result .pending-toggle::before { content: ''; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+.registry-only .bet-card[open] .pending-toggle::before { transform: rotate(225deg) translate(-1px,-1px); }
+.registry-only .bet-card .registry-ledger-result .share-button { grid-column: 2; grid-row: 2; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 4px; border: 0; border-radius: 4px; background: none; color: #777; opacity: 1; pointer-events: auto; }
+.registry-only .bet-card .share-button:hover, .registry-only .bet-card .share-button:focus-visible { background: #292929; color: #fff; }
+.registry-only .bet-card .registry-ledger-expanded { margin: 0; padding: 20px 24px 24px; border: 0; border-top: 1px solid #292929; border-radius: 0 0 10px 10px; background: #0d0d0d; }
+.registry-only .bet-card .registry-expanded-label { color: #777; font-size: 9px; letter-spacing: .08em; margin-bottom: 16px; }
+@media (max-width: 1100px) {
+ .registry-only .bet-card .registry-ledger-content { grid-template-columns: minmax(0,1fr); gap: 16px; }
+ .registry-only .bet-card .registry-ledger-meta { justify-self: start; padding-right: 0; border-right: 0; grid-template-columns: 60px 60px 100px; }
+ .registry-only .bet-card > summary { gap: 20px; }
+}
+@media (max-width: 600px) {
+ .registry-only .bet-card > summary { grid-template-columns: minmax(0,1fr) 96px; padding: 18px 16px; gap: 12px; }
+ .registry-only .bet-card .registry-ledger-content { gap: 16px; }
+ .registry-only .bet-card .registry-event { font-size: 15px; }
+ .registry-only .bet-card .registry-date, .registry-only .bet-card .registry-competition { font-size: 9px; }
+ .registry-only .bet-card .registry-ledger-meta { grid-template-columns: auto auto auto; gap: 14px; }
+ .registry-only .bet-card .registry-ledger-meta b { font-size: 11px; }
+ .registry-only .bet-card .registry-ledger-meta > span, .registry-only .bet-card .bet-metric-label { font-size: 8px; }
+ .registry-only .bet-card .registry-ledger-result { gap: 10px 6px; grid-template-columns: minmax(0,1fr) 20px; }
+ .registry-only .bet-card .registry-ledger-result .registry-profit { font-size: 17px; }
+ .registry-only .bet-card .registry-ledger-result .pill { font-size: 9px; }
+ .registry-only .bet-card .registry-ledger-result .share-button { width: 20px; height: 20px; }
+ .registry-only .bet-card .registry-ledger-expanded { padding: 18px 16px; }
+}
+@media (prefers-reduced-motion:reduce) { .registry-only .bet-card, .registry-only .bet-card * { transition: none; } }
+
+/* Resultado reconocible por color, símbolo y texto, también sin distinguir colores. */
+.registry-only .bet-card { --bet-accent: #c7d0c0; --bet-tint: #bec8ae; border-radius: 16px; border-color: color-mix(in srgb,var(--bet-tint) 30%,#172018); background: linear-gradient(105deg,color-mix(in srgb,var(--bet-tint) 9%,#0c130e),#0e150f 55%); }
+.registry-only .bet-card.registry-row-ganado { --bet-accent: var(--green); --bet-tint: var(--green); }
+.registry-only .bet-card.registry-row-perdido { --bet-accent: #ff8a98; --bet-tint: #f06677; }
+.registry-only .bet-card:hover, .registry-only .bet-card[open] { border-color: color-mix(in srgb,var(--bet-tint) 60%,#172018); background: linear-gradient(105deg,color-mix(in srgb,var(--bet-tint) 13%,#0c130e),#121c13 65%); }
+.registry-only .bet-card > summary { border-radius: 16px; }
+.registry-only .bet-card > summary::before { width: 4px; top: 18px; bottom: 18px; border-radius: 0 4px 4px 0; opacity: 1; }
+.registry-only .bet-card .registry-ledger-result .pill { color: var(--bet-accent); background: color-mix(in srgb,var(--bet-tint) 13%,transparent); border: 1px solid color-mix(in srgb,var(--bet-tint) 32%,transparent); border-radius: 100px; padding: 5px 9px; gap: 5px; font-weight: 650; font-size: 10px; white-space: nowrap; }
+.registry-only .bet-card .registry-ledger-result .pill::before { content: none; }
+.registry-only .bet-card .bet-status-icon { width: 12px; height: 12px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.registry-only .bet-card .registry-date { color: #9aa794; }
+.registry-only .bet-card .registry-competition { color: #9eac98; }
+.registry-only .bet-card .registry-ledger-meta { border-color: #35432e; }
+.registry-only .bet-card .registry-ledger-meta > span, .registry-only .bet-card .bet-card-sigma .bet-metric-label { color: #a4af9d; }
+.registry-only .bet-card .registry-ledger-expanded { background: #0b120d; border-color: #2c3928; border-radius: 0 0 16px 16px; }
+@media (max-width:600px) {
+ .registry-only .bet-card .registry-ledger-result .pill { font-size: 9px; padding: 4px 7px; }
+ .registry-only .bet-card .registry-ledger-meta > span, .registry-only .bet-card .bet-card-sigma .bet-metric-label { font-size: 9px; }
+ .registry-only .bet-card .registry-ledger-meta b { font-size: 12px; }
+}
+
+/* Perdidas: base neutra con acento rojo, también al abrir y pasar el cursor. */
+.registry-only .bet-card.registry-row-perdido {
+  border-color: color-mix(in srgb, var(--bet-tint) 30%, #202020);
+  background: linear-gradient(105deg, color-mix(in srgb, var(--bet-tint) 9%, #111111), #101010 55%);
+}
+.registry-only .bet-card.registry-row-perdido:hover,
+.registry-only .bet-card.registry-row-perdido[open] {
+  border-color: color-mix(in srgb, var(--bet-tint) 60%, #202020);
+  background: linear-gradient(105deg, color-mix(in srgb, var(--bet-tint) 13%, #111111), #141414 65%);
+}
+.registry-only .bet-card.registry-row-perdido .registry-date { color: #9c9c9c; }
+.registry-only .bet-card.registry-row-perdido .registry-competition { color: #a3a3a3; }
+.registry-only .bet-card.registry-row-perdido .registry-ledger-meta { border-color: #383838; }
+.registry-only .bet-card.registry-row-perdido .registry-ledger-meta > span,
+.registry-only .bet-card.registry-row-perdido .bet-card-sigma .bet-metric-label { color: #ababab; }
+.registry-only .bet-card.registry-row-perdido .registry-ledger-expanded { background: #0d0d0d; border-color: #333333; }
+
+/* Pendientes: superficie neutra, sin reflejos verdes ni turquesas. */
+.registry-only .registry-pending-card {
+  border-color: #383838;
+  background: linear-gradient(135deg, #181818, #101010);
+  box-shadow: 0 16px 38px #0004, inset 0 1px #ffffff0d;
+}
+.registry-only .registry-pending-card:hover { border-color: #505050; background: linear-gradient(135deg, #1c1c1c, #141414); }
+.registry-only .registry-pending-card .pending-telegram-banner { color: #dedede; }
+.registry-only .registry-pending-card .pending-telegram-icon { background: #dedede; fill: #141414; }
+.registry-only .registry-pending-card .pending-telegram-action { border-color: #484848; background: #ffffff08; color: #dedede; }
+.registry-only .registry-pending-card .pending-telegram-action:hover,
+.registry-only .registry-pending-card .pending-telegram-action:focus-visible { border-color: #777; background: #ffffff12; color: #fff; }
+.registry-only .registry-pending-card .registry-pending-inner { border-color: #484848; background: linear-gradient(110deg, #1b1b1b, #141414); }
+.registry-only .registry-pending-card .registry-date,
+.registry-only .registry-pending-card .registry-competition { color: #a3a3a3; }
+.registry-only .registry-pending-card .pending-status-pill { border-color: #484848; background: #ffffff0a; color: #c4c4c4; }
+
+/* Valor Sigma: distintivo azul diamante compacto, independiente del resultado. */
+.registry-only .bet-card .registry-ledger-meta { align-items: start; }
+.registry-only .bet-card .registry-ledger-meta > span > b { padding-block: 5px; }
+.registry-only .bet-card .bet-card-sigma .bet-metric-label { line-height: 1.2; }
+.registry-only .bet-card .bet-card-sigma .registry-sigma {
+  display: inline-flex;
+  width: fit-content;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid #83d9ff40;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #56caff1c, #56caff08);
+  box-shadow: inset 0 1px #b5ebff12;
+  color: #9ce2ff;
+  transition: background .16s ease, border-color .16s ease;
+}
+.registry-only .bet-card .bet-card-sigma .registry-sigma:hover,
+.registry-only .bet-card .bet-card-sigma .registry-sigma:focus-visible {
+  border-color: #83d9ff85;
+  background: #56caff26;
+}
+.registry-only .bet-card .bet-card-sigma .registry-sigma b {
+  color: #9ce2ff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+.registry-only .bet-card .bet-card-sigma .sigma-diamond {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  stroke: #9ce2ff;
+  stroke-width: 1.5;
+}
+@media (max-width:600px) {
+  .registry-only .bet-card .bet-card-sigma .registry-sigma { gap: 5px; padding: 5px 6px; }
+  .registry-only .bet-card .bet-card-sigma .registry-sigma b { font-size: 11px; }
+  .registry-only .bet-card .bet-card-sigma .sigma-diamond { width: 12px; height: 12px; flex-basis: 12px; }
+}
+
+/* Misma tipografía para encuentros pendientes y cerrados. */
+.registry-only .registry-pending-card .registry-event,
+.registry-only .bet-card .registry-event {
+  font-family: var(--font-sans);
+  font-size: clamp(20px, 1.8vw, 23px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.registry-only .bet-card .registry-ledger-meta,
+.registry-only .bet-card .registry-ledger-meta > span,
+.registry-only .bet-card .registry-ledger-meta b,
+.registry-only .bet-card .bet-card-sigma .bet-metric-label,
+.registry-only .bet-card .bet-card-sigma .registry-sigma b {
+  font-family: var(--font-sans);
+}
+.registry-only .bet-card .registry-ledger-meta > span,
+.registry-only .bet-card .bet-card-sigma .bet-metric-label { font-size: 11px; font-weight: 500; line-height: 1.2; }
+.registry-only .bet-card .registry-ledger-meta b,
+.registry-only .bet-card .bet-card-sigma .registry-sigma b { font-size: 13px; font-weight: 650; line-height: 1.2; font-variant-numeric: tabular-nums; }
+@media (max-width:600px) {
+  .registry-only .registry-pending-card .registry-event,
+  .registry-only .bet-card .registry-event { font-size: clamp(16px, 4.6vw, 18px); }
+  .registry-only .bet-card .registry-ledger-meta > span,
+  .registry-only .bet-card .bet-card-sigma .bet-metric-label { font-size: 10px; }
+  .registry-only .bet-card .registry-ledger-meta b,
+  .registry-only .bet-card .bet-card-sigma .registry-sigma b { font-size: 12px; }
+}

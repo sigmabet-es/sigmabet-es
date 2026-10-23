@@ -14969,3 +14969,52 @@ nav[aria-label="Footer"] a[href="/partidos/"] {
   padding-right: 36px;
   cursor: pointer;
 }
+
+/* Navegación mensual desde el propio eje del gráfico. */
+.registry-chart button.chart-month-label {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  padding-block: 5px;
+  top: 7px;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.registry-chart button.chart-month-label:hover {
+  border-color: #ffffff20;
+  background: #ffffff08;
+}
+.registry-chart button.chart-month-label[aria-pressed="true"] {
+  background: #ffffff08;
+  border-color: #ffffff20;
+}
+.registry-chart button.chart-month-label:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.registry-chart-history {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid #383838;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.registry-chart-history[hidden] { display: none; }
+.registry-chart-history:hover { background: #ffffff08; border-color: #666; }
+.registry-chart-history:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .registry-chart button.chart-month-label { transition: none; }
+}
+.registry-only .registry-chart-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
