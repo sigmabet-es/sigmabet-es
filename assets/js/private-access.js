@@ -9,6 +9,16 @@
   const destination = params.get('next');
   let busy = false;
   const clear = () => { tools.hidden = true; login.hidden = false; logout.hidden = true; };
+  const showTools = () => {
+    tools.hidden = false; login.hidden = true; logout.hidden = false;
+    status.textContent = 'Sesión iniciada';
+  };
+  const restoreSession = async () => {
+    try {
+      const response = await fetch('/admin/?session=1', {cache: 'no-store'});
+      if (response.ok) showTools();
+    } catch { /* Se mantiene disponible el inicio de sesión. */ }
+  };
   const enter = async user => {
     if (!user || busy) return;
     busy = true; status.textContent = 'Comprobando acceso…';
@@ -16,7 +26,7 @@
       const token = await user.jwt();
       const response = await fetch('/admin/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({token})});
       if (!response.ok) throw new Error(response.status === 403 ? 'Tu cuenta necesita el rol admin. Solicita que lo activen en Netlify Identity.' : 'No se ha podido iniciar la sesión.');
-      widget.close(); tools.hidden = false; login.hidden = true; logout.hidden = false;
+      widget.close(); showTools();
       status.textContent = `Sesión iniciada · ${user.email}`;
       if (destination && /^\/admin\/(apuestas|analizador)\/$/.test(destination)) location.assign(destination);
     } catch (error) { clear(); status.textContent = error.message; logout.hidden = false; }
@@ -31,5 +41,14 @@
     catch { status.textContent = 'No se pudo cerrar la sesión del servidor. Reintenta antes de salir.'; logout.hidden = false; }
   });
   widget.on('error', () => { status.textContent = 'No se pudo conectar con Netlify Identity. Comprueba que esté activado en este sitio.'; });
-  widget.on('init', user => { if (params.get('logout') === '1') widget.logout(); else if (user) enter(user); });
+  const initialize = user => {
+    if (params.get('logout') === '1') widget.logout();
+    else if (user) enter(user);
+    else restoreSession();
+  };
+  widget.on('init', initialize);
+  // Al volver de una herramienta, Identity puede haberse inicializado antes de este script.
+  const existingUser = widget.currentUser();
+  if (existingUser || params.get('logout') === '1') initialize(existingUser);
+  else restoreSession();
 })();

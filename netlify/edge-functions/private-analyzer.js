@@ -27,6 +27,11 @@ export default async (request, context) => {
     if (!await authorizedUser(url.origin, body.token)) return new Response('Necesitas una cuenta con rol admin.', {status: 403, headers: noStore});
     return new Response(null, {status: 204, headers: {...noStore, 'set-cookie': sessionCookie(body.token)}});
   }
+  if (home && request.method === 'GET' && url.searchParams.get('session') === '1') {
+    const token = (request.headers.get('cookie') || '').split(';').map(s => s.trim()).find(s => s.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1);
+    const authenticated = await authorizedUser(url.origin, token);
+    return new Response(null, {status: authenticated ? 204 : 401, headers: noStore});
+  }
   if (home && ['GET', 'HEAD'].includes(request.method)) return context.next();
   const token = (request.headers.get('cookie') || '').split(';').map(s => s.trim()).find(s => s.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1);
   if (!await authorizedUser(url.origin, token)) {

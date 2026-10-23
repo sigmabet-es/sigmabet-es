@@ -17,6 +17,9 @@ const request = (path, options = {}) => new Request(`https://sigmabet.es${path}`
   let response = await scope.handler(request('/admin/apuestas/'), context);
   assert.equal(response.status, 303); assert.match(response.headers.get('location'), /^\/admin\/\?next=/);
   response = await scope.handler(request('/admin/'), context); assert.equal(response.status, 200);
+  response = await scope.handler(request('/admin/?session=1'), context); assert.equal(response.status, 401);
+  response = await scope.handler(request('/admin/?session=1', {headers: {cookie: 'sigmabet_admin_session=admin.jwt'}}), context); assert.equal(response.status, 204);
+  response = await scope.handler(request('/admin/?session=1', {headers: {cookie: 'sigmabet_admin_session=expired.jwt'}}), context); assert.equal(response.status, 401);
   const post = token => request('/admin/', {method: 'POST', headers: {origin: 'https://sigmabet.es', 'content-type': 'application/json'}, body: JSON.stringify({token})});
   assert.equal((await scope.handler(post('fake.admin'), context)).status, 403);
   assert.equal((await scope.handler(post('expired.jwt'), context)).status, 403);
