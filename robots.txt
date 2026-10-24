@@ -2,6 +2,7 @@ User-agent: *
 Disallow: /material-grafico.html
 Disallow: /senal-sigma.html
 Disallow: /admin/
+Disallow: /privado/
 Disallow: /partidos/plantilla/
 Disallow: /competiciones/laliga/jornada-plantilla/
 Disallow: /equipos/plantilla/

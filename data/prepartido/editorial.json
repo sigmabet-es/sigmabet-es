@@ -1,0 +1,247 @@
+{
+  "updatedAt": "2026-08-26T15:42:35.829Z",
+  "matches": {
+    "real-betis-real-sociedad-2026-08-21": {
+      "quality": "basic",
+      "seoPriority": "C",
+      "robots": "noindex",
+      "updatedAt": "2026-08-26T15:42:35.822Z",
+      "preview": "Resumen corto de la previa.",
+      "analysis": "No hay ningún análisis disponible para este encuentro.",
+      "keys": [
+        "Clave 1",
+        "Clave 2",
+        "Clave 3"
+      ],
+      "probabilities": null,
+      "mainBet": {
+        "type": "principal",
+        "market": "No Bet",
+        "selection": "Sin apuesta recomendada",
+        "bookmaker": null,
+        "odds": null,
+        "sigmaProbability": null,
+        "minimumOdds": null,
+        "stake": null,
+        "publishedAt": null,
+        "result": "no_bet"
+      },
+      "valueBets": [],
+      "injuries": [
+        {
+          "teamId": "real-betis",
+          "name": "Abdessamad Ezzalzouli",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Rodilla",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Aitor Ruibal",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Menisco",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Diego Conde",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Hombro",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Giovani Lo Celso",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-betis",
+          "name": "Gonzalo Petit",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Muslo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Gonçalo Guedes",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Molestias físicas",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Jon Gorrotxategi",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Pablo Marín",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "Músculo",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "name": "Álvaro Odriozola",
+          "position": null,
+          "status": "lesionado",
+          "confidence": "pendiente",
+          "reason": "LCA",
+          "source": null,
+          "sourceUrl": null,
+          "updatedAt": null
+        }
+      ],
+      "lineups": [
+        {
+          "teamId": "real-betis",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "alta",
+          "players": [
+            "(1) Á. Valles",
+            "(11) F. García",
+            "(4) Natan",
+            "(5) M. Bartra",
+            "(2) H. Bellerín",
+            "(21) M. Roca",
+            "(6) F. Bernal",
+            "(17) R. Riquelme",
+            "(8) P. Fornals",
+            "(7) Antony",
+            "(9) C. Hernández"
+          ],
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "alta",
+          "players": [
+            "(1) Á. Remiro",
+            "(17) S. Gómez",
+            "(31) J. Martín",
+            "(5) I. Zubeldia",
+            "(2) J. Aramburu",
+            "(21) Y. Herrera",
+            "(24) L. Sucic",
+            "(7) A. Barrenetxea",
+            "(18) C. Soler",
+            "(14) T. Kubo",
+            "(9) O. S. Óskarsson"
+          ],
+          "updatedAt": null
+        }
+      ],
+      "news": []
+    },
+    "real-madrid-real-sociedad-2026-08-26": {
+      "quality": "basic",
+      "seoPriority": "C",
+      "robots": "noindex",
+      "updatedAt": "2026-08-26T15:42:35.829Z",
+      "preview": "Resumen corto de la previa.",
+      "analysis": "No hay ningún análisis disponible para este encuentro.",
+      "keys": [
+        "Clave 1",
+        "Clave 2",
+        "Clave 3"
+      ],
+      "probabilities": null,
+      "mainBet": {
+        "type": "principal",
+        "market": "No Bet",
+        "selection": "Sin apuesta recomendada",
+        "bookmaker": null,
+        "odds": null,
+        "sigmaProbability": null,
+        "minimumOdds": null,
+        "stake": null,
+        "publishedAt": null,
+        "result": "no_bet"
+      },
+      "valueBets": [],
+      "injuries": [],
+      "lineups": [
+        {
+          "teamId": "real-madrid",
+          "type": "probable",
+          "formation": "4-2-3-1",
+          "confidence": "alta",
+          "players": [
+            "(1) T. Courtois",
+            "(17) M. Cucurella",
+            "(4) D. Huijsen",
+            "(16) I. Konaté",
+            "(12) T. Alexander-Arnold",
+            "(8) F. Valverde",
+            "(20) B. Silva",
+            "(7) Vinícius Jr.",
+            "(5) J. Bellingham",
+            "(25) Y. Diomande",
+            "(10) K. Mbappé"
+          ],
+          "updatedAt": null
+        },
+        {
+          "teamId": "real-sociedad",
+          "type": "probable",
+          "formation": "4-4-2-0",
+          "confidence": "media",
+          "players": [
+            "(1) Á. Remiro",
+            "(17) S. Gómez",
+            "(5) I. Zubeldia",
+            "(31) J. Martínv",
+            "(2) J. Aramburu",
+            "(7) A. Barrenetxea",
+            "(24) L. Sucic",
+            "(21) Y. Herrera",
+            "(14) T. Kubo",
+            "(18) C. Soler",
+            "(9) O. S. Óskarsson"
+          ],
+          "updatedAt": null
+        }
+      ],
+      "news": []
+    }
+  }
+}
