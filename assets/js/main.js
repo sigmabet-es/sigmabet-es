@@ -1172,29 +1172,28 @@ if (registry) {
       const selections = selectionParts(segment.row.apuesta, segment.row.resultadoSelecciones);
       const context = displayText(segment.row.competition || segment.row.competicion || segment.row.liga, "Registro de apuestas");
       return `
-        <div class="chart-bet-main">
-          <div class="chart-bet-meta-row">
-            <span>${escapeHtml(displayText(segment.row.fecha, ""))}</span>
-            <i class="chart-result-pill chart-result-${escapeHtml(statusClass)}">${escapeHtml(status)}</i>
-          </div>
-          <strong>${escapeHtml(displayText(segment.row.partido, "Apuesta"))}</strong>
-          <p>${escapeHtml(context)}</p>
+        <div class="chart-bet-meta-row">
+          <span>${escapeHtml(displayText(segment.row.fecha, ""))}</span>
+          <i class="chart-result-pill chart-result-${escapeHtml(statusClass)}">${escapeHtml(status)}</i>
         </div>
-        <dl class="chart-bet-metrics">
-          <div><dt>Cuota</dt><dd>${escapeHtml(formatOdd(segment.row.cuota))}</dd></div>
-          <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
-          <div class="chart-sigma-metric"><dt>Valor Sigma</dt><dd>${escapeHtml(String(segment.row.valorSigma ?? "").trim().replace(/(\d)\.(?=\d)/g, "$1,") || "—")}</dd></div>
-          <div><dt>Balance</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
-        </dl>
+        <div class="chart-bet-main">
+          <p>${escapeHtml(context)}</p>
+          <strong>${escapeHtml(displayText(segment.row.partido, "Apuesta"))}</strong>
+        </div>
         <ul class="chart-selection-list">
           ${(selections.length ? selections : [{ text: segment.row.apuesta || "Apuesta registrada", status }])
             .map((selection) => {
-              const selectionStatusLabel = resultLabel(selection.status || status);
+              const selectionStatusLabel = resultLabel(selection.status || "Pendiente");
               const selectionClass = normalize(selectionStatusLabel).replace(/\s+/g, "-");
-              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span>${escapeHtml(selection.text)}</span><b>${escapeHtml(selectionStatusLabel)}</b></li>`;
-            })
-            .join("")}
+              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span>${escapeHtml(selection.text)}</span><span class="sr-only">${escapeHtml(selectionStatusLabel)}</span></li>`;
+            }).join("")}
         </ul>
+        <dl class="chart-bet-metrics">
+          <div><dt>Cuota</dt><dd>${escapeHtml(formatOdd(segment.row.cuota))}</dd></div>
+          <div class="chart-bet-sigma"><dt>Valor Sigma</dt><dd><b><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10l5 6-10 11L2 10 7 4Z"/><path d="m7 4 5 17 5-17M2 10h20M7 4l5 6 5-6"/></svg>${escapeHtml(String(segment.row.valorSigma ?? "").trim().replace(/(\d)\.(?=\d)/g, "$1,") || "—")}</b></dd></div>
+          <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
+          <div><dt>Resultado</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
+        </dl>
       `;
     };
     const calloutPosition = (segment) => {
@@ -1255,9 +1254,9 @@ if (registry) {
           </svg>
           <div class="chart-month-axis" aria-label="Meses del registro">${monthAxisMarkup}</div>
           <p class="chart-month-caption">Resultado mensual · unidades (u)</p>
-          <aside class="chart-bet-card chart-bet-card-side chart-callout-card is-hidden" data-chart-bet-detail aria-hidden="true">
-          </aside>
         </div>
+        <aside class="chart-bet-card chart-bet-card-side chart-callout-card is-hidden" data-chart-bet-detail aria-hidden="true">
+        </aside>
       </div>
     `;
 
@@ -1272,28 +1271,68 @@ if (registry) {
       hideDetail();
       return;
     }
+    const positionDetail = (event) => {
+      if (!plotTarget || !detailTarget) return;
+      const anchor = event?.currentTarget?.getBoundingClientRect() || plotTarget.getBoundingClientRect();
+      const pointerX = event?.type?.startsWith("mouse") ? event.clientX : (anchor.left + anchor.right) / 2;
+      const pointerY = event?.type?.startsWith("mouse") ? event.clientY : (anchor.top + anchor.bottom) / 2;
+      const margin = 16, gap = 28;
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = window.innerHeight;
+      detailTarget.style.removeProperty("max-height");
+      const card = detailTarget.getBoundingClientRect();
+      const clampX = x => Math.max(margin, Math.min(x, viewportWidth - card.width - margin));
+      const clampY = y => Math.max(margin, Math.min(y, viewportHeight - card.height - margin));
+      let left, top;
+      detailTarget.style.right = "auto";
+      // La mayor parte de la tarjeta queda por encima del cursor, a un lado.
+      if (pointerX + gap + card.width <= viewportWidth - margin) {
+        left = pointerX + gap;
+        top = clampY(pointerY - card.height + 44);
+      } else if (pointerX - gap - card.width >= margin) {
+        // Anclar el borde derecho directamente al cursor evita diferencias de anchura.
+        detailTarget.style.right = `${viewportWidth - pointerX + gap}px`;
+        top = clampY(pointerY - card.height + 44);
+      } else {
+        left = clampX(pointerX - card.width / 2);
+        const above = Math.max(0, pointerY - gap - margin);
+        const below = Math.max(0, viewportHeight - pointerY - gap - margin);
+        if (above >= card.height || above >= below) {
+          detailTarget.style.maxHeight = `${Math.max(1, above)}px`;
+          top = Math.max(margin, pointerY - gap - Math.min(card.height, above));
+        } else {
+          detailTarget.style.maxHeight = `${Math.max(1, below)}px`;
+          top = pointerY + gap;
+        }
+      }
+      detailTarget.style.left = left === undefined ? "auto" : `${left}px`;
+      detailTarget.style.top = `${top}px`;
+    };
     chartTarget.querySelectorAll("[data-chart-bet-index]").forEach((node) => {
       const segment = betSegments[Number(node.dataset.chartBetIndex)];
-      const setActiveSegment = () => {
+      const setActiveSegment = (event) => {
         if (!segment || !detailTarget) return;
-        const callout = calloutPosition(segment);
         detailTarget.classList.remove("is-hidden");
         detailTarget.setAttribute("aria-hidden", "false");
         detailTarget.classList.toggle("chart-bet-positive", segment.type === "positive");
         detailTarget.classList.toggle("chart-bet-negative", segment.type === "negative");
-        detailTarget.style.cssText = callout.style;
         detailTarget.innerHTML = betDetailMarkup(segment);
+        positionDetail(event);
       };
       node.addEventListener("mouseenter", setActiveSegment);
+      node.addEventListener("mousemove", positionDetail);
       node.addEventListener("mouseleave", hideDetail);
       node.addEventListener("focus", setActiveSegment);
       node.addEventListener("blur", hideDetail);
     });
     plotTarget?.addEventListener("mousemove", (event) => {
       const target = event.target instanceof Element ? event.target : null;
-      if (!target?.closest("[data-chart-bet-index]")) hideDetail();
+      if (!target?.closest("[data-chart-bet-index], [data-chart-bet-detail]")) {
+        hideDetail();
+      }
     });
     plotTarget?.addEventListener("mouseleave", hideDetail);
+    plotTarget?.querySelector(":scope > svg")?.addEventListener("mouseleave", hideDetail);
   };
 
   const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.", target = rowsTarget, updateCount = true) => {

@@ -4522,7 +4522,8 @@ td {
   padding: 16px;
 }
 
-.chart-frame svg {
+.chart-frame > svg,
+.chart-frame .registry-chart-plot > svg {
   display: block;
   width: 100%;
   min-height: 240px;
@@ -7330,7 +7331,8 @@ body:not(.has-active-signal) .signal-access-grid {
     padding: 10px 42px 10px 8px;
   }
 
-  .chart-frame svg {
+  .chart-frame > svg,
+.chart-frame .registry-chart-plot > svg {
     min-height: 200px;
   }
 
@@ -8498,7 +8500,7 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding: 8px 38px 8px 8px;
   }
 
-  .registry-chart.chart-frame svg {
+  .registry-chart.chart-frame .registry-chart-plot > svg {
     min-height: 176px;
   }
 
@@ -8590,7 +8592,7 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding: 6px 32px 6px 6px;
   }
 
-  .registry-chart.chart-frame svg {
+  .registry-chart.chart-frame .registry-chart-plot > svg {
     min-height: 238px;
   }
 
@@ -10657,7 +10659,7 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding: 14px 34px 14px 10px;
   }
 
-  .registry-chart.chart-frame svg {
+  .registry-chart.chart-frame .registry-chart-plot > svg {
     display: block;
     width: 100%;
     height: auto;
@@ -10815,7 +10817,7 @@ body:not(.has-active-signal) .signal-home-status > span {
     padding-right: 34px;
   }
 
-  .registry-chart.chart-frame svg {
+  .registry-chart.chart-frame .registry-chart-plot > svg {
     width: 100%;
     height: auto;
     min-height: 0;
