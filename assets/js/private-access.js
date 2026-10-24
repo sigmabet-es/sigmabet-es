@@ -28,7 +28,7 @@
       if (!response.ok) throw new Error(response.status === 403 ? 'Tu cuenta necesita el rol admin. Solicita que lo activen en Netlify Identity.' : 'No se ha podido iniciar la sesión.');
       widget.close(); showTools();
       status.textContent = `Sesión iniciada · ${user.email}`;
-      if (destination && /^\/admin\/(apuestas|analizador)\/$/.test(destination)) location.assign(destination);
+      if (destination && /^\/admin\/(apuestas|analizador|redes)\/$/.test(destination)) location.assign(destination);
     } catch (error) { clear(); status.textContent = error.message; logout.hidden = false; }
     finally { busy = false; }
   };
