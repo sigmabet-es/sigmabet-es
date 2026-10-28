@@ -6,8 +6,10 @@
     <title>Registro público | SigmaBet</title>
     <meta name="description" content="Historial público de apuestas de SigmaBet: cuota, stake, resultado, unidades, balance y Yield." />
     <link rel="icon" href="assets/img/logo.svg?v=20260709-05" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260709-05" />
-    <script src="assets/js/main.js?v=20260709-05" defer></script>
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261027-legal" />
+    <link rel="stylesheet" href="assets/css/registro-cards.css?v=20261024-centered-odds" />
+    <script src="assets/js/main.js?v=20261027-legal" defer></script>
+      <link rel="stylesheet" href="assets/css/chart-bet-card.css?v=20261024-void-selection-style" />
   </head>
   <body>
     <header class="site-header">
@@ -36,6 +38,14 @@
           </div>
 
           <section class="registry-overview" aria-label="Estadísticas del registro">
+            <div class="registry-stat-grid registry-summary-first">
+              <article><span>Balance</span><strong data-summary="balance"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+              <article><span>Yield</span><strong data-summary="yield"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+              <article><span>Acierto</span><strong data-summary="hit"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+              <article><span>Apuestas cerradas</span><strong data-summary="total"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+              <article><span>Cuota media</span><strong data-summary="avgOdd"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+              <article><span>Stake medio</span><strong data-summary="avgStake"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
+            </div>
             <div class="registry-chart-card">
               <div class="registry-chart-head">
                 <div>
@@ -43,18 +53,26 @@
                   <p>Balance de unidades según los filtros activos.</p>
                 </div>
                 <div class="registry-chart-actions">
+                  <button type="button" class="registry-chart-history" data-chart-history hidden>Ver histórico</button>
                   <div class="registry-toolbar registry-chart-filter" aria-label="Filtro temporal del gráfico">
                     <label>
                       <span>Rango</span>
                       <select aria-label="Filtrar gráfico por tiempo" data-filter="time">
                         <option value="Todos" selected>Histórico</option>
-                        <option value="7d">7 días</option>
-                        <option value="30d">30 días</option>
-                        <option value="90d">90 días</option>
-                        <option value="365d">1 año</option>
+                        <option value="month">Mes</option>
                         <option value="custom">Personalizado</option>
                       </select>
                     </label>
+                    <div class="registry-month-picker" data-month-range hidden>
+                      <label>
+                        <span>Año</span>
+                        <select aria-label="Seleccionar año" data-filter="year"></select>
+                      </label>
+                      <label>
+                        <span>Mes</span>
+                        <select aria-label="Seleccionar mes" data-filter="month"></select>
+                      </label>
+                    </div>
                     <div class="registry-custom-range" id="registry-date-panel" data-custom-range hidden>
                       <label>
                         <span>Desde</span>
@@ -84,23 +102,20 @@
               </div>
               <p class="registry-chart-updated">Actualizado <b data-summary="updated"><span class="stat-skeleton" aria-label="Cargando"></span></b></p>
             </div>
-            <div class="registry-stat-grid">
-              <article><span>Apuestas</span><strong data-summary="total"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-              <article><span>Acierto</span><strong data-summary="hit"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-              <article><span>Yield</span><strong data-summary="yield"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-              <article><span>Cuota media</span><strong data-summary="avgOdd"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-              <article><span>Beneficio</span><strong data-summary="balance"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-              <article><span>Stake medio</span><strong data-summary="avgStake"><span class="stat-skeleton" aria-label="Cargando"></span></strong></article>
-            </div>
           </section>
 
           <p class="registry-status" data-registry-status>Actualizando el registro…</p>
           <p class="data-warning" data-registry-warning hidden>No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.</p>
 
+          <section class="registry-pending-section" data-pending-section hidden aria-labelledby="pending-title">
+            <div class="registry-history-head"><div><h2 id="pending-title">Pendientes</h2><p>Apuestas abiertas, fuera del balance hasta su cierre.</p></div><span data-pending-count></span></div>
+            <div class="registry-ledger" data-pending-rows></div>
+          </section>
+
           <div class="registry-history-head">
             <div>
               <h2>Histórico de apuestas</h2>
-              <p>Todas las apuestas registradas según los filtros activos.</p>
+              <p>Apuestas cerradas del periodo seleccionado, de más reciente a más antigua.</p>
             </div>
             <span data-registry-count>Actualizando</span>
           </div>
@@ -108,6 +123,7 @@
           <section class="registry-ledger" aria-label="Histórico de apuestas" data-registry-rows>
             <div class="registry-ledger-empty">No se borran pérdidas. No se ocultan rachas malas. No se maquilla el histórico.</div>
           </section>
+          <button class="registry-load-more" type="button" data-history-more hidden>Cargar 20 más</button>
         </div>
       </section>
     </main>

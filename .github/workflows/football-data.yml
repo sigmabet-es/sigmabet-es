@@ -1,0 +1,48 @@
+name: Actualizar datos de LaLiga
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: football-data-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Recuperar base interna
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/sigmabet-private/football.sqlite
+          key: football-data-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: football-data-v1-
+      - name: Verificar sincronizador
+        run: python3 -m unittest discover -s tools/tests -p 'test_football*.py'
+      - name: Sincronizar y regenerar fichas
+        env:
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+        run: |
+          python3 tools/sync-football-data.py --force --db "$RUNNER_TEMP/sigmabet-private/football.sqlite"
+          python3 tools/sync-football-history.py --db "$RUNNER_TEMP/sigmabet-private/football.sqlite"
+          node tools/build-prepartido.js
+      - name: Guardar cambios públicos
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/prepartido/laliga.json data/prepartido/history.json data/prepartido/coverage.json partidos/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Actualizar calendario y resultados de LaLiga'
+            git push
+          fi
