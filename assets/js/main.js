@@ -1,3 +1,22 @@
+// La liquidación económica procede del Excel; aquí solo se ajusta la cuota visible.
+const applyVoidAdjustment = (row) => {
+  // Deshacer ajustes antiguos guardados en caché: Notas ya no determina la cuota.
+  const {cuotaOriginal, cuotaAjustada, ...base} = row;
+  const original = cuotaOriginal ?? row.cuota;
+  base.cuota = original;
+  const statuses = `${row.resultadoSelecciones || ""} ${row.apuesta || ""}`;
+  const normalized = statuses.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const raw = String(row.cuotaNull ?? "").trim();
+  if (!/↩|\b(?:anulad[oa]|nulo|void|push|cancelad[oa])\b/u.test(normalized) || !/^\d+(?:[.,]\d+)?$/.test(raw)) return base;
+  const odd = Number(raw.replace(",", "."));
+  if (!Number.isFinite(odd) || odd < 1) return base;
+  return {...base, cuotaOriginal: original, cuota: raw, cuotaAjustada: true};
+};
+
+const adjustedOddMarkup = (row, format, escape) => row.cuotaAjustada
+  ? `<span class="adjusted-odd"><del>${escape(String(format(row.cuotaOriginal)).replace(".", ","))}</del><span aria-hidden="true">→</span><span>${escape(String(format(row.cuota)).replace(".", ","))}</span></span>`
+  : escape(format(row.cuota));
+
 const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
 const TELEGRAM_URL = "https://t.me/SigmaBetES";
@@ -5,6 +24,16 @@ const TELEGRAM_URL = "https://t.me/SigmaBetES";
 document.querySelectorAll("[data-telegram-link]").forEach((link) => {
   link.setAttribute("href", TELEGRAM_URL);
 });
+
+// La caché pública dura solo mientras esta página permanece abierta.
+const publicDatasetCache = new Map();
+try {
+  for (const key of Object.keys(window.localStorage)) {
+    if (key.startsWith("sigmabet:registry:") || key.startsWith("sigmabet:home:")) {
+      window.localStorage.removeItem(key);
+    }
+  }
+} catch { /* El bloqueo del almacenamiento no impide consultar el registro. */ }
 
 const fetchWithTimeout = async (url, options = {}, timeoutMs = 10000) => {
   const controller = new AbortController();
@@ -36,13 +65,16 @@ if (toggle && nav) {
 
 const telegramMobileBar = (() => {
   if (!window.matchMedia("(max-width: 760px)").matches) return null;
-  if (sessionStorage.getItem("sigmabetTelegramBarClosed") === "true") return null;
+  try {
+    if (sessionStorage.getItem("sigmabetTelegramBarClosed") === "true") return null;
+  } catch { /* La barra funciona también sin almacenamiento disponible. */ }
 
   const bar = document.createElement("div");
   bar.className = "telegram-mobile-bar";
   bar.setAttribute("data-telegram-mobile-bar", "");
   bar.innerHTML = `
-    <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Unirme al Telegram gratis</a>
+    <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Ver pronósticos gratuitos</a>
+    <small class="telegram-risk-note">+18 · Apostar implica riesgo de pérdidas.</small>
     <button type="button" aria-label="Cerrar Telegram">×</button>
   `;
   document.body.append(bar);
@@ -54,7 +86,7 @@ const telegramMobileBar = (() => {
     }
   };
   const close = () => {
-    sessionStorage.setItem("sigmabetTelegramBarClosed", "true");
+    try { sessionStorage.setItem("sigmabetTelegramBarClosed", "true"); } catch {}
     document.body.classList.remove("has-telegram-mobile-bar");
     bar.remove();
     window.removeEventListener("scroll", onScroll);
@@ -776,6 +808,7 @@ if (registry) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    cuotaNull: ["cuota null"],
     valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     stake: ["stake"],
@@ -852,6 +885,7 @@ if (registry) {
           apuesta,
           casa: getCell(row, headers, "casa"),
           cuota: getCell(row, headers, "cuota"),
+          cuotaNull: getCell(row, headers, "cuotaNull"),
           valorSigma: getCell(row, headers, "valorSigma"),
           resultado: getCell(row, headers, "resultado"),
           stake: getCell(row, headers, "stake"),
@@ -906,6 +940,7 @@ if (registry) {
     const text = String(value || "").trim();
     const clean = normalize(text);
     if (!clean) return "";
+    if (/↩/u.test(text) || /\banulad[oa]\b/.test(clean)) return "Anulada";
     if (/^[✅🟢✓✔]/u.test(text) || ["ganado", "ganada", "verde", "win", "acierto", "acertado", "acertada"].includes(clean)) {
       return "Ganado";
     }
@@ -926,16 +961,19 @@ if (registry) {
 
   const stripSelectionStatus = (value) => {
     let text = displayText(value, "");
+    text = text.replace(/^\s*↩\uFE0F?\s*|\s*↩\uFE0F?\s*$/gu, "");
     text = text.replace(/^[✅🟢✓✔❌🔴✕✖➖⚪🟡]\s*/u, "");
-    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
-    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
-    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
+    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
+    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
+    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
     return text.trim();
   };
 
   const selectionParts = (pickValue, statusValue) => {
     const picks = pickParts(pickValue);
-    const rawStatuses = pickParts(statusValue);
+    let rawStatuses = pickParts(statusValue);
+    const symbols = String(statusValue || "").replace(/\uFE0F/g, "");
+    if (/^[✅🟢✓✔❌🔴✕✖➖⚪🟡↩\s+;,|]+$/u.test(symbols)) rawStatuses = symbols.match(/[✅🟢✓✔❌🔴✕✖➖⚪🟡↩]/gu) || [];
     const hasUsefulStatuses = rawStatuses.some((part) => selectionStatus(part) || stripSelectionStatus(part) !== part);
 
     if (rawStatuses.length && hasUsefulStatuses) {
@@ -949,7 +987,7 @@ if (registry) {
       });
     }
 
-    return picks.map((pick) => ({ text: pick, status: "" }));
+    return picks.map((pick) => ({ text: stripSelectionStatus(pick), status: selectionStatus(pick) }));
   };
 
   const sharePickText = (row) => {
@@ -1185,11 +1223,11 @@ if (registry) {
             .map((selection) => {
               const selectionStatusLabel = resultLabel(selection.status || "Pendiente");
               const selectionClass = normalize(selectionStatusLabel).replace(/\s+/g, "-");
-              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span>${escapeHtml(selection.text)}</span><span class="sr-only">${escapeHtml(selectionStatusLabel)}</span></li>`;
+              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span class="selection-copy">${escapeHtml(selection.text)}</span>${selection.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : `<span class="sr-only">${escapeHtml(selectionStatusLabel)}</span>`}</li>`;
             }).join("")}
         </ul>
         <dl class="chart-bet-metrics">
-          <div><dt>Cuota</dt><dd>${escapeHtml(formatOdd(segment.row.cuota))}</dd></div>
+          <div><dt>${segment.row.cuotaAjustada ? "Cuota final" : "Cuota"}</dt><dd>${adjustedOddMarkup(segment.row, formatOdd, escapeHtml)}</dd></div>
           <div class="chart-bet-sigma"><dt>Valor Sigma</dt><dd><b><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10l5 6-10 11L2 10 7 4Z"/><path d="m7 4 5 17 5-17M2 10h20M7 4l5 6 5-6"/></svg>${escapeHtml(String(segment.row.valorSigma ?? "").trim().replace(/(\d)\.(?=\d)/g, "$1,") || "—")}</b></dd></div>
           <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
           <div><dt>Resultado</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
@@ -1364,6 +1402,7 @@ if (registry) {
           match: row.partido,
           pick: isPendingRow ? "Disponible en el Telegram gratuito" : row.apuesta,
           odd: formatOdd(row.cuota),
+          originalOdd: row.cuotaAjustada ? formatOdd(row.cuotaOriginal) : "",
           stake: row.stake,
           valorSigma: row.valorSigma,
           result: statusLabel,
@@ -1399,7 +1438,7 @@ if (registry) {
         }
 
         return `
-          <details class="registry-ledger-item bet-card ${rowClass}">
+          <details class="registry-ledger-item bet-card ${rowClass}${row.cuotaAjustada ? " has-adjusted-odd" : ""}">
             <summary>
               <div class="registry-ledger-content">
                 <div class="registry-ledger-main">
@@ -1408,7 +1447,7 @@ if (registry) {
                   <span class="registry-competition">${escapeHtml(row.competition)}</span>
                 </div>
                 <div class="registry-ledger-meta">
-                  <span>Cuota <b>${escapeHtml(formatOdd(row.cuota))}</b></span>
+                  <span>Cuota <b>${adjustedOddMarkup(row, formatOdd, escapeHtml)}</b></span>
                   <span>Stake <b>${escapeHtml(row.stake)}</b></span>
                   <span class="bet-card-sigma"><span class="bet-metric-label">Valor Sigma</span>${sigmaMarkup(row)}</span>
                 </div>
@@ -1435,6 +1474,7 @@ if (registry) {
                   `
                   : `
                     <p class="registry-expanded-label">Apuesta registrada</p>
+                    ${row.cuotaAjustada ? `<p class="registry-void-note">↩ Cuota recalculada por selección anulada</p>` : ""}
                     <div class="pick-timeline">
                       ${(timeline.length ? timeline : [{ text: row.apuesta || "Apuesta registrada", status: "" }])
                         .map((part) => {
@@ -1442,7 +1482,7 @@ if (registry) {
                           const selectionClass = part.status ? normalize(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
                           return `
                             <div class="pick-step selection-${selectionClass}">
-                              <span>${escapeHtml(part.text)}</span>
+                              <span class="selection-copy">${escapeHtml(part.text)}</span>${part.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : ""}
                             </div>
                           `;
                         })
@@ -1561,19 +1601,19 @@ if (registry) {
       if (!registryHasRenderedData) setSummaryLoading();
       if (registryWarningTarget) registryWarningTarget.hidden = true;
       const dataset = await loadRegistryDataset();
-      registryRows = dataset.rows;
+      registryRows = dataset.rows.map(applyVoidAdjustment);
       updateMonthOptions();
       registryUpdatedAt = dataset.updatedAt;
-      localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
+      publicDatasetCache.set(registryCacheKey, { rows: registryRows, updatedAt: registryUpdatedAt });
       updateCustomRangeVisibility();
       registryHasRenderedData = true;
       registryHasTerminalError = false;
       renderRegistryView({ source: dataset.source });
       if (dataset.source === "stale" && registryWarningTarget) registryWarningTarget.hidden = false;
     } catch (error) {
-      const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
+      const cached = publicDatasetCache.get(registryCacheKey);
       if (cached?.rows?.length) {
-        registryRows = cached.rows;
+        registryRows = cached.rows.map(applyVoidAdjustment);
         updateMonthOptions();
         registryUpdatedAt = cached.updatedAt;
         registryHasRenderedData = true;
@@ -1798,6 +1838,8 @@ if (homeFeed) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    cuotaNull: ["cuota null"],
+    notas: ["notas", "nota"],
     valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     resultadoSelecciones: [
@@ -1840,6 +1882,8 @@ if (homeFeed) {
         apuesta: homeCell(row, headers, "apuesta"),
         casa: homeCell(row, headers, "casa"),
         cuota: homeCell(row, headers, "cuota"),
+        cuotaNull: homeCell(row, headers, "cuotaNull"),
+        notas: homeCell(row, headers, "notas"),
           valorSigma: homeCell(row, headers, "valorSigma"),
         resultado: homeCell(row, headers, "resultado"),
         resultadoSelecciones: homeCell(row, headers, "resultadoSelecciones"),
@@ -1897,6 +1941,7 @@ if (homeFeed) {
     const text = String(value || "").trim();
     const clean = normalizeHome(text);
     if (!clean) return "";
+    if (/↩/u.test(text) || /\banulad[oa]\b/.test(clean)) return "Anulada";
     if (/^[✅🟢✓✔]/u.test(text) || ["ganado", "ganada", "verde", "win", "acierto", "acertado", "acertada"].includes(clean)) return "Ganado";
     if (/^[❌🔴✕✖]/u.test(text) || ["perdido", "perdida", "rojo", "loss", "fallo", "fallado", "fallada"].includes(clean)) return "Perdido";
     if (/^[➖⚪🟡]/u.test(text) || ["nulo", "void", "push", "cancelado", "cancelada"].includes(clean)) return "Nulo";
@@ -1911,16 +1956,19 @@ if (homeFeed) {
 
   const stripHomeSelectionStatus = (value) => {
     let text = textHome(value, "");
+    text = text.replace(/^\s*↩\uFE0F?\s*|\s*↩\uFE0F?\s*$/gu, "");
     text = text.replace(/^[✅🟢✓✔❌🔴✕✖➖⚪🟡]\s*/u, "");
-    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
-    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
-    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
+    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
+    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
+    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
     return text.trim();
   };
 
   const homeSelectionParts = (pickValue, statusValue) => {
     const picks = homePickParts(pickValue);
-    const rawStatuses = homePickParts(statusValue);
+    let rawStatuses = homePickParts(statusValue);
+    const symbols = String(statusValue || "").replace(/\uFE0F/g, "");
+    if (/^[✅🟢✓✔❌🔴✕✖➖⚪🟡↩\s+;,|]+$/u.test(symbols)) rawStatuses = symbols.match(/[✅🟢✓✔❌🔴✕✖➖⚪🟡↩]/gu) || [];
     const hasUsefulStatuses = rawStatuses.some((part) => homeSelectionStatus(part) || stripHomeSelectionStatus(part) !== part);
 
     if (rawStatuses.length && hasUsefulStatuses) {
@@ -1934,7 +1982,7 @@ if (homeFeed) {
       });
     }
 
-    return picks.map((pick) => ({ text: pick, status: "" }));
+    return picks.map((pick) => ({ text: stripHomeSelectionStatus(pick), status: homeSelectionStatus(pick) }));
   };
 
   const dateInHomeRange = (row) => {
@@ -2002,7 +2050,7 @@ if (homeFeed) {
                   <span class="registry-competition">${escapeHome(row.competition || row.tipo || "Fútbol")}</span>
                 </div>
                 <div class="registry-ledger-meta">
-                  <span>Cuota <b>${escapeHome(numberHome(row.cuota).toFixed(2))}</b></span>
+                  <span>Cuota <b>${adjustedOddMarkup(row, value => numberHome(value).toFixed(2).replace(".", ","), escapeHome)}</b></span>
                   <span>Stake <b>${escapeHome(row.stake)}</b></span>
                 </div>
               </div>
@@ -2020,7 +2068,7 @@ if (homeFeed) {
                     const selectionText = typeof selection === "string" ? selection : selection.text;
                     const selectionLabel = typeof selection === "string" ? "" : resultLabelHome(selection.status);
                     const selectionClass = selection.status ? normalizeHome(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
-                    return `<div class="pick-step selection-${selectionClass}"><span>${escapeHome(selectionText)}</span></div>`;
+                    return `<div class="pick-step selection-${selectionClass}"><span class="selection-copy">${escapeHome(selectionText)}</span>${selection.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : ""}</div>`;
                   })
                   .join("")}
               </div>
@@ -2203,17 +2251,17 @@ if (homeFeed) {
       if (!homeHasRenderedData) setHomeStatsLoading();
       if (warningTarget) warningTarget.hidden = true;
       const dataset = await loadHomeDataset();
-      homeRows = dataset.rows;
+      homeRows = dataset.rows.map(applyVoidAdjustment);
       homeUpdatedAt = dataset.updatedAt;
-      localStorage.setItem(homeCacheKey, JSON.stringify({ rows: homeRows, updatedAt: homeUpdatedAt }));
+      publicDatasetCache.set(homeCacheKey, { rows: homeRows, updatedAt: homeUpdatedAt });
       homeHasRenderedData = true;
       homeHasTerminalError = false;
       renderHomeFeed({ source: dataset.source });
       if (dataset.source === "stale" && warningTarget) warningTarget.hidden = false;
     } catch (error) {
-      const cached = JSON.parse(localStorage.getItem(homeCacheKey) || "null");
+      const cached = publicDatasetCache.get(homeCacheKey);
       if (cached?.rows?.length) {
-        homeRows = cached.rows;
+        homeRows = cached.rows.map(applyVoidAdjustment);
         homeUpdatedAt = cached.updatedAt;
         homeHasRenderedData = true;
         homeHasTerminalError = false;
@@ -2321,6 +2369,7 @@ const shareCanvasHelpers = (() => {
     const hasNumeric = Number.isFinite(numeric);
     if (!clean && !hasNumeric) return { color: muted, label: "SIN RESULTADO" };
     if (clean.includes("perd") || clean.includes("rojo") || (hasNumeric && numeric < 0)) return { color: red, label: "PERDIDO" };
+    if (clean.includes("anulad") || clean.includes("↩")) return { color: "#AEB8B2", label: "ANULADA" };
     if (clean.includes("nulo")) return { color: "#D7B354", label: "NULO" };
     if (clean.includes("pend")) return { color: muted, label: "PENDIENTE" };
     return { color: green, label: "GANADO" };
@@ -2508,7 +2557,24 @@ const shareCanvasHelpers = (() => {
     write("STAKE", 490, resultTop + 26, 13, 600, "#ADB4B1");
     fit(payload.stake || "—", 490, resultTop + 68, 132, 30);
     write("CUOTA", 104, resultTop + 26, 13, 600, "#ADB4B1");
-    fit(payload.odd || "—", 104, resultTop + 68, 140, 30);
+    if (payload.originalOdd) {
+      const original = String(payload.originalOdd).replace(".", ",");
+      const final = String(payload.odd || "—").replace(".", ",");
+      const combined = `${original} → ${final}`;
+      let oddSize = 22;
+      while (oddSize > 12) {
+        ctx.font = `650 ${oddSize}px ${sans}`;
+        if (ctx.measureText(combined).width <= 140) break;
+        oddSize--;
+      }
+      write(combined, 104, resultTop + 72, oddSize, 650);
+      ctx.font = `650 ${oddSize}px ${sans}`;
+      ctx.beginPath(); ctx.moveTo(104, resultTop + 72 + oddSize * .55);
+      ctx.lineTo(104 + ctx.measureText(original).width, resultTop + 72 + oddSize * .55);
+      ctx.strokeStyle = "#A5AFA9"; ctx.lineWidth = 1.5; ctx.stroke();
+    } else {
+      fit(payload.odd || "—", 104, resultTop + 68, 140, 30);
+    }
 
     write("REGISTRO PÚBLICO · sigmabet.es", 104, footerTop - 42, 14, 550, "#7D8983");
     write("Más datos. Menos fe.", 104, footerTop + 26, 19, 650, "#CBCFCB");

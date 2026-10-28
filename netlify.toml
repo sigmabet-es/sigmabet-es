@@ -23,3 +23,22 @@
   from = "/privado/*"
   to = "/admin/:splat"
   status = 301
+
+# Los antiguos enlaces del estudio llevan ahora al área autenticada.
+[[redirects]]
+  from = "/material-grafico.html"
+  to = "/admin/material-grafico.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/material-grafico"
+  to = "/admin/material-grafico.html"
+  status = 302
+  force = true
+
+[[headers]]
+  for = "/senal-sigma*"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+    X-Robots-Tag = "noindex, nofollow, noarchive"

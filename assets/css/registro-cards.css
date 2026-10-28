@@ -250,3 +250,17 @@
   .registry-only .bet-card .registry-ledger-meta b,
   .registry-only .bet-card .bet-card-sigma .registry-sigma b { font-size: 12px; }
 }
+
+/* El cambio de cuota ocupa una sola línea, alineada con las demás métricas. */
+.registry-only .bet-card.has-adjusted-odd .registry-ledger-meta{grid-template-columns:minmax(92px,max-content) 64px 100px}
+.registry-only .bet-card .registry-ledger-meta .adjusted-odd{display:inline-flex!important;flex-direction:row!important;align-items:baseline;gap:6px;white-space:nowrap;line-height:1.2}
+.registry-only .bet-card .adjusted-odd del{font-size:11px;color:#818d85}
+.registry-only .bet-card .adjusted-odd>span[aria-hidden]{color:#818d85;font-size:11px}
+.registry-only .bet-card .adjusted-odd>span:last-child{color:#eef3ef;font-weight:600}
+.registry-only .bet-card .registry-void-note{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;font:500 11px/1.5 var(--font-sans);color:#99a59d}
+@media(max-width:740px){.registry-only .bet-card.has-adjusted-odd .registry-ledger-meta{grid-template-columns:minmax(86px,max-content) 60px 100px;gap:10px}}
+
+/* Centrar la etiqueta sobre el cambio completo de cuota. */
+.registry-only .bet-card.has-adjusted-odd .registry-ledger-meta>span:first-child{align-items:center;text-align:center;justify-self:stretch}
+.registry-only .bet-card.has-adjusted-odd .registry-ledger-meta>span:first-child>b{display:flex;justify-content:center;width:100%}
+.registry-only .bet-card.has-adjusted-odd .registry-ledger-meta .adjusted-odd{justify-content:center;align-items:center}

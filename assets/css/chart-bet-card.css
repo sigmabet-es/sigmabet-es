@@ -60,3 +60,9 @@
 .registry-chart-layout > .chart-callout-card.is-hidden{display:none;visibility:hidden;opacity:0;transition:none}
 
 .registry-chart-layout > .chart-callout-card.chart-bet-card{box-sizing:border-box;margin:0;transform:none}
+
+.chart-callout-card .chart-bet-metrics .adjusted-odd{font-size:12px!important;line-height:1.4}
+
+.chart-callout-card .chart-selection-list .chart-selection-anulada{grid-template-columns:8px minmax(0,1fr) auto;align-items:center}
+.chart-callout-card .chart-selection-list .chart-selection-anulada>.selection-copy{opacity:.48;text-decoration:line-through}
+.chart-callout-card .chart-selection-list .selection-void-label{font-size:9px;padding:3px 6px}

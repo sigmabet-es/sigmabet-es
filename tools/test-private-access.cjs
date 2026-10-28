@@ -16,6 +16,13 @@ const request = (path, options = {}) => new Request(`https://sigmabet.es${path}`
 (async () => {
   let response = await scope.handler(request('/admin/apuestas/'), context);
   assert.equal(response.status, 303); assert.match(response.headers.get('location'), /^\/admin\/\?next=/);
+  for (const path of ['/admin/senal-sigma.html', '/admin/material-grafico.html']) {
+    const anonymous = await scope.handler(request(path), context);
+    assert.equal(anonymous.status, 303);
+    assert.equal(await anonymous.text(), '');
+    const authorized = await scope.handler(request(path, {headers: {cookie: 'sigmabet_admin_session=admin.jwt'}}), context);
+    assert.equal(await authorized.text(), 'protected content');
+  }
   response = await scope.handler(request('/admin/'), context); assert.equal(response.status, 200);
   response = await scope.handler(request('/admin/?session=1'), context); assert.equal(response.status, 401);
   response = await scope.handler(request('/admin/?session=1', {headers: {cookie: 'sigmabet_admin_session=admin.jwt'}}), context); assert.equal(response.status, 204);
