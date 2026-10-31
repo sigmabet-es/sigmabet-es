@@ -16,7 +16,7 @@ const request = (path, options = {}) => new Request(`https://sigmabet.es${path}`
 (async () => {
   let response = await scope.handler(request('/admin/apuestas/'), context);
   assert.equal(response.status, 303); assert.match(response.headers.get('location'), /^\/admin\/\?next=/);
-  for (const path of ['/admin/senal-sigma.html', '/admin/material-grafico.html']) {
+  for (const path of ['/admin/senal-sigma.html', '/admin/material-grafico.html', '/admin/balance/', '/admin/balance/index.html']) {
     const anonymous = await scope.handler(request(path), context);
     assert.equal(anonymous.status, 303);
     assert.equal(await anonymous.text(), '');
