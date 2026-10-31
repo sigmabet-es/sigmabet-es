@@ -45,6 +45,6 @@ console.log('Telegram: resultados y enlaces correctos, pendientes excluidas, enl
   assert.equal(clips.length,2);
   assert.equal(clips[0].y+clips[0].h,clips[1].y,'Ambos recortes deben coincidir exactamente en el cero.');
  }
- assert(drawn.some(text=>text.includes('PROVISIONAL')));assert(drawn.includes('-0,68 u'));assert(drawn.includes('0,00 u'));assert(drawn.includes('+14,50 u'));assert(drawn.some(text=>text.includes('pendientes excluidas')));
+ assert(!drawn.some(text=>text.includes('PROVISIONAL')));assert(drawn.includes('ACIERTO'));assert(drawn.includes('33,3 %'));assert(drawn.includes('+18 · Juego responsable'));assert(drawn.includes('-0,68 u'));assert(drawn.includes('0,00 u'));assert(drawn.includes('+14,50 u'));assert(drawn.some(text=>text.includes('pendientes excluidas')));
  console.log('Balance mensual: meses y años aislados, pendientes excluidas, liquidaciones originales, nulos, duplicados, datos incompletos y PNG 1080 × 1080 correctos.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

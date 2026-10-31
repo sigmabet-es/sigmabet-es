@@ -3,20 +3,20 @@
   const format = (value, decimals = 2) => new Intl.NumberFormat('es-ES', {minimumFractionDigits: decimals, maximumFractionDigits: decimals}).format(value);
   const signed = value => `${value > 0 ? '+' : ''}${format(value)}`;
   const monthLabel = month => new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(`${month}-01T12:00:00Z`));
-  const render = async (data, {provisional = false} = {}) => {
+  const render = async (data) => {
     await document.fonts.ready;
     const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1080;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Este navegador no permite generar imágenes.');
     const color = data.balance > 0 ? GREEN : data.balance < 0 ? '#ff717d' : WHITE;
-    const write = (text,x,y,size=20,weight=500,fill=WHITE) => {ctx.font = `${weight} ${size}px Manrope, system-ui, sans-serif`; ctx.fillStyle=fill; ctx.textBaseline='top'; ctx.fillText(String(text),x,y);};
+    const write = (text,x,y,size=20,weight=500,fill=WHITE,align='left') => {ctx.textAlign=align;ctx.font = `${weight} ${size}px Manrope, system-ui, sans-serif`; ctx.fillStyle=fill; ctx.textBaseline='top'; ctx.fillText(String(text),x,y);};
     ctx.fillStyle='#090d0b'; ctx.fillRect(0,0,1080,1080);
     const glow = ctx.createRadialGradient(1020,420,0,1020,420,700); glow.addColorStop(0,data.balance < 0 ? '#ff617a16' : '#00ff7f18');glow.addColorStop(1,'#090d0b00');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,1080);
     ctx.strokeStyle='#ffffff06'; ctx.lineWidth=1;
     for(let n=0;n<=1080;n+=48){ctx.beginPath();ctx.moveTo(n,0);ctx.lineTo(n,1080);ctx.moveTo(0,n);ctx.lineTo(1080,n);ctx.stroke();}
     write('σ',64,49,60,800,GREEN);write('SigmaBet',119,63,29,750);write('REGISTRO PÚBLICO',744,73,15,600,MUTED);
     ctx.fillStyle='#34453b';ctx.fillRect(64,131,952,1);
-    write(provisional ? 'BALANCE MENSUAL · PROVISIONAL' : 'BALANCE MENSUAL',64,170,16,650,MUTED);
+    write('BALANCE MENSUAL',64,170,16,650,MUTED);
     const label=monthLabel(data.month);write(label.charAt(0).toUpperCase()+label.slice(1),64,203,44,700);
     const value=signed(data.balance);let size=132;
     ctx.font=`750 ${size}px Manrope, system-ui, sans-serif`;
@@ -52,11 +52,25 @@
     }
     write('Inicio del mes · 0 u',66,729,15,500,MUTED);write(`${data.settled} apuestas cerradas`,766,729,15,500,MUTED);
     ctx.fillStyle='#34453b';ctx.fillRect(64,781,952,1);
-    const metrics=[['YIELD',data.yield===null?'—':`${signed(data.yield)} %`],['GANADAS',data.wins],['PERDIDAS',data.losses],['ANULADAS',data.voids]];
-    metrics.forEach(([label,value],i)=>{const left=66+i*244;write(label,left,816,14,650,MUTED);write(value,left,848,34,700,i===0?color:WHITE);});
-    write(data.pending?`${data.pending} pendientes excluidas del balance.`:'Liquidaciones del registro · Sin apuestas pendientes.',66,917,16,500,MUTED);
-    write('sigmabet.es',66,985,21,750);write('+18 · No hay apuestas seguras.',600,989,17,500,MUTED);
-    write('Los resultados pasados no garantizan resultados futuros.',66,1027,14,500,MUTED);
+    const metrics=[
+      {label:'YIELD',value:data.yield===null?'—':`${signed(data.yield)} %`,x:66,color},
+      {label:'ACIERTO',value:data.hitRate===null?'—':`${format(data.hitRate,1)} %`,x:306,color:WHITE},
+      {label:'GANADAS',value:data.wins,x:520,color:WHITE,dot:GREEN},
+      {label:'PERDIDAS',value:data.losses,x:688,color:WHITE,dot:'#ff717d'},
+      {label:'ANULADAS',value:data.voids,x:856,color:WHITE,dot:MUTED},
+    ];
+    metrics.forEach(metric=>{
+      let labelX=metric.x;
+      if(metric.dot){ctx.beginPath();ctx.arc(metric.x+4,824,4,0,Math.PI*2);ctx.fillStyle=metric.dot;ctx.fill();labelX+=17;}
+      write(metric.label,labelX,817,13,650,MUTED);
+      write(metric.value,metric.x,848,36,700,metric.color);
+    });
+    const monthNote=data.pending?`${data.settled} apuestas liquidadas · ${data.pending} pendientes excluidas del balance`:`${data.settled} apuestas liquidadas · Resultados expresados en unidades`;
+    write(monthNote,66,914,15,500,MUTED);
+    ctx.fillStyle='#34453b';ctx.fillRect(64,956,952,1);
+    write('sigmabet.es',66,983,23,750);
+    write('+18 · Juego responsable',1014,988,16,650,MUTED,'right');
+    write('No hay apuestas seguras. Los resultados pasados no garantizan resultados futuros.',66,1031,14,500,MUTED);
     return canvas;
   };
   window.SigmaMonthlyArt={render,format,signed,monthLabel};
