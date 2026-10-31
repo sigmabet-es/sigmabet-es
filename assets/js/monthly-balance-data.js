@@ -47,7 +47,7 @@
     const headers = records[index].map(normalize);
     const get = (row, ...names) => String(row[headers.findIndex(h => names.includes(h))] ?? '').trim();
     if (!headers.includes('resultado') || !headers.some(h => ['u / profit','u/profit','profit','unidades'].includes(h))) throw new Error('Faltan las columnas Resultado y/o U / Profit en el CSV.');
-    return records.slice(index + 1).map(row => ({fecha: get(row,'fecha'), partido: get(row,'partido','evento'), cuota: get(row,'cuota','odd'), apuesta: get(row,'apuesta','pick'), resultado: get(row,'resultado'), profit: get(row,'u / profit','u/profit','profit','unidades'), stake: get(row,'stake')})).filter(row => row.apuesta && dateKey(row.fecha));
+    return records.slice(index + 1).map(row => ({fecha: get(row,'fecha'), partido: get(row,'partido','evento'), cuota: get(row,'cuota','odd'), cuotaNull: get(row,'cuota null'), resultadoSelecciones: get(row,'resultado selecciones','resultado seleccion','resultados selecciones','estado selecciones'), apuesta: get(row,'apuesta','pick'), resultado: get(row,'resultado'), profit: get(row,'u / profit','u/profit','profit','unidades'), stake: get(row,'stake')})).filter(row => row.apuesta && dateKey(row.fecha));
   };
   const uniqueRows = rows => {
     const seen = new Set();
@@ -76,7 +76,7 @@
     const stake = stakeComplete ? settled.reduce((sum,row) => sum + number(row.stake),0) : 0;
     const wins = settled.filter(row => status(row.resultado) === 'win').length;
     const losses = settled.filter(row => status(row.resultado) === 'loss').length;
-    return {month, balance, points, settled: settled.length, wins, losses, voids: settled.length - wins - losses, pending: selected.filter(row => status(row.resultado) === 'pending').length, yield: stake ? balance / stake * 100 : null, hitRate: settled.length ? wins / settled.length * 100 : null, stakeComplete, issues};
+    return {month, balance, points, bets: settled, settled: settled.length, wins, losses, voids: settled.length - wins - losses, pending: selected.filter(row => status(row.resultado) === 'pending').length, yield: stake ? balance / stake * 100 : null, hitRate: settled.length ? wins / settled.length * 100 : null, stakeComplete, issues};
   };
-  window.SigmaMonthlyData = {parseCsv, dateKey, months, summarize};
+  window.SigmaMonthlyData = {parseCsv, dateKey, months, summarize, status, number};
 })();

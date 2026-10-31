@@ -27,13 +27,28 @@
     const x=66,y=500,w=948,h=210;
     const low=Math.min(0,...data.points),high=Math.max(0,...data.points),span=high-low || 1;
     const py=value => y+18+(high-value)/span*(h-36);
-    ctx.setLineDash([5,8]);ctx.strokeStyle='#a0b2a040';ctx.beginPath();ctx.moveTo(x,py(0));ctx.lineTo(x+w,py(0));ctx.stroke();ctx.setLineDash([]);
+    const zeroY=py(0);
+    ctx.setLineDash([5,8]);ctx.strokeStyle='#a0b2a060';ctx.beginPath();ctx.moveTo(x,zeroY);ctx.lineTo(x+w,zeroY);ctx.stroke();ctx.setLineDash([]);
+    write('0',38,zeroY-8,14,600,MUTED);
     const pts=data.points.map((value,i)=>[x+i/Math.max(1,data.points.length-1)*w,py(value)]);
     if(pts.length>1){
-      const area=ctx.createLinearGradient(0,y,0,y+h);area.addColorStop(0,color+'24');area.addColorStop(1,color+'00');
-      ctx.beginPath();ctx.moveTo(pts[0][0],py(0));pts.forEach(([a,b])=>ctx.lineTo(a,b));ctx.lineTo(pts.at(-1)[0],py(0));ctx.closePath();ctx.fillStyle=area;ctx.fill();
-      ctx.beginPath();pts.forEach(([a,b],i)=>i?ctx.lineTo(a,b):ctx.moveTo(a,b));ctx.strokeStyle=color;ctx.lineWidth=4;ctx.lineJoin='round';ctx.stroke();
-      const last=pts.at(-1);ctx.beginPath();ctx.arc(last[0],last[1],6,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+      // Recortar en el cero mantiene exacto el cambio de color, incluso entre apuestas.
+      for (const positive of [true,false]) {
+        const tone=positive?GREEN:'#ff717d';
+        const top=positive?y:zeroY, bottom=positive?zeroY:y+h;
+        if(bottom<=top)continue;
+        ctx.save();ctx.beginPath();ctx.rect(x-8,top,w+16,bottom-top);ctx.clip();
+        const area=ctx.createLinearGradient(0,zeroY,0,positive?y:y+h);
+        area.addColorStop(0,tone+'00');area.addColorStop(1,tone+'32');
+        ctx.beginPath();ctx.moveTo(pts[0][0],zeroY);pts.forEach(([a,b])=>ctx.lineTo(a,b));ctx.lineTo(pts.at(-1)[0],zeroY);ctx.closePath();ctx.fillStyle=area;ctx.fill();
+        ctx.beginPath();pts.forEach(([a,b],i)=>i?ctx.lineTo(a,b):ctx.moveTo(a,b));ctx.strokeStyle=tone;ctx.lineWidth=4;ctx.lineJoin='round';ctx.stroke();
+        ctx.restore();
+      }
+      // Los tramos exactamente a cero permanecen neutros.
+      ctx.beginPath();
+      pts.forEach(([a,b],i)=>{if(i && data.points[i]===0 && data.points[i-1]===0){ctx.moveTo(...pts[i-1]);ctx.lineTo(a,b);}});
+      ctx.strokeStyle=MUTED;ctx.lineWidth=4;ctx.stroke();
+      const last=pts.at(-1),lastValue=data.points.at(-1);ctx.beginPath();ctx.arc(last[0],last[1],6,0,Math.PI*2);ctx.fillStyle=lastValue>0?GREEN:lastValue<0?'#ff717d':WHITE;ctx.fill();
     }
     write('Inicio del mes · 0 u',66,729,15,500,MUTED);write(`${data.settled} apuestas cerradas`,766,729,15,500,MUTED);
     ctx.fillStyle='#34453b';ctx.fillRect(64,781,952,1);

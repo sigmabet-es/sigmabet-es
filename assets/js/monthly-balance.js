@@ -7,7 +7,7 @@
     const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Atlantic/Canary',year:'numeric',month:'2-digit'}).formatToParts(new Date());
     return `${parts.find(p=>p.type==='year').value}-${parts.find(p=>p.type==='month').value}`;
   };
-  const clear=message=>{revision++;canvas=null;download.disabled=true;preview.replaceChildren();const p=document.createElement('p');p.textContent=message;preview.append(p);status.textContent=message;root.querySelectorAll('[data-summary]').forEach(el=>{el.textContent='—';el.className='';});};
+  const clear=message=>{window.SigmaMonthlyTelegram?.update(null);revision++;canvas=null;download.disabled=true;preview.replaceChildren();const p=document.createElement('p');p.textContent=message;preview.append(p);status.textContent=message;root.querySelectorAll('[data-summary]').forEach(el=>{el.textContent='—';el.className='';});};
   const render=async()=>{
     const version=++revision;canvas=null;download.disabled=true;
     if(!month.value){clear('No hay meses disponibles en el registro.');return;}
@@ -22,6 +22,7 @@
       $('[data-month-note]').textContent=summary.issues.length?summary.issues.join(' '):!summary.settled?'Este mes todavía no tiene apuestas cerradas.':`${provisional?'Balance provisional.':'Mes cerrado.'} ${summary.pending?'Las apuestas pendientes quedan fuera del balance.':''} ${!summary.stakeComplete?'Falta stake válido en alguna apuesta: el yield no se mostrará.':''}`;
       if(summary.issues.length){clear('Corrige los datos señalados antes de generar la imagen.');return;}
       if(!summary.settled){clear('Este mes todavía no tiene apuestas cerradas.');return;}
+      window.SigmaMonthlyTelegram?.update(summary,{provisional});
       status.textContent='Generando imagen…';
       const next=await art.render(summary,{provisional});
       if(version!==revision)return;
