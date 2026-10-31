@@ -1,3 +1,18 @@
+// La liquidación económica procede del Excel; aquí solo se ajusta la cuota visible.
+const applyVoidAdjustment = (row) => {
+  // Deshacer ajustes antiguos guardados en caché: Notas ya no determina la cuota.
+  const {cuotaOriginal, cuotaAjustada, ...base} = row;
+  const original = cuotaOriginal ?? row.cuota;
+  base.cuota = original;
+  const statuses = `${row.resultadoSelecciones || ""} ${row.apuesta || ""}`;
+  const normalized = statuses.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const raw = String(row.cuotaNull ?? "").trim();
+  if (!/↩|\b(?:anulad[oa]|nulo|void|push|cancelad[oa])\b/u.test(normalized) || !/^\d+(?:[.,]\d+)?$/.test(raw)) return base;
+  const odd = Number(raw.replace(",", "."));
+  if (!Number.isFinite(odd) || odd < 1) return base;
+  return {...base, cuotaOriginal: original, cuota: raw, cuotaAjustada: true};
+};
+
 const SHEET_URL =
   process.env.SIGMABET_REGISTRY_CSV_URL ||
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQF6IjnBd19bjJ8Ws5La0n8FBKmh-ad3Kfj89CQRCKi3JrbsTGcuIn6WJaqkQXL_A/pub?gid=544576635&single=true&output=csv";
@@ -94,6 +109,8 @@ const aliases = {
   apuesta: ["apuesta", "pick"],
   casa: ["casa", "bookie", "casa de apuestas"],
   cuota: ["cuota", "odd"],
+  cuotaNull: ["cuota null"],
+    valorSigma: ["ev estimado"],
   resultado: ["resultado"],
   stake: ["stake"],
   profit: ["u / profit", "u/profit", "profit", "unidades"],
@@ -182,6 +199,8 @@ const parseRows = (csv) => {
         apuesta,
         casa: getCell(row, headers, "casa"),
         cuota: getCell(row, headers, "cuota"),
+        cuotaNull: getCell(row, headers, "cuotaNull"),
+          valorSigma: getCell(row, headers, "valorSigma"),
         resultado: getCell(row, headers, "resultado"),
         stake: getCell(row, headers, "stake"),
         profit: getCell(row, headers, "profit"),
@@ -194,7 +213,8 @@ const parseRows = (csv) => {
       };
     })
     .filter((row) => row.fecha || row.competition || row.partido || row.apuesta || row.resultado)
-    .filter((row) => isValidRow(row, seen));
+    .filter((row) => isValidRow(row, seen))
+    .map(applyVoidAdjustment);
 };
 
 const isSettled = (row) => !["", "pendiente"].includes(normalize(row.resultado));

@@ -1,3 +1,22 @@
+// La liquidación económica procede del Excel; aquí solo se ajusta la cuota visible.
+const applyVoidAdjustment = (row) => {
+  // Deshacer ajustes antiguos guardados en caché: Notas ya no determina la cuota.
+  const {cuotaOriginal, cuotaAjustada, ...base} = row;
+  const original = cuotaOriginal ?? row.cuota;
+  base.cuota = original;
+  const statuses = `${row.resultadoSelecciones || ""} ${row.apuesta || ""}`;
+  const normalized = statuses.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const raw = String(row.cuotaNull ?? "").trim();
+  if (!/↩|\b(?:anulad[oa]|nulo|void|push|cancelad[oa])\b/u.test(normalized) || !/^\d+(?:[.,]\d+)?$/.test(raw)) return base;
+  const odd = Number(raw.replace(",", "."));
+  if (!Number.isFinite(odd) || odd < 1) return base;
+  return {...base, cuotaOriginal: original, cuota: raw, cuotaAjustada: true};
+};
+
+const adjustedOddMarkup = (row, format, escape) => row.cuotaAjustada
+  ? `<span class="adjusted-odd"><del>${escape(String(format(row.cuotaOriginal)).replace(".", ","))}</del><span aria-hidden="true">→</span><span>${escape(String(format(row.cuota)).replace(".", ","))}</span></span>`
+  : escape(format(row.cuota));
+
 const toggle = document.querySelector("[data-nav-toggle]");
 const nav = document.querySelector("[data-nav]");
 const TELEGRAM_URL = "https://t.me/SigmaBetES";
@@ -5,6 +24,16 @@ const TELEGRAM_URL = "https://t.me/SigmaBetES";
 document.querySelectorAll("[data-telegram-link]").forEach((link) => {
   link.setAttribute("href", TELEGRAM_URL);
 });
+
+// La caché pública dura solo mientras esta página permanece abierta.
+const publicDatasetCache = new Map();
+try {
+  for (const key of Object.keys(window.localStorage)) {
+    if (key.startsWith("sigmabet:registry:") || key.startsWith("sigmabet:home:")) {
+      window.localStorage.removeItem(key);
+    }
+  }
+} catch { /* El bloqueo del almacenamiento no impide consultar el registro. */ }
 
 const fetchWithTimeout = async (url, options = {}, timeoutMs = 10000) => {
   const controller = new AbortController();
@@ -36,13 +65,16 @@ if (toggle && nav) {
 
 const telegramMobileBar = (() => {
   if (!window.matchMedia("(max-width: 760px)").matches) return null;
-  if (sessionStorage.getItem("sigmabetTelegramBarClosed") === "true") return null;
+  try {
+    if (sessionStorage.getItem("sigmabetTelegramBarClosed") === "true") return null;
+  } catch { /* La barra funciona también sin almacenamiento disponible. */ }
 
   const bar = document.createElement("div");
   bar.className = "telegram-mobile-bar";
   bar.setAttribute("data-telegram-mobile-bar", "");
   bar.innerHTML = `
-    <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Unirme al Telegram gratis</a>
+    <a href="${TELEGRAM_URL}" target="_blank" rel="noreferrer">Ver pronósticos gratuitos</a>
+    <small class="telegram-risk-note">+18 · Apostar implica riesgo de pérdidas.</small>
     <button type="button" aria-label="Cerrar Telegram">×</button>
   `;
   document.body.append(bar);
@@ -54,7 +86,7 @@ const telegramMobileBar = (() => {
     }
   };
   const close = () => {
-    sessionStorage.setItem("sigmabetTelegramBarClosed", "true");
+    try { sessionStorage.setItem("sigmabetTelegramBarClosed", "true"); } catch {}
     document.body.classList.remove("has-telegram-mobile-bar");
     bar.remove();
     window.removeEventListener("scroll", onScroll);
@@ -190,6 +222,7 @@ if (signalNavLink || signalFeed) {
     partido: ["partido", "evento", "encuentro", "match"],
     apuesta: ["apuesta", "pick", "seleccion", "selección", "mercado"],
     cuota: ["cuota", "odd"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado", "estado", "resultado pick"],
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades", "uds", "beneficio", "lucro"],
@@ -252,6 +285,7 @@ if (signalNavLink || signalFeed) {
           partido: signalCell(row, headers, "partido"),
           apuesta,
           cuota: signalCell(row, headers, "cuota"),
+          valorSigma: signalCell(row, headers, "valorSigma"),
           resultado: signalCell(row, headers, "resultado"),
           stake: signalCell(row, headers, "stake"),
           profit: signalCell(row, headers, "profit"),
@@ -551,10 +585,13 @@ if (registry) {
   const registryOverview = registry.querySelector(".registry-overview");
   const filters = {
     time: registry.querySelector('[data-filter="time"]'),
+    year: registry.querySelector('[data-filter="year"]'),
+    month: registry.querySelector('[data-filter="month"]'),
     from: registry.querySelector('[data-filter="from"]'),
     to: registry.querySelector('[data-filter="to"]'),
   };
   const customRange = registry.querySelector("[data-custom-range]");
+  const historyReset = registry.querySelector("[data-chart-history]");
   const summaryTargets = {
     total: registry.querySelector('[data-summary="total"]'),
     hit: registry.querySelector('[data-summary="hit"]'),
@@ -612,8 +649,59 @@ if (registry) {
   const formatUnits = (value) => {
     const number = numberFrom(value);
     const sign = number > 0 ? "+" : "";
-    return `${sign}${number.toFixed(2)} u`;
+    return `${sign}${number.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} u`;
   };
+
+  const sigmaMarkup = (row) => {
+    const raw = String(row.valorSigma ?? "").trim();
+    // Conservar la escala de la hoja: no convertir valores sin unidad a porcentajes.
+    const label = raw ? raw.replace(/(\d)\.(?=\d)/g, "$1,") : "—";
+    return `<span class="registry-sigma" tabindex="0" aria-label="Valor Sigma ${escapeHtml(label)}" aria-describedby="sigma-value-tooltip"><svg class="sigma-diamond" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10l5 6-10 11L2 10 7 4Z"/><path d="m7 4 5 17 5-17M2 10h20M7 4l5 6 5-6"/></svg><b>${escapeHtml(label)}</b></span>`;
+  };
+
+  // Fuera de las tarjetas para evitar recortes por overflow o contain.
+  const sigmaTooltip = document.createElement("div");
+  sigmaTooltip.id = "sigma-value-tooltip";
+  sigmaTooltip.className = "sigma-value-tooltip";
+  sigmaTooltip.setAttribute("role", "tooltip");
+  sigmaTooltip.textContent = "Valor Sigma: ventaja estimada de la apuesta según nuestro análisis. No garantiza el resultado.";
+  sigmaTooltip.hidden = true;
+  document.body.append(sigmaTooltip);
+  let sigmaAnchor = null;
+  const hideSigmaTooltip = () => { sigmaTooltip.hidden = true; sigmaAnchor = null; };
+  const showSigmaTooltip = (anchor) => {
+    sigmaAnchor = anchor;
+    sigmaTooltip.hidden = false;
+    const bounds = anchor.getBoundingClientRect();
+    const box = sigmaTooltip.getBoundingClientRect();
+    const margin = 12;
+    const left = Math.max(margin, Math.min(bounds.left + bounds.width / 2 - box.width / 2, window.innerWidth - box.width - margin));
+    const below = bounds.bottom + 10;
+    const top = below + box.height <= window.innerHeight - margin ? below : Math.max(margin, bounds.top - box.height - 10);
+    sigmaTooltip.style.left = `${left}px`;
+    sigmaTooltip.style.top = `${top}px`;
+  };
+  registry.addEventListener("pointerover", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor && anchor !== sigmaAnchor) showSigmaTooltip(anchor);
+  });
+  registry.addEventListener("pointerout", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor && !anchor.contains(event.relatedTarget)) hideSigmaTooltip();
+  });
+  registry.addEventListener("focusin", (event) => {
+    const anchor = event.target.closest?.(".registry-sigma");
+    if (anchor) showSigmaTooltip(anchor);
+  });
+  registry.addEventListener("focusout", (event) => {
+    if (event.target.closest?.(".registry-sigma")) hideSigmaTooltip();
+  });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") hideSigmaTooltip(); });
+  window.addEventListener("scroll", () => {
+    if (sigmaAnchor && document.activeElement === sigmaAnchor) showSigmaTooltip(sigmaAnchor);
+    else hideSigmaTooltip();
+  }, { passive: true, capture: true });
+  window.addEventListener("resize", hideSigmaTooltip, { passive: true });
 
   const formatPercent = (value) => `${(value * 100).toFixed(2)}%`;
 
@@ -720,6 +808,8 @@ if (registry) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    cuotaNull: ["cuota null"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     stake: ["stake"],
     profit: ["u / profit", "u/profit", "profit", "unidades"],
@@ -795,6 +885,8 @@ if (registry) {
           apuesta,
           casa: getCell(row, headers, "casa"),
           cuota: getCell(row, headers, "cuota"),
+          cuotaNull: getCell(row, headers, "cuotaNull"),
+          valorSigma: getCell(row, headers, "valorSigma"),
           resultado: getCell(row, headers, "resultado"),
           stake: getCell(row, headers, "stake"),
           profit: getCell(row, headers, "profit"),
@@ -848,6 +940,7 @@ if (registry) {
     const text = String(value || "").trim();
     const clean = normalize(text);
     if (!clean) return "";
+    if (/↩/u.test(text) || /\banulad[oa]\b/.test(clean)) return "Anulada";
     if (/^[✅🟢✓✔]/u.test(text) || ["ganado", "ganada", "verde", "win", "acierto", "acertado", "acertada"].includes(clean)) {
       return "Ganado";
     }
@@ -868,16 +961,19 @@ if (registry) {
 
   const stripSelectionStatus = (value) => {
     let text = displayText(value, "");
+    text = text.replace(/^\s*↩\uFE0F?\s*|\s*↩\uFE0F?\s*$/gu, "");
     text = text.replace(/^[✅🟢✓✔❌🔴✕✖➖⚪🟡]\s*/u, "");
-    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
-    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
-    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
+    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
+    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
+    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
     return text.trim();
   };
 
   const selectionParts = (pickValue, statusValue) => {
     const picks = pickParts(pickValue);
-    const rawStatuses = pickParts(statusValue);
+    let rawStatuses = pickParts(statusValue);
+    const symbols = String(statusValue || "").replace(/\uFE0F/g, "");
+    if (/^[✅🟢✓✔❌🔴✕✖➖⚪🟡↩\s+;,|]+$/u.test(symbols)) rawStatuses = symbols.match(/[✅🟢✓✔❌🔴✕✖➖⚪🟡↩]/gu) || [];
     const hasUsefulStatuses = rawStatuses.some((part) => selectionStatus(part) || stripSelectionStatus(part) !== part);
 
     if (rawStatuses.length && hasUsefulStatuses) {
@@ -891,7 +987,7 @@ if (registry) {
       });
     }
 
-    return picks.map((pick) => ({ text: pick, status: "" }));
+    return picks.map((pick) => ({ text: stripSelectionStatus(pick), status: selectionStatus(pick) }));
   };
 
   const sharePickText = (row) => {
@@ -911,8 +1007,10 @@ if (registry) {
 
   const updateCustomRangeVisibility = () => {
     const isCustom = filters.time?.value === "custom";
-    if (!customRange) return;
-    customRange.hidden = !isCustom;
+    if (customRange) customRange.hidden = !isCustom;
+    const monthRange = registry.querySelector("[data-month-range]");
+    if (monthRange) monthRange.hidden = filters.time?.value !== "month";
+    if (historyReset) historyReset.hidden = (filters.time?.value || "Todos") === "Todos";
   };
 
   const rowMatchesTime = (row) => {
@@ -922,36 +1020,15 @@ if (registry) {
     const date = parseDate(row.fecha);
     if (!date) return false;
 
-    const now = new Date();
-    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (value === "month") {
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      return filters.month?.value === key;
+    }
+
     if (value === "custom") {
       const from = filters.from?.value ? new Date(`${filters.from.value}T00:00:00`) : null;
       const to = filters.to?.value ? new Date(`${filters.to.value}T23:59:59`) : null;
       return (!from || date >= from) && (!to || date <= to);
-    }
-
-    if (value === "7d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 6);
-      return date >= start && date <= now;
-    }
-
-    if (value === "30d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 29);
-      return date >= start && date <= now;
-    }
-
-    if (value === "90d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 89);
-      return date >= start && date <= now;
-    }
-
-    if (value === "365d") {
-      const start = new Date(startToday);
-      start.setDate(start.getDate() - 364);
-      return date >= start && date <= now;
     }
 
     return true;
@@ -1036,20 +1113,27 @@ if (registry) {
       return balance;
     });
     const values = points.length ? [0, ...points] : [0, 0];
-    const min = Math.min(...values, 0);
-    const max = Math.max(...values, 0);
-    const range = max - min || 1;
+    const dataMin = Math.min(...values, 0);
+    const dataMax = Math.max(...values, 0);
+    const roughStep = Math.max(1, (dataMax - dataMin) / 4);
+    const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+    const step = [1, 2, 5, 10].map((factor) => factor * magnitude).find((value) => value >= roughStep);
+    const min = Math.floor(dataMin / step) * step;
+    const max = Math.max(min + step, Math.ceil(dataMax / step) * step);
+    const range = max - min;
+    const scaleTicks = Array.from({ length: Math.round(range / step) + 1 }, (_, index) => max - index * step);
     const width = 640;
     const height = 240;
     const padX = 28;
     const padY = 30;
     const innerW = width - padX * 2;
     const innerH = height - padY * 2;
-    const coords = values.map((value, index) => {
-      const x = padX + (innerW * index) / Math.max(values.length - 1, 1);
-      const y = padY + innerH - ((value - min) / range) * innerH;
-      return { value, x, y };
-    });
+    // Una distancia uniforme por apuesta; el zoom cambia la ventana visible.
+    const coords = values.map((value, index) => ({
+      value,
+      x: padX + innerW * index / Math.max(1, values.length - 1),
+      y: padY + innerH - ((value - min) / range) * innerH,
+    }));
     const betSegments = settled.map((row, index) => {
       const from = coords[index];
       const to = coords[index + 1];
@@ -1063,6 +1147,31 @@ if (registry) {
         cumulative,
       };
     });
+    // El eje avanza por apuesta: cada mes ocupa el tramo de sus operaciones.
+    const monthBands = [];
+    settled.forEach((row, index) => {
+      const date = parseDate(row.fecha);
+      const key = date ? `${date.getFullYear()}-${date.getMonth()}` : "unknown";
+      const previous = monthBands[monthBands.length - 1];
+      if (previous?.key === key) {
+        previous.end = coords[index + 1].x;
+        previous.profit += numberFrom(row.profit);
+      } else {
+        monthBands.push({ key, date, start: coords[index].x, end: coords[index + 1].x, profit: numberFrom(row.profit) });
+      }
+    });
+    const monthMarkup = monthBands.map((band, index) =>
+      `<rect class="chart-month-band${index % 2 ? ' chart-month-band-alt' : ''}" x="${band.start}" y="${padY}" width="${band.end - band.start}" height="${innerH}" />${index ? `<line class="chart-month-divider" x1="${band.start}" x2="${band.start}" y1="${padY}" y2="${height - padY}" />` : ""}`
+    ).join("");
+    const monthAxisMarkup = monthBands.map((band) => {
+      if (!band.date) return "";
+      const fullLabel = band.date.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+      const label = band.date.toLocaleDateString("es-ES", { month: "short", year: "numeric" }).replace(".", "");
+      const tone = band.profit > 0 ? "is-positive" : band.profit < 0 ? "is-negative" : "";
+      const monthKey = `${band.date.getFullYear()}-${String(band.date.getMonth() + 1).padStart(2, "0")}`;
+      const selected = filters.time?.value === "month" && filters.month?.value === monthKey;
+      return `<button type="button" class="chart-month-label" data-chart-month="${monthKey}" aria-pressed="${selected}" aria-label="${escapeHtml(`Ver ${fullLabel}, resultado mensual ${formatUnits(band.profit)}`)}" style="left:${band.start / width * 100}%;width:${(band.end - band.start) / width * 100}%" title="${escapeHtml(`Ver ${fullLabel}`)}"><span>${escapeHtml(label)}</span><strong class="${tone}">(${escapeHtml(formatUnits(band.profit))})</strong></button>`;
+    }).join("");
     const zeroY = padY + innerH - ((0 - min) / range) * innerH;
     const segments = [];
     const areas = [];
@@ -1101,28 +1210,28 @@ if (registry) {
       const selections = selectionParts(segment.row.apuesta, segment.row.resultadoSelecciones);
       const context = displayText(segment.row.competition || segment.row.competicion || segment.row.liga, "Registro de apuestas");
       return `
-        <div class="chart-bet-main">
-          <div class="chart-bet-meta-row">
-            <span>${escapeHtml(displayText(segment.row.fecha, ""))}</span>
-            <i class="chart-result-pill chart-result-${escapeHtml(statusClass)}">${escapeHtml(status)}</i>
-          </div>
-          <strong>${escapeHtml(displayText(segment.row.partido, "Apuesta"))}</strong>
-          <p>${escapeHtml(context)}</p>
+        <div class="chart-bet-meta-row">
+          <span>${escapeHtml(displayText(segment.row.fecha, ""))}</span>
+          <i class="chart-result-pill chart-result-${escapeHtml(statusClass)}">${escapeHtml(status)}</i>
         </div>
-        <dl class="chart-bet-metrics">
-          <div><dt>Cuota</dt><dd>${escapeHtml(formatOdd(segment.row.cuota))}</dd></div>
-          <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
-          <div><dt>Balance</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
-        </dl>
+        <div class="chart-bet-main">
+          <p>${escapeHtml(context)}</p>
+          <strong>${escapeHtml(displayText(segment.row.partido, "Apuesta"))}</strong>
+        </div>
         <ul class="chart-selection-list">
           ${(selections.length ? selections : [{ text: segment.row.apuesta || "Apuesta registrada", status }])
             .map((selection) => {
-              const selectionStatusLabel = resultLabel(selection.status || status);
+              const selectionStatusLabel = resultLabel(selection.status || "Pendiente");
               const selectionClass = normalize(selectionStatusLabel).replace(/\s+/g, "-");
-              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span>${escapeHtml(selection.text)}</span><b>${escapeHtml(selectionStatusLabel)}</b></li>`;
-            })
-            .join("")}
+              return `<li class="chart-selection-${escapeHtml(selectionClass)}"><span class="selection-copy">${escapeHtml(selection.text)}</span>${selection.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : `<span class="sr-only">${escapeHtml(selectionStatusLabel)}</span>`}</li>`;
+            }).join("")}
         </ul>
+        <dl class="chart-bet-metrics">
+          <div><dt>${segment.row.cuotaAjustada ? "Cuota final" : "Cuota"}</dt><dd>${adjustedOddMarkup(segment.row, formatOdd, escapeHtml)}</dd></div>
+          <div class="chart-bet-sigma"><dt>Valor Sigma</dt><dd><b><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4h10l5 6-10 11L2 10 7 4Z"/><path d="m7 4 5 17 5-17M2 10h20M7 4l5 6 5-6"/></svg>${escapeHtml(String(segment.row.valorSigma ?? "").trim().replace(/(\d)\.(?=\d)/g, "$1,") || "—")}</b></dd></div>
+          <div><dt>Stake</dt><dd>${escapeHtml(displayText(segment.row.stake, "1u"))}</dd></div>
+          <div><dt>Resultado</dt><dd class="${profitClass}">${escapeHtml(profit)}</dd></div>
+        </dl>
       `;
     };
     const calloutPosition = (segment) => {
@@ -1148,16 +1257,13 @@ if (registry) {
     const enableChartCallout = window.matchMedia("(min-width: 761px)").matches;
     chartTarget.innerHTML = `
       <div class="registry-chart-layout">
-        <div class="registry-chart-plot" data-chart-plot>
-          <div class="chart-unit-axis" aria-hidden="true">
-            <span>+u</span>
-            <span>0u</span>
-            <span>-u</span>
-          </div>
+        <div class="registry-chart-plot" data-chart-plot style="min-width:${Math.max(320, monthBands.length * 112)}px">
           <svg viewBox="0 0 640 240" role="img" aria-label="Evolución de unidades">
-            <path class="chart-grid-line" d="M24 56 H616"></path>
-            <path class="chart-grid-line" d="M24 120 H616"></path>
-            <path class="chart-grid-line" d="M24 184 H616"></path>
+            ${scaleTicks.map((value) => {
+              const y = padY + innerH * (max - value) / range;
+              return `<path class="chart-grid-line" d="M${padX} ${y} H${width - padX}"></path><text class="chart-scale-label" x="${width - padX + 5}" y="${y}" dominant-baseline="middle">${escapeHtml(value.toLocaleString("es-ES", { maximumFractionDigits: 0 }))} u</text>`;
+            }).join("")}
+            <g class="chart-months">${monthMarkup}</g>
             <path class="chart-zero-line" d="M${padX} ${zeroY.toFixed(1)} H${width - padX}"></path>
             ${areas.map((area) => `<path class="chart-area chart-area-${area.type}" d="${area.d}"></path>`).join("")}
             ${segments.map((segment) => `<path class="chart-line chart-line-${segment.type}" d="${segment.d}"></path>`).join("")}
@@ -1184,9 +1290,11 @@ if (registry) {
                 : ""
             }
           </svg>
-          <aside class="chart-bet-card chart-bet-card-side chart-callout-card is-hidden" data-chart-bet-detail aria-hidden="true">
-          </aside>
+          <div class="chart-month-axis" aria-label="Meses del registro">${monthAxisMarkup}</div>
+          <p class="chart-month-caption">Resultado mensual · unidades (u)</p>
         </div>
+        <aside class="chart-bet-card chart-bet-card-side chart-callout-card is-hidden" data-chart-bet-detail aria-hidden="true">
+        </aside>
       </div>
     `;
 
@@ -1201,48 +1309,91 @@ if (registry) {
       hideDetail();
       return;
     }
+    const positionDetail = (event) => {
+      if (!plotTarget || !detailTarget) return;
+      const anchor = event?.currentTarget?.getBoundingClientRect() || plotTarget.getBoundingClientRect();
+      const pointerX = event?.type?.startsWith("mouse") ? event.clientX : (anchor.left + anchor.right) / 2;
+      const pointerY = event?.type?.startsWith("mouse") ? event.clientY : (anchor.top + anchor.bottom) / 2;
+      const margin = 16, gap = 28;
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = window.innerHeight;
+      detailTarget.style.removeProperty("max-height");
+      const card = detailTarget.getBoundingClientRect();
+      const clampX = x => Math.max(margin, Math.min(x, viewportWidth - card.width - margin));
+      const clampY = y => Math.max(margin, Math.min(y, viewportHeight - card.height - margin));
+      let left, top;
+      detailTarget.style.right = "auto";
+      // La mayor parte de la tarjeta queda por encima del cursor, a un lado.
+      if (pointerX + gap + card.width <= viewportWidth - margin) {
+        left = pointerX + gap;
+        top = clampY(pointerY - card.height + 44);
+      } else if (pointerX - gap - card.width >= margin) {
+        // Anclar el borde derecho directamente al cursor evita diferencias de anchura.
+        detailTarget.style.right = `${viewportWidth - pointerX + gap}px`;
+        top = clampY(pointerY - card.height + 44);
+      } else {
+        left = clampX(pointerX - card.width / 2);
+        const above = Math.max(0, pointerY - gap - margin);
+        const below = Math.max(0, viewportHeight - pointerY - gap - margin);
+        if (above >= card.height || above >= below) {
+          detailTarget.style.maxHeight = `${Math.max(1, above)}px`;
+          top = Math.max(margin, pointerY - gap - Math.min(card.height, above));
+        } else {
+          detailTarget.style.maxHeight = `${Math.max(1, below)}px`;
+          top = pointerY + gap;
+        }
+      }
+      detailTarget.style.left = left === undefined ? "auto" : `${left}px`;
+      detailTarget.style.top = `${top}px`;
+    };
     chartTarget.querySelectorAll("[data-chart-bet-index]").forEach((node) => {
       const segment = betSegments[Number(node.dataset.chartBetIndex)];
-      const setActiveSegment = () => {
+      const setActiveSegment = (event) => {
         if (!segment || !detailTarget) return;
-        const callout = calloutPosition(segment);
         detailTarget.classList.remove("is-hidden");
         detailTarget.setAttribute("aria-hidden", "false");
         detailTarget.classList.toggle("chart-bet-positive", segment.type === "positive");
         detailTarget.classList.toggle("chart-bet-negative", segment.type === "negative");
-        detailTarget.style.cssText = callout.style;
         detailTarget.innerHTML = betDetailMarkup(segment);
+        positionDetail(event);
       };
       node.addEventListener("mouseenter", setActiveSegment);
+      node.addEventListener("mousemove", positionDetail);
       node.addEventListener("mouseleave", hideDetail);
       node.addEventListener("focus", setActiveSegment);
       node.addEventListener("blur", hideDetail);
     });
     plotTarget?.addEventListener("mousemove", (event) => {
       const target = event.target instanceof Element ? event.target : null;
-      if (!target?.closest("[data-chart-bet-index]")) hideDetail();
+      if (!target?.closest("[data-chart-bet-index], [data-chart-bet-detail]")) {
+        hideDetail();
+      }
     });
     plotTarget?.addEventListener("mouseleave", hideDetail);
+    plotTarget?.querySelector(":scope > svg")?.addEventListener("mouseleave", hideDetail);
   };
 
-  const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.") => {
-    if (!rowsTarget) return;
-    if (countTarget) {
+  const renderRows = (visibleRows, emptyMessage = "No hay apuestas que coincidan con los filtros seleccionados.", target = rowsTarget, updateCount = true) => {
+    if (!target) return;
+    if (countTarget && updateCount) {
       countTarget.textContent = `${visibleRows.length} ${visibleRows.length === 1 ? "apuesta" : "apuestas"}`;
     }
 
     if (!visibleRows.length) {
-      rowsTarget.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(emptyMessage)}</div>`;
+      target.innerHTML = `<div class="registry-ledger-empty">${escapeHtml(emptyMessage)}</div>`;
       return;
     }
 
-    rowsTarget.innerHTML = visibleRows
+    target.innerHTML = visibleRows
       .map((row) => {
         const profit = numberFrom(row.profit);
         const profitClass = profit > 0 ? "profit-positive" : profit < 0 ? "profit-negative" : "";
         const statusLabel = resultLabel(row.resultado);
         const isPendingRow = ["", "pendiente"].includes(normalize(row.resultado));
         const rowClass = `registry-row-${normalize(statusLabel).replace(/\s+/g, "-")}`;
+        const statusIconPath = rowClass === "registry-row-ganado"
+          ? "m5 12 4 4L19 6"
+          : rowClass === "registry-row-perdido" ? "m6 6 12 12M18 6 6 18" : "M5 12h14";
         const timeline = isPendingRow ? [] : selectionParts(row.apuesta, row.resultadoSelecciones);
         const sharePayload = {
           type: "apuesta",
@@ -1251,7 +1402,9 @@ if (registry) {
           match: row.partido,
           pick: isPendingRow ? "Disponible en el Telegram gratuito" : row.apuesta,
           odd: formatOdd(row.cuota),
+          originalOdd: row.cuotaAjustada ? formatOdd(row.cuotaOriginal) : "",
           stake: row.stake,
+          valorSigma: row.valorSigma,
           result: statusLabel,
           profit: formatUnits(row.profit),
           selections: isPendingRow
@@ -1278,14 +1431,14 @@ if (registry) {
                   <strong class="registry-event">${escapeHtml(row.partido)}</strong>
                   <span class="registry-competition">${escapeHtml(row.competition)}</span>
                 </div>
-                <span class="pending-status-pill">Pendiente</span>
+                <div class="registry-pending-metrics"><span class="pending-status-pill">Pendiente</span></div>
               </div>
             </article>
           `;
         }
 
         return `
-          <details class="registry-ledger-item ${rowClass}">
+          <details class="registry-ledger-item bet-card ${rowClass}${row.cuotaAjustada ? " has-adjusted-odd" : ""}">
             <summary>
               <div class="registry-ledger-content">
                 <div class="registry-ledger-main">
@@ -1294,12 +1447,13 @@ if (registry) {
                   <span class="registry-competition">${escapeHtml(row.competition)}</span>
                 </div>
                 <div class="registry-ledger-meta">
-                  <span>Cuota <b>${escapeHtml(formatOdd(row.cuota))}</b></span>
+                  <span>Cuota <b>${adjustedOddMarkup(row, formatOdd, escapeHtml)}</b></span>
                   <span>Stake <b>${escapeHtml(row.stake)}</b></span>
+                  <span class="bet-card-sigma"><span class="bet-metric-label">Valor Sigma</span>${sigmaMarkup(row)}</span>
                 </div>
               </div>
               <div class="registry-ledger-result">
-                <span class="pill ${resultClass(row.resultado)}">${escapeHtml(statusLabel)}</span>
+                <span class="pill ${resultClass(row.resultado)}"><svg class="bet-status-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${statusIconPath}"></path></svg>${escapeHtml(statusLabel)}</span>
                 <strong class="registry-profit ${profitClass}">${formatUnits(row.profit)}</strong>
                 <span class="pending-toggle"></span>
                 <button class="share-button" type="button" aria-label="Compartir apuesta" title="Compartir apuesta" data-share-card="${escapeHtml(JSON.stringify(sharePayload))}">
@@ -1320,6 +1474,7 @@ if (registry) {
                   `
                   : `
                     <p class="registry-expanded-label">Apuesta registrada</p>
+                    ${row.cuotaAjustada ? `<p class="registry-void-note">↩ Cuota recalculada por selección anulada</p>` : ""}
                     <div class="pick-timeline">
                       ${(timeline.length ? timeline : [{ text: row.apuesta || "Apuesta registrada", status: "" }])
                         .map((part) => {
@@ -1327,7 +1482,7 @@ if (registry) {
                           const selectionClass = part.status ? normalize(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
                           return `
                             <div class="pick-step selection-${selectionClass}">
-                              <span>${escapeHtml(part.text)}</span>
+                              <span class="selection-copy">${escapeHtml(part.text)}</span>${part.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : ""}
                             </div>
                           `;
                         })
@@ -1342,13 +1497,52 @@ if (registry) {
       .join("");
   };
 
+  const updateMonthOptions = () => {
+    if (!filters.month || !filters.year) return;
+    const selected = filters.month.value;
+    const selectedYear = filters.year.value;
+    const months = new Map();
+    registryRows.forEach((row) => {
+      const date = parseDate(row.fecha);
+      if (!date) return;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      months.set(key, date.toLocaleDateString("es-ES", { month: "long" }));
+    });
+    const years = [...new Set([...months.keys()].map((key) => key.slice(0, 4)))].sort().reverse();
+    filters.year.replaceChildren(...years.map((year) => new Option(year, year)));
+    if (years.includes(selectedYear)) filters.year.value = selectedYear;
+    const options = [...months].filter(([key]) => key.startsWith(`${filters.year.value}-`)).sort(([a], [b]) => b.localeCompare(a));
+    filters.month.replaceChildren(...options.map(([key, label]) => new Option(label.charAt(0).toUpperCase() + label.slice(1), key)));
+    if (options.some(([key]) => key === selected)) filters.month.value = selected;
+    if (!months.size) filters.month.append(new Option("Sin datos", ""));
+    filters.month.disabled = filters.year.disabled = !months.size;
+  };
+
+  const historyMore = registry.querySelector("[data-history-more]");
+  let historyLimit = 20;
+  const renderHistory = () => {
+    hideSigmaTooltip();
+    const periodRows = registryRows.filter(rowMatchesFilters);
+    const pending = periodRows.filter((row) => !isSettled(row)).reverse();
+    const pendingSection = registry.querySelector("[data-pending-section]");
+    if (pendingSection) {
+      pendingSection.hidden = !pending.length;
+      registry.querySelector("[data-pending-count]").textContent = `${pending.length} abiertas`;
+      renderRows(pending, "", registry.querySelector("[data-pending-rows]"), false);
+    }
+    const rows = periodRows.filter(isSettled).reverse();
+    renderRows(rows.slice(0, historyLimit), "No hay apuestas cerradas en el periodo seleccionado.", rowsTarget, false);
+    if (countTarget) countTarget.textContent = `${Math.min(historyLimit, rows.length)} de ${rows.length} apuestas`;
+    if (historyMore) historyMore.hidden = rows.length <= historyLimit;
+  };
+  historyMore?.addEventListener("click", () => { historyLimit += 20; renderHistory(); });
+
   const renderRegistryView = ({ source = "fresh" } = {}) => {
     const filteredRows = registryRows.filter(rowMatchesFilters);
-    const displayRows = [...filteredRows].reverse();
     const settledRows = filteredRows.filter(isSettled);
     renderSummary(filteredRows);
     renderRegistryChart(filteredRows);
-    renderRows(displayRows, "Todavía no existen apuestas cerradas en este periodo.");
+    renderHistory();
 
     if (source === "stale") {
       updateStatus("No hemos podido actualizar el registro. Se muestran los últimos datos disponibles.");
@@ -1407,18 +1601,20 @@ if (registry) {
       if (!registryHasRenderedData) setSummaryLoading();
       if (registryWarningTarget) registryWarningTarget.hidden = true;
       const dataset = await loadRegistryDataset();
-      registryRows = dataset.rows;
+      registryRows = dataset.rows.map(applyVoidAdjustment);
+      updateMonthOptions();
       registryUpdatedAt = dataset.updatedAt;
-      localStorage.setItem(registryCacheKey, JSON.stringify({ rows: registryRows, updatedAt: registryUpdatedAt }));
+      publicDatasetCache.set(registryCacheKey, { rows: registryRows, updatedAt: registryUpdatedAt });
       updateCustomRangeVisibility();
       registryHasRenderedData = true;
       registryHasTerminalError = false;
       renderRegistryView({ source: dataset.source });
       if (dataset.source === "stale" && registryWarningTarget) registryWarningTarget.hidden = false;
     } catch (error) {
-      const cached = JSON.parse(localStorage.getItem(registryCacheKey) || "null");
+      const cached = publicDatasetCache.get(registryCacheKey);
       if (cached?.rows?.length) {
-        registryRows = cached.rows;
+        registryRows = cached.rows.map(applyVoidAdjustment);
+        updateMonthOptions();
         registryUpdatedAt = cached.updatedAt;
         registryHasRenderedData = true;
         registryHasTerminalError = false;
@@ -1430,9 +1626,39 @@ if (registry) {
     }
   };
 
+  const selectChartMonth = (monthKey) => {
+    if (registryHasTerminalError || !/^\d{4}-(0[1-9]|1[0-2])$/.test(monthKey)) return;
+    if (!filters.time || !filters.year || !filters.month) return;
+    // Reconstruir primero los meses del año pulsado, incluso si cambia el año.
+    filters.year.value = monthKey.slice(0, 4);
+    updateMonthOptions();
+    filters.month.value = monthKey;
+    filters.time.value = "month";
+    historyLimit = 20;
+    updateCustomRangeVisibility();
+    renderRegistryView();
+    chartTarget.querySelector(`[data-chart-month="${monthKey}"]`)?.focus({ preventScroll: true });
+  };
+
+  // Delegación: los botones se regeneran al actualizar o filtrar la gráfica.
+  chartTarget?.addEventListener("click", (event) => {
+    const monthButton = event.target.closest("[data-chart-month]");
+    if (monthButton) selectChartMonth(monthButton.dataset.chartMonth);
+  });
+  historyReset?.addEventListener("click", () => {
+    if (registryHasTerminalError || !filters.time) return;
+    filters.time.value = "Todos";
+    historyLimit = 20;
+    updateCustomRangeVisibility();
+    renderRegistryView();
+    filters.time.focus({ preventScroll: true });
+  });
+
   Object.values(filters).forEach((filter) => {
     filter?.addEventListener("change", () => {
       if (registryHasTerminalError) return;
+      historyLimit = 20;
+      if (filter === filters.year) updateMonthOptions();
       updateCustomRangeVisibility();
       renderRegistryView();
     });
@@ -1612,6 +1838,9 @@ if (homeFeed) {
     apuesta: ["apuesta", "pick"],
     casa: ["casa", "bookie", "casa de apuestas"],
     cuota: ["cuota", "odd"],
+    cuotaNull: ["cuota null"],
+    notas: ["notas", "nota"],
+    valorSigma: ["ev estimado"],
     resultado: ["resultado"],
     resultadoSelecciones: [
       "resultado selecciones",
@@ -1653,6 +1882,9 @@ if (homeFeed) {
         apuesta: homeCell(row, headers, "apuesta"),
         casa: homeCell(row, headers, "casa"),
         cuota: homeCell(row, headers, "cuota"),
+        cuotaNull: homeCell(row, headers, "cuotaNull"),
+        notas: homeCell(row, headers, "notas"),
+          valorSigma: homeCell(row, headers, "valorSigma"),
         resultado: homeCell(row, headers, "resultado"),
         resultadoSelecciones: homeCell(row, headers, "resultadoSelecciones"),
         stake: homeCell(row, headers, "stake"),
@@ -1709,6 +1941,7 @@ if (homeFeed) {
     const text = String(value || "").trim();
     const clean = normalizeHome(text);
     if (!clean) return "";
+    if (/↩/u.test(text) || /\banulad[oa]\b/.test(clean)) return "Anulada";
     if (/^[✅🟢✓✔]/u.test(text) || ["ganado", "ganada", "verde", "win", "acierto", "acertado", "acertada"].includes(clean)) return "Ganado";
     if (/^[❌🔴✕✖]/u.test(text) || ["perdido", "perdida", "rojo", "loss", "fallo", "fallado", "fallada"].includes(clean)) return "Perdido";
     if (/^[➖⚪🟡]/u.test(text) || ["nulo", "void", "push", "cancelado", "cancelada"].includes(clean)) return "Nulo";
@@ -1723,16 +1956,19 @@ if (homeFeed) {
 
   const stripHomeSelectionStatus = (value) => {
     let text = textHome(value, "");
+    text = text.replace(/^\s*↩\uFE0F?\s*|\s*↩\uFE0F?\s*$/gu, "");
     text = text.replace(/^[✅🟢✓✔❌🔴✕✖➖⚪🟡]\s*/u, "");
-    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
-    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
-    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
+    text = text.replace(/^\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*[-:|·–—]\s*/i, "");
+    text = text.replace(/\s*[-:|·–—]\s*(ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\s*$/i, "");
+    text = text.replace(/\s*\((ganado|ganada|verde|win|acierto|acertado|acertada|perdido|perdida|rojo|loss|fallo|fallado|fallada|nulo|void|push|anulado|anulada|cancelado|cancelada|pendiente|pending|por jugar)\)\s*$/i, "");
     return text.trim();
   };
 
   const homeSelectionParts = (pickValue, statusValue) => {
     const picks = homePickParts(pickValue);
-    const rawStatuses = homePickParts(statusValue);
+    let rawStatuses = homePickParts(statusValue);
+    const symbols = String(statusValue || "").replace(/\uFE0F/g, "");
+    if (/^[✅🟢✓✔❌🔴✕✖➖⚪🟡↩\s+;,|]+$/u.test(symbols)) rawStatuses = symbols.match(/[✅🟢✓✔❌🔴✕✖➖⚪🟡↩]/gu) || [];
     const hasUsefulStatuses = rawStatuses.some((part) => homeSelectionStatus(part) || stripHomeSelectionStatus(part) !== part);
 
     if (rawStatuses.length && hasUsefulStatuses) {
@@ -1746,7 +1982,7 @@ if (homeFeed) {
       });
     }
 
-    return picks.map((pick) => ({ text: pick, status: "" }));
+    return picks.map((pick) => ({ text: stripHomeSelectionStatus(pick), status: homeSelectionStatus(pick) }));
   };
 
   const dateInHomeRange = (row) => {
@@ -1814,7 +2050,7 @@ if (homeFeed) {
                   <span class="registry-competition">${escapeHome(row.competition || row.tipo || "Fútbol")}</span>
                 </div>
                 <div class="registry-ledger-meta">
-                  <span>Cuota <b>${escapeHome(numberHome(row.cuota).toFixed(2))}</b></span>
+                  <span>Cuota <b>${adjustedOddMarkup(row, value => numberHome(value).toFixed(2).replace(".", ","), escapeHome)}</b></span>
                   <span>Stake <b>${escapeHome(row.stake)}</b></span>
                 </div>
               </div>
@@ -1832,7 +2068,7 @@ if (homeFeed) {
                     const selectionText = typeof selection === "string" ? selection : selection.text;
                     const selectionLabel = typeof selection === "string" ? "" : resultLabelHome(selection.status);
                     const selectionClass = selection.status ? normalizeHome(selectionLabel).replace(/\s+/g, "-") : "sin-resultado";
-                    return `<div class="pick-step selection-${selectionClass}"><span>${escapeHome(selectionText)}</span></div>`;
+                    return `<div class="pick-step selection-${selectionClass}"><span class="selection-copy">${escapeHome(selectionText)}</span>${selection.status === "Anulada" ? '<small class="selection-void-label">Anulada</small>' : ""}</div>`;
                   })
                   .join("")}
               </div>
@@ -2015,17 +2251,17 @@ if (homeFeed) {
       if (!homeHasRenderedData) setHomeStatsLoading();
       if (warningTarget) warningTarget.hidden = true;
       const dataset = await loadHomeDataset();
-      homeRows = dataset.rows;
+      homeRows = dataset.rows.map(applyVoidAdjustment);
       homeUpdatedAt = dataset.updatedAt;
-      localStorage.setItem(homeCacheKey, JSON.stringify({ rows: homeRows, updatedAt: homeUpdatedAt }));
+      publicDatasetCache.set(homeCacheKey, { rows: homeRows, updatedAt: homeUpdatedAt });
       homeHasRenderedData = true;
       homeHasTerminalError = false;
       renderHomeFeed({ source: dataset.source });
       if (dataset.source === "stale" && warningTarget) warningTarget.hidden = false;
     } catch (error) {
-      const cached = JSON.parse(localStorage.getItem(homeCacheKey) || "null");
+      const cached = publicDatasetCache.get(homeCacheKey);
       if (cached?.rows?.length) {
-        homeRows = cached.rows;
+        homeRows = cached.rows.map(applyVoidAdjustment);
         homeUpdatedAt = cached.updatedAt;
         homeHasRenderedData = true;
         homeHasTerminalError = false;
@@ -2133,6 +2369,7 @@ const shareCanvasHelpers = (() => {
     const hasNumeric = Number.isFinite(numeric);
     if (!clean && !hasNumeric) return { color: muted, label: "SIN RESULTADO" };
     if (clean.includes("perd") || clean.includes("rojo") || (hasNumeric && numeric < 0)) return { color: red, label: "PERDIDO" };
+    if (clean.includes("anulad") || clean.includes("↩")) return { color: "#AEB8B2", label: "ANULADA" };
     if (clean.includes("nulo")) return { color: "#D7B354", label: "NULO" };
     if (clean.includes("pend")) return { color: muted, label: "PENDIENTE" };
     return { color: green, label: "GANADO" };
@@ -2153,120 +2390,196 @@ const shareCanvasHelpers = (() => {
     await document.fonts?.ready;
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
-    canvas.height = 1080;
     const ctx = canvas.getContext("2d");
-    const state = resultColors(payload.result, payload.profit);
+    const isPending = String(payload.result || "").trim().toLowerCase() === "pendiente";
+    const state = resultColors(payload.result, isPending ? "" : payload.profit);
     const selections = Array.isArray(payload.selections) && payload.selections.length
       ? payload.selections
       : [{ text: payload.pick || "Apuesta registrada", status: payload.result || "" }];
 
-    drawGrid(ctx);
-    drawBrand(ctx);
-
-    ctx.strokeStyle = "rgba(245,245,245,0.1)";
-    ctx.fillStyle = "rgba(245,245,245,0.028)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    roundedRect(ctx, 86, 178, 908, 806, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = green;
-    ctx.font = `850 20px ${mono}`;
-    ctx.fillText("> PICK REGISTRADO", 116, 246);
-
-    ctx.fillStyle = muted;
-    ctx.font = `750 18px ${mono}`;
-    ctx.fillText(String(payload.date || "--").toUpperCase(), 116, 292);
-    ctx.fillText(String(payload.competition || "SigmaBet").toUpperCase(), 116, 322);
-
-    ctx.fillStyle = text;
-    ctx.font = `900 70px ${sans}`;
-    wrapText(ctx, payload.match || "Partido", 116, 414, 710, 78, 2);
-
-    ctx.strokeStyle = `${state.color}66`;
-    ctx.fillStyle = `${state.color}12`;
-    ctx.beginPath();
-    roundedRect(ctx, 770, 272, 164, 46, 999);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = state.color;
-    ctx.font = `850 18px ${mono}`;
-    ctx.textAlign = "center";
-    ctx.fillText(state.label, 852, 302);
-    ctx.textAlign = "left";
-
-    ctx.fillStyle = state.color;
-    ctx.font = `900 56px ${mono}`;
-    ctx.textAlign = "right";
-    ctx.fillText(payload.profit || "0.00u", 934, 398);
-    ctx.textAlign = "left";
-
-    const metric = (label, value, x, y, width) => {
-      ctx.strokeStyle = "rgba(245,245,245,0.1)";
-      ctx.fillStyle = "rgba(0,0,0,0.2)";
-      ctx.beginPath();
-      roundedRect(ctx, x, y, width, 82, 10);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = text;
-      ctx.font = `850 30px ${mono}`;
-      ctx.fillText(value || "--", x + 22, y + 39);
-      ctx.fillStyle = muted;
-      ctx.font = `800 15px ${mono}`;
-      ctx.fillText(label, x + 22, y + 62);
+    // Medir antes de dibujar para conservar encuentros y selecciones completos.
+    const linesFor = (value, maxWidth) => {
+      const words = String(value || "").trim().split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = "";
+      for (const word of words) {
+        if (ctx.measureText(word).width > maxWidth) {
+          if (line) { lines.push(line); line = ""; }
+          for (const character of word) {
+            if (line && ctx.measureText(line + character).width > maxWidth) {
+              lines.push(line);
+              line = "";
+            }
+            line += character;
+          }
+        } else if (line && ctx.measureText(`${line} ${word}`).width > maxWidth) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = line ? `${line} ${word}` : word;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
     };
-
-    metric("CUOTA", payload.odd || "--", 116, 484, 252);
-    metric("STAKE", payload.stake || "--", 386, 484, 252);
-    metric("UDS.", payload.profit || "--", 656, 484, 278);
-
-    ctx.fillStyle = muted;
-    ctx.font = `850 18px ${mono}`;
-    ctx.fillText("SELECCIONES", 116, 638);
-
-    ctx.strokeStyle = "rgba(245,245,245,0.11)";
-    ctx.lineWidth = 2;
-    const circleX = 136;
-    const textX = 174;
-    const rowHeight = 74;
-    const visibleSelections = selections.slice(0, 3);
-    const centers = visibleSelections.map((_, index) => 674 + index * rowHeight);
-
-    if (centers.length > 1) {
-      ctx.strokeStyle = "rgba(245,245,245,0.18)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(circleX, centers[0]);
-      ctx.lineTo(circleX, centers[centers.length - 1]);
-      ctx.stroke();
-    }
-
-    visibleSelections.forEach((selection, index) => {
-      const centerY = centers[index];
-      drawSelectionStatus(ctx, circleX, centerY, selection.status || payload.result || "");
-      ctx.fillStyle = text;
-      ctx.font = `850 27px ${sans}`;
-      wrapText(ctx, selection.text || "Selección", textX, centerY - 8, 720, 30, 2);
+    let titleSize = 54;
+    let titleLines;
+    do {
+      ctx.font = `750 ${titleSize}px ${sans}`;
+      titleLines = linesFor(payload.match || "Partido", 872);
+      if (titleLines.length <= 3 || titleSize <= 34) break;
+      titleSize -= 2;
+    } while (true);
+    const titleLineHeight = Math.ceil(titleSize * 1.16);
+    const titleTop = 278;
+    const selectionsTop = Math.max(388, titleTop + titleLines.length * titleLineHeight + 30);
+    ctx.font = `650 26px ${sans}`;
+    const selectionRows = selections.map((selection) => {
+      const lines = linesFor(selection.text || "Selección", 772);
+      return { ...selection, lines, height: Math.max(82, lines.length * 32 + 32) };
     });
+    const rowsBottom = selectionsTop + 36 + selectionRows.reduce((sum, row) => sum + row.height + 12, 0);
+    const resultTop = Math.max(738, rowsBottom + 40);
+    const footerTop = Math.max(962, resultTop + 208);
+    canvas.height = Math.max(1080, footerTop + 102);
 
-    if (selections.length > visibleSelections.length) {
-      ctx.fillStyle = muted;
-      ctx.font = `750 22px ${mono}`;
-      ctx.fillText(`+${selections.length - visibleSelections.length} selecciones más`, textX, 674 + visibleSelections.length * rowHeight + 4);
+    const box = (x, y, width, height, radius, fill, stroke, borderWidth = 1) => {
+      ctx.beginPath();
+      roundedRect(ctx, x, y, width, height, radius);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = borderWidth; ctx.stroke(); }
+    };
+    const write = (value, x, y, size, weight = 600, color = text, align = "left") => {
+      ctx.font = `${weight} ${size}px ${sans}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = "top";
+      ctx.fillText(String(value), x, y);
+    };
+    const fit = (value, x, y, width, size, weight = 650, color = text, align = "left") => {
+      let fitted = size;
+      do {
+        ctx.font = `${weight} ${fitted}px ${sans}`;
+        if (ctx.measureText(String(value)).width <= width) break;
+        fitted -= 1;
+      } while (fitted > 12);
+      write(value, x, y, fitted, weight, color, align);
+    };
+    ctx.fillStyle = "#080909";
+    ctx.fillRect(0, 0, 1080, canvas.height);
+    ctx.strokeStyle = "rgba(0,255,127,0.055)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 64; x < 1080; x += 64) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
+    for (let y = 64; y < canvas.height; y += 64) { ctx.moveTo(0, y); ctx.lineTo(1080, y); }
+    ctx.stroke();
+    const glow = ctx.createRadialGradient(950, 180, 0, 950, 180, 720);
+    glow.addColorStop(0, "#FFFFFF04");
+    glow.addColorStop(1, "#FFFFFF00");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 1080, canvas.height);
+    drawBrand(ctx);
+    write(payload.date || "Registro público", 976, 100, 19, 500, "#ADADAD", "right");
+    box(64, 178, 952, footerTop - 178, 26, "#111313");
+    const cardGlow = ctx.createRadialGradient(1016, footerTop, 0, 1016, footerTop, 760);
+    cardGlow.addColorStop(0, `${state.color}38`);
+    cardGlow.addColorStop(0.5, `${state.color}12`);
+    cardGlow.addColorStop(1, `${state.color}00`);
+    box(64, 178, 952, footerTop - 178, 26, cardGlow, state.color, 3);
+    // La liga actúa como antetítulo, sin duplicar etiquetas ni añadir otro contenedor.
+    fit(String(payload.competition || "Registro SigmaBet"), 104, 231, 580, 20, 550, "#AEBBB4");
+    const ticketStatus = state.label === "GANADO" ? "GANADOR" : state.label;
+    ctx.font = `800 22px ${sans}`;
+    const tabWidth = Math.max(184, ctx.measureText(ticketStatus).width + 100);
+    const tabRight = 990;
+    const tabLeft = tabRight - tabWidth;
+    // Dos curvas tangentes por lado forman una unión continua con el borde.
+    ctx.beginPath();
+    ctx.moveTo(tabLeft, 178);
+    ctx.arc(tabLeft, 204, 26, -Math.PI / 2, 0);
+    ctx.arc(tabLeft + 52, 204, 26, Math.PI, Math.PI / 2, true);
+    ctx.lineTo(tabRight - 52, 230);
+    ctx.arc(tabRight - 52, 204, 26, Math.PI / 2, 0, true);
+    ctx.arc(tabRight, 204, 26, Math.PI, Math.PI * 1.5);
+    ctx.lineTo(tabLeft, 178);
+    ctx.fillStyle = state.color;
+    ctx.fill();
+    write(ticketStatus, (tabLeft + tabRight) / 2, 192, 22, 800, "#08120D", "center");
+    titleLines.forEach((line, index) => write(line, 104, titleTop + index * titleLineHeight, titleSize, 750));
+
+    write("SELECCIONES", 104, selectionsTop, 15, 650, "#9BA3A0");
+    let rowTop = selectionsTop + 36;
+    for (const selection of selectionRows) {
+      box(104, rowTop, 872, selection.height, 12, "#FFFFFF03", "#FFFFFF0C");
+      const selectionState = resultColors(selection.status || "", "");
+      const centerY = rowTop + selection.height / 2;
+      box(122, centerY - 17, 34, 34, 17, "#FFFFFF08");
+      ctx.beginPath();
+      ctx.strokeStyle = selectionState.color;
+      ctx.lineWidth = 2.5;
+      if (selectionState.label === "GANADO") { ctx.moveTo(131, centerY); ctx.lineTo(137, centerY + 6); ctx.lineTo(147, centerY - 6); }
+      else if (selectionState.label === "PERDIDO") { ctx.moveTo(133, centerY - 6); ctx.lineTo(145, centerY + 6); ctx.moveTo(145, centerY - 6); ctx.lineTo(133, centerY + 6); }
+      else { ctx.moveTo(133, centerY); ctx.lineTo(145, centerY); }
+      ctx.stroke();
+      const textTop = rowTop + (selection.height - selection.lines.length * 32) / 2;
+      selection.lines.forEach((line, index) => write(line, 176, textTop + index * 32, 26, 650));
+      rowTop += selection.height + 12;
+    }
+    if (!isPending) {
+      write("RESULTADO EN UNIDADES", 976, resultTop + 26, 13, 650, "#ADB4B1", "right");
+      fit(payload.profit || "—", 976, resultTop + 62, 296, 52, 750, state.color, "right");
+    }
+    // Valor Sigma conserva el distintivo utilizado en la web.
+    write("VALOR SIGMA", 266, resultTop + 26, 13, 600, "#ADB4B1");
+    {
+      const x = 266;
+      const sigmaValue = (String(payload.valorSigma ?? "").trim() || "—").replace(/(\d)\.(?=\d)/g, "$1,");
+        const badgeY = resultTop + 61;
+        ctx.font = `650 26px ${sans}`;
+        const badgeWidth = Math.min(196, Math.max(130, ctx.measureText(sigmaValue).width + 64));
+        const badgeFill = ctx.createLinearGradient(x, badgeY, x + badgeWidth, badgeY + 48);
+        badgeFill.addColorStop(0, "#56CAFF1C");
+        badgeFill.addColorStop(1, "#56CAFF08");
+        box(x, badgeY, badgeWidth, 48, 9, badgeFill, "#83D9FF40");
+        const dx = x + 13, dy = badgeY + 10, scale = 1.1;
+        const path = (points) => {
+          ctx.moveTo(dx + points[0][0] * scale, dy + points[0][1] * scale);
+          points.slice(1).forEach(([px, py]) => ctx.lineTo(dx + px * scale, dy + py * scale));
+        };
+        ctx.beginPath();
+        path([[7,4],[17,4],[22,10],[12,21],[2,10],[7,4]]);
+        path([[7,4],[12,21],[17,4]]);
+        path([[2,10],[22,10]]);
+        path([[7,4],[12,10],[17,4]]);
+        ctx.strokeStyle = "#9CE2FF"; ctx.lineWidth = 1.65; ctx.lineJoin = "round"; ctx.stroke();
+        fit(sigmaValue, x + 49, badgeY + 10, badgeWidth - 61, 26, 650, "#9CE2FF");
+    }
+    write("STAKE", 490, resultTop + 26, 13, 600, "#ADB4B1");
+    fit(payload.stake || "—", 490, resultTop + 68, 132, 30);
+    write("CUOTA", 104, resultTop + 26, 13, 600, "#ADB4B1");
+    if (payload.originalOdd) {
+      const original = String(payload.originalOdd).replace(".", ",");
+      const final = String(payload.odd || "—").replace(".", ",");
+      const combined = `${original} → ${final}`;
+      let oddSize = 22;
+      while (oddSize > 12) {
+        ctx.font = `650 ${oddSize}px ${sans}`;
+        if (ctx.measureText(combined).width <= 140) break;
+        oddSize--;
+      }
+      write(combined, 104, resultTop + 72, oddSize, 650);
+      ctx.font = `650 ${oddSize}px ${sans}`;
+      ctx.beginPath(); ctx.moveTo(104, resultTop + 72 + oddSize * .55);
+      ctx.lineTo(104 + ctx.measureText(original).width, resultTop + 72 + oddSize * .55);
+      ctx.strokeStyle = "#A5AFA9"; ctx.lineWidth = 1.5; ctx.stroke();
+    } else {
+      fit(payload.odd || "—", 104, resultTop + 68, 140, 30);
     }
 
-    ctx.strokeStyle = "rgba(245,245,245,0.08)";
-    ctx.beginPath();
-    ctx.moveTo(116, 958);
-    ctx.lineTo(934, 958);
-    ctx.stroke();
-    ctx.fillStyle = muted;
-    ctx.font = `750 18px ${mono}`;
-    ctx.fillText("+18 · Juego responsable · No hay apuestas seguras", 116, 1000);
-    ctx.fillStyle = green;
-    ctx.font = `850 22px ${mono}`;
-    ctx.fillText("@SigmaBetES", 732, 1000);
+    write("REGISTRO PÚBLICO · sigmabet.es", 104, footerTop - 42, 14, 550, "#7D8983");
+    write("Más datos. Menos fe.", 104, footerTop + 26, 19, 650, "#CBCFCB");
+    write("@SigmaBetES", 976, footerTop + 24, 22, 700, green, "right");
+    write("+18 · Juego responsable · No hay apuestas seguras", 104, footerTop + 59, 13, 500, "#858B87");
     return canvas;
   };
 
